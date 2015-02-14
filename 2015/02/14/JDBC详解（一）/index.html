@@ -4,21 +4,75 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>Hexo</title>
+  <title>jdbc_01 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="John Doe">
   
   
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/">
+    <meta name="description" content="JDBC API
+下面介绍了常用的JDBC API：
+
+Driver
+Connection
+DriverManager
+Statement
+PreparedStatement
+ResultSet
+ResultSetMetaData
+
+还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！
+Driver和Connection接口
+Driver是数据库">
+  
+  <meta name="description" content="JDBC API
+下面介绍了常用的JDBC API：
+
+Driver
+Connection
+DriverManager
+Statement
+PreparedStatement
+ResultSet
+ResultSetMetaData
+
+还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！
+Driver和Connection接口
+Driver是数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jdbc_01">
+<meta property="og:url" content="http://yoursite.com/2015/02/14/JDBC详解（一）/">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description">
+<meta property="og:description" content="JDBC API
+下面介绍了常用的JDBC API：
+
+Driver
+Connection
+DriverManager
+Statement
+PreparedStatement
+ResultSet
+ResultSetMetaData
+
+还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！
+Driver和Connection接口
+Driver是数据库">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
-<meta name="twitter:description">
+<meta name="twitter:title" content="jdbc_01">
+<meta name="twitter:description" content="JDBC API
+下面介绍了常用的JDBC API：
+
+Driver
+Connection
+DriverManager
+Statement
+PreparedStatement
+ResultSet
+ResultSetMetaData
+
+还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！
+Driver和Connection接口
+Driver是数据库">
 
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -54,13 +108,7 @@
   </nav>
   <div class="clearfix"></div>
 </header>
-    <div class="content">
-
-
-
-
-  
-    <article class="post">
+    <div class="content"><article class="post">
   <header>
     
       <div class="icon"></div>
@@ -72,7 +120,7 @@
     
     
   
-    <h1 class="title"><a href="/2015/02/14/JDBC详解（一）/">jdbc_01</a></h1>
+    <h1 class="title">jdbc_01</h1>
   
 
   </header>
@@ -183,7 +231,7 @@
 
     
   </div>
-  <footer class="end-sep">
+  <footer>
     
       
       
@@ -191,66 +239,6 @@
     <div class="clearfix"></div>
   </footer>
 </article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/14/hello-world/">
-  <time datetime="2015-02-14T14:48:10.000Z">
-    Feb 14 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/14/hello-world/">Hello World</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2>
-<h3 id="Create_a_new_post">Create a new post</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-
-  <nav id="pagination">
-  
-  
-  <div class="clearfix"></div>
-</nav>
 
 </div>
   </div>
