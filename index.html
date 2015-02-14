@@ -64,6 +64,208 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2015/02/15/Oracle/查询和过滤、排序操作/">
+  <time datetime="2015-02-14T17:05:28.000Z">
+    2月 15 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/02/15/Oracle/查询和过滤、排序操作/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h3 id="SQL语句">SQL语句</h3>
+<p>SQL语句分为以下三种类型：</p>
+<ul>
+<li><p>DML: Data Manipulation Language 数据操纵语言。<br>DML用于查询与修改数据记录，包括如下SQL语句：</p>
+<ul>
+<li>INSERT：添加数据到数据库中；</li>
+<li>UPDATE：修改数据库中的数据；</li>
+<li>DELETE：删除数据库中的数据；</li>
+<li>SELECT：选择（查询）数据。</li>
+</ul>
+</li>
+<li><p>DDL:  Data Definition Language 数据定义语言。<br>DDL用于定义数据库的结构，比如创建、修改或删除数据库对象，包括如下SQL语句：</p>
+<ul>
+<li>CREATE TABLE：创建数据库表；</li>
+<li>ALTER  TABLE：更改表结构、添加、删除、修改列长度；</li>
+<li>DROP TABLE：删除表；</li>
+<li>CREATE INDEX：在表上建立索引；</li>
+<li>DROP INDEX：删除索引。</li>
+</ul>
+</li>
+<li><p>DCL:  Data Control Language 数据控制语言。<br>DCL用来控制数据库的访问，包括如下SQL语句：</p>
+<ul>
+<li>GRANT：授予访问权限；</li>
+<li>REVOKE：撤销访问权限；</li>
+<li>COMMIT：提交事务处理；</li>
+<li>ROLLBACK：事务处理回退；</li>
+<li>SAVEPOINT：设置保存点；</li>
+<li>LOCK：对数据库的特定部分进行锁定。</li>
+</ul>
+</li>
+</ul>
+<h3 id="查询操作">查询操作</h3>
+<p>使用<code>select</code>语句进行查询操作，注意下面几点：</p>
+<ul>
+<li><p>SQL大小写不敏感，但是字符串中字符则大小写敏感。</p>
+</li>
+<li><p>字符串只能出现在单引号中，例如：</p>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> <span class="string">'hello'</span> <span class="keyword">from</span> dual;</span> <span class="comment">-- 正确</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="string">"hello"</span> <span class="keyword">from</span> dual;</span> <span class="comment">-- 错误</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>列的别名紧跟列名，也可以在列名和别名之间加入关键字<code>as</code>，<code>as</code>也可以省略。别名使用双引号，以便在别名中包含空格或者特殊的字符并区分大小写。但也可以不用引号（此时应该避免使用关键字）。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">sysdate</span> <span class="keyword">as</span> <span class="keyword">now</span>, <span class="keyword">sysdate</span> <span class="keyword">as</span> <span class="string">"date"</span> <span class="keyword">from</span> dual;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>使用<code>||</code>符号可以连接字符串，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> <span class="string">'hello'</span> || <span class="string">'world'</span> <span class="keyword">from</span> dual;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>表示日期时也只能用单引号中，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> hiredate = <span class="comment">'17-11月-81;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li><p>使用DISTINCT可以去重。<br><strong>注意，当查询多个列时，DISTINCT一定要放在第一个列前，这时候表示对多个列的组合做去重，也就是相当于DISTINCT作用于每个列。同时DISTINCT不会忽略NULL值！</strong></p>
+</li>
+<li><p>空值问题：空值是无效的，未指定的，未知的或不可预知的值，包含空值的数学表达式的值都为空值。例如：</p>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">se</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，null不等于null，只能用<code>IS(NOT) NULL</code>进行空值比较。或者用<code>nvl(colName, 0)</code>进行虑空操作。</strong></p>
+<ul>
+<li>分页查询：分页查询需要查询3次，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> (<span class="keyword">select</span> e.*, rownum rn <span class="keyword">from</span> (<span class="keyword">select</span> * <span class="keyword">from</span> empl) e <span class="keyword">where</span> rownum &lt; <span class="number">10</span> ) <span class="keyword">where</span> rn &gt; <span class="number">2</span>;</span></div></pre></td></tr></table></figure>
+
+
+
+<h3 id="过滤和排序">过滤和排序</h3>
+<p>使用<code>where</code>和<code>order by</code>子句可以进行过滤和排序操作。注意下面几点：</p>
+<ul>
+<li>字符串大小写敏感，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- King大小写敏感</span></div><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> name = <span class="string">'King'</span>;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>日期中文格式为：DD-MON月-RR，使用日期进行查询时需要写在单引号中：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> hiredate = <span class="comment">'17-11月-81;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>比较运行符中，是否等于使用的是<code>=</code>而不是<code>==</code>。这种PLSQL中也是一样。</li>
+</ul>
+<ul>
+<li>模糊查询使用LIKE，而<code>%</code> 代表零个或多个字符(任意个字符)，<code>_</code> 代表一个字符。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> name <span class="keyword">like</span> <span class="string">'_o%'</span>;</span></div></pre></td></tr></table></figure>
+
+<p>如果要查询的字符串包含了<code>%</code>或者<code>_</code>，则要用<code>ESCAPE</code>声明一个转义符，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> name <span class="keyword">like</span> <span class="string">'\_o%'</span> <span class="keyword">escape</span> <span class="string">'\';</span></span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>判断是否为空值用<code>IS(NOT) NULL</code>，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> salary <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">null</span>;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>表示范围用<code>between ... and</code>或者<code>(not) in (...)</code>，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> emp <span class="keyword">where</span> salary <span class="keyword">between</span> <span class="number">5000</span> <span class="keyword">and</span> <span class="number">8000</span>;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>逻辑运算符有<code>AND</code>、<code>OR</code>和<code>NOT</code>。<br><strong>一个简单的优化技巧，Oracle数据库是从右向左解析，当用AND时，尽量把false的放置在语句的右边；当用OR时，尽量把true的放置在语句的右边。</strong></li>
+</ul>
+<h3 id="补充一些基本命令">补充一些基本命令</h3>
+<p>在命令行模式下执行下面命令。<br>把命令输出到文件中：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">spool <span class="built_in">c</span>:\<span class="number">123</span>.txt</div></pre></td></tr></table></figure>
+
+<p>清屏：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">host <span class="keyword">cls</span><span class="comment">;</span></div></pre></td></tr></table></figure>
+
+
+<p>显示当前用户：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">show</span> <span class="keyword">user</span>;</span></div></pre></td></tr></table></figure>
+
+
+<p>查询系统中的数据库表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> tabs;</span></div></pre></td></tr></table></figure>
+
+
+<p>查看某个数据库表的结构：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">desc</span> employee;</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/02/15/查询和过滤、排序操作/">
+  <time datetime="2015-02-14T17:05:07.000Z">
+    2月 15 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/02/15/查询和过滤、排序操作/">查询和过滤、排序操作</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2015/02/14/JDBC详解（一）/">
   <time datetime="2015-02-14T15:03:16.000Z">
     2月 14 2015
