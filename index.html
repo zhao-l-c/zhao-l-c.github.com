@@ -279,24 +279,33 @@
   
   <div class="entry">
     
-      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2>
-<h3 id="Create_a_new_post">Create a new post</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+      <h2 id="简单介绍">简单介绍</h2>
+<p>Hexo是一个快速、简单和强大的博客框架，基于Node.js技术。使用Hexo和Github可以搭建自己的博客系统。</p>
+<h2 id="软件安装">软件安装</h2>
+<h3 id="安装Node-js">安装Node.js</h3>
+<p>Node.js主要用于生成静态的HTML文件。Windows下直接下载安装文件即可。</p>
+<h3 id="安装Git">安装Git</h3>
+<p>Git的作用是把生成的静态HTML文件PUSH到你的Github上。</p>
+<h3 id="安装Hexo">安装Hexo</h3>
+<p>Windows下Node.js默认已经安装了npm，所以直接执行下面的命令即可使用npm安装Hexo：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="operator"><span class="keyword">install</span> hexo -g</span></div></pre></td></tr></table></figure>
 
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>参数<code>-g</code>表示全局安装。</p>
+<h2 id="创建博客">创建博客</h2>
+<h3 id="初始化博客根目录">初始化博客根目录</h3>
+<p>在某个目录下执行<code>hexo init</code>命令即可初始化博客的根目录，例如在D盘下执行：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo <span class="keyword">init</span> <span class="type">MyBlog</span></div></pre></td></tr></table></figure>
 
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>这时候D盘下就有名为MyBlog的文件夹，也就是需要的博客根目录。也可以先创建一个MyBlog文件夹，然后在里面执行<code>hexo init</code>就行了。</p>
+<h3 id="安装依赖包">安装依赖包</h3>
+<p>执行下面的命令安装依赖包：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="operator"><span class="keyword">install</span></span></div></pre></td></tr></table></figure>
 
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+<p>（这个命令会根据package.json文件中的说明下载一些Hexo依赖的文件。）</p>
+<p>…未完</p>
+<blockquote>
+<p>参考资料<br><a href="http://www.jianshu.com/p/821fe67e712b" target="_blank" rel="external">Hexo搭建Github Pages托管的静态个人博客</a><br><a href="http://hexo.io/" target="_blank" rel="external">hexo官网</a></p>
+</blockquote>
 
     
   </div>
