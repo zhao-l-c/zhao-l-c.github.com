@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Oracle基础（三）：多表查询 | LC的学习笔记</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="zlc">
+  
+  
+    <meta name="description" content="多表查询
+下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。
+笛卡尔集
+例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：
+1234567-- 4 条记录select count(d.deptno) from dept d; -- 19 条记录select count(j.job_id) from jobs j;  -- 76 条记录，没有添加连接条件，得到">
+  
+  <meta name="description" content="多表查询
+下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。
+笛卡尔集
+例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：
+1234567-- 4 条记录select count(d.deptno) from dept d; -- 19 条记录select count(j.job_id) from jobs j;  -- 76 条记录，没有添加连接条件，得到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oracle基础（三）：多表查询">
+<meta property="og:url" content="http://yoursite.com/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/">
+<meta property="og:site_name" content="LC的学习笔记">
+<meta property="og:description" content="多表查询
+下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。
+笛卡尔集
+例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：
+1234567-- 4 条记录select count(d.deptno) from dept d; -- 19 条记录select count(j.job_id) from jobs j;  -- 76 条记录，没有添加连接条件，得到">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oracle基础（三）：多表查询">
+<meta name="twitter:description" content="多表查询
+下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。
+笛卡尔集
+例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：
+1234567-- 4 条记录select count(d.deptno) from dept d; -- 19 条记录select count(j.job_id) from jobs j;  -- 76 条记录，没有添加连接条件，得到">
+
+  
+    <link rel="alternate" href="/atom.xml" title="LC的学习笔记" type="application/atom+xml">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LC的学习笔记</a></h1>
+    <p><a href="/">平时学习的内容整理为简单的教程，避免过目即忘</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/">Home</a></li>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+      
+        <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/">
+  <time datetime="2015-02-22T12:56:41.000Z">
+    2月 22 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Oracle基础（三）：多表查询</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h2 id="多表查询">多表查询</h2>
+<p>下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。</p>
+<h3 id="笛卡尔集">笛卡尔集</h3>
+<p>例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- 4 条记录</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(d.deptno) <span class="keyword">from</span> dept d;</span> </div><div class="line"><span class="comment">-- 19 条记录</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(j.job_id) <span class="keyword">from</span> jobs j;</span> </div><div class="line"> </div><div class="line"><span class="comment">-- 76 条记录，没有添加连接条件，得到的是笛卡尔集</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(*) <span class="keyword">from</span> dept, jobs;</span></div></pre></td></tr></table></figure>
+
+<p>这和使用SQL语法时的<code>CORSS JOIN</code>意义一致。<br>为了避免笛卡尔集， 可以在 WHERE 加入有效的连接条件。</p>
+<a id="more"></a>
+<h3 id="连接条件的类型">连接条件的类型</h3>
+<h4 id="等值连接">等值连接</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> e.ename,e.sal,e.empno,d.dname <span class="keyword">from</span> emp e,dept d <span class="keyword">where</span> e.deptno=d.deptno;</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，连接多n个表至少需要n-1个连接条件。</strong></p>
+<h4 id="不等值连接">不等值连接</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> e.last_name, e.salary, j.grade_level <span class="keyword">FROM</span> employees e, job_grades j <span class="keyword">WHERE</span> e.salary <span class="keyword">BETWEEN</span> j.lowest_sal <span class="keyword">AND</span> j.highest_sal;</span></div></pre></td></tr></table></figure>
+
+
+<h4 id="外连接">外连接</h4>
+<p>使用外连接可以查询不满足连接条件的数据，归根到底是NULL不能用于比较的问题。</p>
+<p><strong>两个表在连接过程中除了返回满足连接条件的行以外还返回左（或右）表中不满足条件的行 ，这种连接称为左（或右） 外连接。没有匹配的行时, 结果表中相应的列为空(NULL)。连接条件中没有匹配行的表的列后面要加外连接运算符，即用圆括号括起来的加号<code>(+)</code>。</strong><br>左外连接：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> table1.<span class="keyword">column</span>, table2.<span class="keyword">column</span></span></div><div class="line">  <span class="keyword">FROM</span> table1, table2</div><div class="line"><span class="keyword">WHERE</span> table1.<span class="keyword">column</span> = table2.<span class="keyword">column</span>(+);</div></pre></td></tr></table></figure>
+
+<p>右外连接：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> table1.<span class="keyword">column</span>, table2.<span class="keyword">column</span></span></div><div class="line">  <span class="keyword">FROM</span> table1, table2</div><div class="line"><span class="keyword">WHERE</span> table1.<span class="keyword">column</span>(+) = table2.<span class="keyword">column</span>;</div></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># 按部门统计部门编号，部门名称和该部门的人数</div><div class="line"><span class="operator"><span class="keyword">select</span> d.department_id, d.department_name, <span class="keyword">count</span>(e.employee_id)</span></div><div class="line">  <span class="keyword">from</span> departments d, employees e</div><div class="line"><span class="keyword">where</span> d.department_id = e.department_id(+)</div><div class="line"><span class="keyword">group</span> <span class="keyword">by</span> d.department_id, d.department_name;</div></pre></td></tr></table></figure>
+
+<p>对于上面的示例：</p>
+<ul>
+<li>左外连接返回左表中不满足连接条件的行，由右表提供NULL连接，所以写法是：<code>d.department_id = e.department_id(+)</code>。</li>
+<li>右外连接返回右表中不满足连接条件的汉，有左表提供NULL连接，所以写法是：<code>d.department_id(+) = e.department_id</code>。</li>
+<li><strong>满外连接只能使用SQL99语法的<code>FULL OUTER JOIN ON</code>。</strong></li>
+</ul>
+<h4 id="自连接">自连接</h4>
+<p>概念：通过表的别名，将同一张表，视为多张表。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 有一条记录它的字段manager_id为空</div><div class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> employees <span class="keyword">where</span> manager_id <span class="keyword">is</span> <span class="literal">null</span>;</span></div><div class="line"></div><div class="line"><span class="operator"><span class="keyword">select</span> e1.last_name || <span class="string">' 的老板是 '</span> || e2.last_name</span></div><div class="line">  <span class="keyword">from</span> employees e1, employees e2</div><div class="line"><span class="keyword">where</span> e1.manager_id = e2.employee_id(+)</div><div class="line"><span class="keyword">order</span> <span class="keyword">by</span> e2.last_name <span class="keyword">desc</span>;</div></pre></td></tr></table></figure>
+
+<p>表e1的manager_id字段为NULL时，表e2的employee_id字段没有匹配行满足连接条件，所以在e2表后加<code>(+)</code>。</p>
+<p>注意：自连接理论上不适合操作数据量大的表，而要使用下面的层次查询。</p>
+<h3 id="SQL99外连接语法">SQL99外连接语法</h3>
+<p>外连接语法格式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span>    table1.<span class="keyword">column</span>, table2.<span class="keyword">column</span></span></div><div class="line">  <span class="keyword">FROM</span>    table1 [<span class="keyword">CROSS</span> <span class="keyword">JOIN</span> table2] |</div><div class="line">  [<span class="keyword">NATURAL</span> <span class="keyword">JOIN</span> table2] |</div><div class="line">  [<span class="keyword">JOIN</span> table2 <span class="keyword">USING</span> (column_name)] |</div><div class="line">  [<span class="keyword">JOIN</span> table2   <span class="keyword">ON</span>(table1.column_name = table2.column_name)] |</div><div class="line">  [<span class="keyword">LEFT</span>|<span class="keyword">RIGHT</span>|<span class="keyword">FULL</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> table2</div><div class="line">  <span class="keyword">ON</span> (table1.column_name = table2.column_name)];</div></pre></td></tr></table></figure>
+
+<h4 id="自然连接">自然连接</h4>
+<p>使用<code>NATURAL JOIN</code>子句，会以两个表中<strong>具有相同名字的列为条件创建等值连接</strong>，如果只是列名相同而数据类型不同，则会产生错误。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- natural join</span></div><div class="line"><span class="operator"><span class="keyword">SELECT</span> department_id, department_name, location_id, city</span></div><div class="line">  <span class="keyword">FROM</span> departments <span class="keyword">NATURAL</span></div><div class="line">  <span class="keyword">JOIN</span> locations;</div><div class="line"><span class="comment">-- 等价于</span></div><div class="line"><span class="operator"><span class="keyword">select</span> d.department_id, d.department_name, d.location_id, l.city</span></div><div class="line">  <span class="keyword">from</span> departments d, locations l</div><div class="line"><span class="keyword">where</span> d.location_id = l.location_id;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>如果有2表中有多个列的列名相等那怎么办？<br>方法是改用<code>JOIN USING</code>指定列名。<strong>注意：不要给选中的列中加上表名前缀或别名。</strong><br>例如上面的例子可以改写为：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> department_id, department_name, location_id, city</span></div><div class="line">  <span class="keyword">FROM</span> departments</div><div class="line">  <span class="keyword">JOIN</span> locations</div><div class="line"><span class="keyword">USING</span> (location_id);</div></pre></td></tr></table></figure>
+
+<ul>
+<li>NATURAL JOIN是以具有相同名字的列为连接条件的，但也可以使用<code>JOIN ON</code>子句指定额外的连接条件。<strong>这时候使用数据表的别名声明不同的列，而在<code>JOIN USING</code>中是不允许的。</strong><br>例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> d.department_id, d.department_name, d.location_id, l.city</span></div><div class="line">  <span class="keyword">FROM</span> departments d</div><div class="line">  <span class="keyword">JOIN</span> locations l</div><div class="line">    <span class="keyword">ON</span> (d.location_id = l.location_id);</div></pre></td></tr></table></figure>
+
+<p><code>JOIN ON</code>可以用于多个表的连接条件，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> d.department_id, d.department_name, d.location_id, l.city, e.first_name</span></div><div class="line">  <span class="keyword">FROM</span> departments d</div><div class="line">  <span class="keyword">JOIN</span> locations l</div><div class="line">    <span class="keyword">ON</span> (d.location_id = l.location_id)</div><div class="line">  <span class="keyword">JOIN</span> employees e</div><div class="line">    <span class="keyword">ON</span> (d.department_id = e.department_id);</div></pre></td></tr></table></figure>
+
+<h4 id="SQL99的左外连接">SQL99的左外连接</h4>
+<p>使用的语法是<code>LEFT OUTER JOIN ON</code>或者<code>LEFT JOIN ON</code>，即左边的表有不满足连接条件的记录，需要右边的表提供NULL连接条件。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- SQL99 左外连接</span></div><div class="line"><span class="operator"><span class="keyword">SELECT</span> e.last_name, e.department_id, d.department_name</span></div><div class="line">  <span class="keyword">FROM</span> employees e</div><div class="line">  <span class="keyword">LEFT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> departments d</div><div class="line">    <span class="keyword">ON</span> (e.department_id = d.department_id);</div><div class="line"><span class="comment">-- 相当于</span></div><div class="line"><span class="operator"><span class="keyword">select</span> e.last_name, e.department_id, d.department_name</span></div><div class="line">  <span class="keyword">from</span> employees e, departments d</div><div class="line">  <span class="keyword">where</span> e.department_id = d.department_id(+);</div></pre></td></tr></table></figure>
+
+
+<h4 id="SQL99的右外连接">SQL99的右外连接</h4>
+<p> 使用的语法是<code>RIGHT OUTER JOIN ON</code>或者<code>RIGHT JOIN ON</code>，即右边的表有不满足条件的记录，需要左边的表提供NULL连接条件。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> e.last_name, e.department_id, d.department_name</span></div><div class="line">  <span class="keyword">FROM</span> employees e</div><div class="line"><span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> departments d</div><div class="line">    <span class="keyword">ON</span> (e.department_id = d.department_id);</div><div class="line"><span class="comment">-- 相当于</span></div><div class="line"><span class="operator"><span class="keyword">select</span> e.last_name, e.department_id, d.department_name</span></div><div class="line">  <span class="keyword">from</span> employees e, departments d</div><div class="line"><span class="keyword">where</span> e.department_id(+) = d.department_id;</div></pre></td></tr></table></figure>
+
+
+<h4 id="SQL满外连接">SQL满外连接</h4>
+<p>使用的语法是<code>FULL OUTER JOIN ON</code>或者<code>FULL JOIN ON</code>。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> e.last_name, e.department_id, d.department_name</span></div><div class="line">  <span class="keyword">FROM</span> employees e</div><div class="line">  <span class="keyword">FULL</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> departments d</div><div class="line">    <span class="keyword">ON</span> (e.department_id = d.department_id);</div></pre></td></tr></table></figure>
+
+<h3 id="层次查询（Hierarchical_Queries_）">层次查询（Hierarchical Queries ）</h3>
+<blockquote>
+<p>参考资料<br><a href="http://docs.oracle.com/cd/B19306_01/server.102/b14200/queries003.htm" target="_blank" rel="external">Hierarchical Queries </a><br><a href="http://www.cnblogs.com/zhf/archive/2008/09/10/1288101.html" target="_blank" rel="external">Oracle中start with…connect by prior子句用法</a></p>
+</blockquote>
+<p>解决数据量大的表自连接查询时效率低的问题，但是查询结果没有自连接直观。层次查询适合于树状结构的数据表。<br>基本语法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span>  [<span class="keyword">LEVEL</span>], [CONNECT_BY_ROOT <span class="keyword">column</span>] </span></div><div class="line">[<span class="keyword">JOIN</span> ]</div><div class="line">[<span class="keyword">WHERE</span>]</div><div class="line"><span class="keyword">CONNECT</span> <span class="keyword">BY</span> {<span class="keyword">PRIOR</span> column1= column2 | column1=<span class="keyword">PRIOR</span> column2}</div><div class="line">[<span class="keyword">START</span> <span class="keyword">WITH</span>]；</div></pre></td></tr></table></figure>
+
+<p>简单说明：</p>
+<ul>
+<li><p>PRIOR：置于CONNECT BY子句中等号的前面时，则强制从根节点到叶节点的顺序检索，即由父节点向子节点方向通过树结构，称之为<strong>自顶向下</strong>的方式。如：<code>connect by prior employee_id = manager_id</code>。<br>置于CONNECT BY 子句中等号的后面时，则强制从叶节点到根节点的顺序检索，即由子节点向父节点方向通过树结构，称之为<strong>自底向上</strong>的方式。例如：<code>connect by employee_id = prior manager_id</code>。</p>
+</li>
+<li><p>START WITH：用来标识哪个节点作为查找树型结构的根节点。若该子句被省略，则表示所有满足查询条件的行作为根节点。</p>
+</li>
+<li><p>LEVEL：在具有树结构的表中，每一行数据都是树结构中的一个节点，由于节点所处的层次位置不同，所以每行记录都可以有一个层号。</p>
+</li>
+<li><p>CONNECT_BY_ROOT：返回该列的最ROOT节点。</p>
+</li>
+<li><p>WHERE子句：在对树结构进行查询时，可以去掉表中的某些行，也可以剪掉树中的一个分支，使用WHERE子句来限定树型结构中的单个节点，以去掉树中的单个节点。</p>
+</li>
+<li><p>应该避免使用<code>ORDER BY</code>和<code>GROUP BY</code>子句，如果需要的话，排序要用<code>ORDER SIBLINGS BY</code>代替，而分组要在层次查询结果外进行分组。**</p>
+</li>
+</ul>
+<h4 id="示例">示例</h4>
+<p>查询员工姓名、编号、职位ID和上级员工的编号、职位ID：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">select</span> tt.*, nvl(f.job_id, <span class="string">'ROOT'</span>) boss_job_id</span></div><div class="line"><span class="keyword">from</span> (</div><div class="line"><span class="keyword">select</span> <span class="keyword">level</span>,</div><div class="line">       e.first_name || <span class="string">' '</span> || e.last_name name,</div><div class="line">       e.employee_id,</div><div class="line">       e.job_id,</div><div class="line">       nvl(e.manager_id, <span class="number">0</span>) boss_id</div><div class="line">  <span class="keyword">from</span> employees e</div><div class="line"><span class="keyword">connect</span> <span class="keyword">by</span> <span class="keyword">prior</span> e.employee_id = e.manager_id</div><div class="line"><span class="keyword">start</span> <span class="keyword">with</span> e.manager_id <span class="keyword">is</span> <span class="literal">null</span></div><div class="line">) tt, employees f</div><div class="line"><span class="keyword">where</span> tt.boss_id = f.employee_id(+)</div></pre></td></tr></table></figure>
+
+<p>测试CONNECT BY：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">SELECT employee_id, last_name, manager_id</div><div class="line">   FROM employees</div><div class="line">   CONNECT BY PRIOR employee_id = manager_id;</div><div class="line"> </div><div class="line">EMPLOYEE_ID LAST_NAME                 MANAGER_ID</div><div class="line">----------- ------------------------- ----------</div><div class="line">        <span class="number">101</span> Kochhar                          <span class="number">100</span></div><div class="line">        <span class="number">108</span> Greenberg                        <span class="number">101</span></div><div class="line">        <span class="number">109</span> Faviet                           <span class="number">108</span></div><div class="line">        <span class="number">110</span> Chen                             <span class="number">108</span></div><div class="line">        <span class="number">111</span> Sciarra                          <span class="number">108</span></div><div class="line">        <span class="number">112</span> Urman                            <span class="number">108</span></div><div class="line">        <span class="number">113</span> Popp                             <span class="number">108</span></div><div class="line">        <span class="number">200</span> Whalen                           <span class="number">101</span></div><div class="line"><span class="keyword">...</span></div></pre></td></tr></table></figure>
+
+<p>测试LEVEL Example ：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">SELECT employee_id, last_name, manager_id, LEVEL</div><div class="line">   FROM employees</div><div class="line">   CONNECT BY PRIOR employee_id = manager_id;</div><div class="line"> </div><div class="line">EMPLOYEE_ID LAST_NAME                 MANAGER_ID      LEVEL</div><div class="line">----------- ------------------------- ---------- ----------</div><div class="line">        <span class="number">101</span> Kochhar                          <span class="number">100</span>          <span class="number">1</span></div><div class="line">        <span class="number">108</span> Greenberg                        <span class="number">101</span>          <span class="number">2</span></div><div class="line">        <span class="number">109</span> Faviet                           <span class="number">108</span>          <span class="number">3</span></div><div class="line">        <span class="number">110</span> Chen                             <span class="number">108</span>          <span class="number">3</span></div><div class="line">        <span class="number">111</span> Sciarra                          <span class="number">108</span>          <span class="number">3</span></div><div class="line">        <span class="number">112</span> Urman                            <span class="number">108</span>          <span class="number">3</span></div><div class="line">        <span class="number">113</span> Popp                             <span class="number">108</span>          <span class="number">3</span></div><div class="line"><span class="keyword">...</span></div></pre></td></tr></table></figure>
+
+<p>测试START WITH ：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> last_name, employee_id, manager_id, <span class="keyword">LEVEL</span></span></div><div class="line">      <span class="keyword">FROM</span> employees</div><div class="line">      <span class="keyword">START</span> <span class="keyword">WITH</span> employee_id = <span class="number">100</span></div><div class="line">      <span class="keyword">CONNECT</span> <span class="keyword">BY</span> <span class="keyword">PRIOR</span> employee_id = manager_id</div><div class="line">      <span class="keyword">ORDER</span> SIBLINGS <span class="keyword">BY</span> last_name;</div><div class="line"></div><div class="line"> LAST_NAME                 EMPLOYEE_ID MANAGER_ID      LEVEL</div><div class="line"><span class="comment">------------------------- ----------- ---------- ----------</span></div><div class="line">King                              100                     1</div><div class="line">Cambrault                         148        100          2</div><div class="line">Bates                             172        148          3</div><div class="line">Bloom                             169        148          3</div><div class="line">Fox                               170        148          3</div><div class="line">Kumar                             173        148          3</div><div class="line">Ozer                              168        148          3</div><div class="line">Smith                             171        148          3</div><div class="line">De Haan                           102        100          2</div><div class="line">Hunold                            103        102          3</div><div class="line">Austin                            105        103          4</div><div class="line">Ernst                             104        103          4</div><div class="line">Lorentz                           107        103          4</div><div class="line">Pataballa                         106        103          4</div><div class="line">Errazuriz                         147        100          2</div><div class="line">Ande                              166        147          3</div><div class="line">Banda                             167        147          3</div><div class="line">...</div></pre></td></tr></table></figure>
+
+<p>测试CONNECT_BY_ROOT：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> last_name <span class="string">"Employee"</span>, CONNECT_BY_ROOT last_name <span class="string">"Manager"</span>,</span></div><div class="line">   <span class="keyword">LEVEL</span>-<span class="number">1</span> <span class="string">"Pathlen"</span>, SYS_CONNECT_BY_PATH(last_name, <span class="string">'/'</span>) <span class="string">"Path"</span></div><div class="line">   <span class="keyword">FROM</span> employees</div><div class="line">   <span class="keyword">WHERE</span> <span class="keyword">LEVEL</span> &gt; <span class="number">1</span> <span class="keyword">and</span> department_id = <span class="number">110</span></div><div class="line">   <span class="keyword">CONNECT</span> <span class="keyword">BY</span> <span class="keyword">PRIOR</span> employee_id = manager_id;</div><div class="line"> </div><div class="line">Employee        Manager         Pathlen Path</div><div class="line"><span class="comment">--------------- ------------ ---------- -----------------------------------</span></div><div class="line">Higgins         Kochhar               1 /Kochhar/Higgins</div><div class="line">Gietz           Kochhar               2 /Kochhar/Higgins/Gietz</div><div class="line">Gietz           Higgins               1 /Higgins/Gietz</div><div class="line">Higgins         King                  2 /King/Kochhar/Higgins</div><div class="line">Gietz           King                  3 /King/Kochhar/Higgins/Gietz</div></pre></td></tr></table></figure>
+
+<p>测试GROUP BY：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> name, <span class="keyword">SUM</span>(salary) <span class="string">"Total_Salary"</span> <span class="keyword">FROM</span> (</span></div><div class="line">   <span class="keyword">SELECT</span> CONNECT_BY_ROOT last_name <span class="keyword">as</span> name, Salary</div><div class="line">      <span class="keyword">FROM</span> employees</div><div class="line">      <span class="keyword">WHERE</span> department_id = <span class="number">110</span></div><div class="line">      <span class="keyword">CONNECT</span> <span class="keyword">BY</span> <span class="keyword">PRIOR</span> employee_id = manager_id)</div><div class="line">      <span class="keyword">GROUP</span> <span class="keyword">BY</span> name;</div><div class="line"> </div><div class="line">NAME                      Total_Salary</div><div class="line"><span class="comment">------------------------- ------------</span></div><div class="line">Gietz                             8300</div><div class="line">Higgins                          20300</div><div class="line">King                             20300</div><div class="line">Kochhar                          20300</div></pre></td></tr></table></figure>
+
+
+
+
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2015 <a href="/">zlc</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+</body>
+</html>
