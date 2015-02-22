@@ -1,360 +1,205 @@
-<!DOCTYPE HTML>
-<html>
+
+  <!DOCTYPE HTML>
+<html lang="zh-cn">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="UTF-8">
   
-  <title>Archives | LC的学习笔记</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  
+    <title>Archives | LC的学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
     <meta name="author" content="zlc">
-  
-  
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="LC的学习笔记">
-<meta property="og:url" content="http://yoursite.com/archives/">
-<meta property="og:site_name" content="LC的学习笔记">
-<meta property="og:description">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LC的学习笔记">
-<meta name="twitter:description">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
 
-  
-    <link rel="alternate" href="/atom.xml" title="LC的学习笔记" type="application/atom+xml">
-  
-  
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css" type="text/css">
-
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  
 </head>
 
-<body>
-  <div class="wrapper">
-    <header id="header">
-  <div class="title">
-    <h1><a href="/">LC的学习笔记</a></h1>
-    <p><a href="/">平时学习的内容整理为简单的教程，避免过目即忘</a></p>
-  </div>
-  <nav class="nav">
-    <ul>
-      
-        <li><a href="/">Home</a></li>
-      
-        <li><a href="/archives">Archives</a></li>
-      
-      
-        <li><a href="/atom.xml">RSS</a></li>
-      
-    </ul>
-    <div class="clearfix"></div>
-  </nav>
-  <div class="clearfix"></div>
-</header>
-    <div class="content">
-
-
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/">
-  <time datetime="2015-02-22T12:56:41.000Z">
-    2月 22 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/">Oracle基础（三）：多表查询</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <h2 id="多表查询">多表查询</h2>
-<p>下面介绍多表查询的内容，主要包括连接条件的使用和层次查询等。</p>
-<h3 id="笛卡尔集">笛卡尔集</h3>
-<p>例如有两个数据表，如果不添加任何连接条件，则查询结果的记录数为两个表记录的乘积：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- 4 条记录</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(d.deptno) <span class="keyword">from</span> dept d;</span> </div><div class="line"><span class="comment">-- 19 条记录</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(j.job_id) <span class="keyword">from</span> jobs j;</span> </div><div class="line"> </div><div class="line"><span class="comment">-- 76 条记录，没有添加连接条件，得到的是笛卡尔集</span></div><div class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">count</span>(*) <span class="keyword">from</span> dept, jobs;</span></div></pre></td></tr></table></figure>
-
-<p>这和使用SQL语法时的<code>CORSS JOIN</code>意义一致。<br>为了避免笛卡尔集， 可以在 WHERE 加入有效的连接条件。</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/#more" class="more-link">Read More</a>
-        </div>
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/22/Database/Oracle/Oracle基础（二）：单行函数和分组函数/">
-  <time datetime="2015-02-21T17:12:38.000Z">
-    2月 22 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/22/Database/Oracle/Oracle基础（二）：单行函数和分组函数/">Oracle基础（二）：单行函数和分组函数</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <h2 id="单行函数">单行函数</h2>
-<p>单行函数就是只有一个输入参数。包括下面这些。</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2015/02/22/Database/Oracle/Oracle基础（二）：单行函数和分组函数/#more" class="more-link">Read More</a>
-        </div>
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/15/Database/Oracle/Oracle基础（一）：查询、过滤、排序操作/">
-  <time datetime="2015-02-14T17:12:38.000Z">
-    2月 15 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/15/Database/Oracle/Oracle基础（一）：查询、过滤、排序操作/">Oracle基础（一）：查询、过滤、排序操作</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <h3 id="SQL语句">SQL语句</h3>
-<p>SQL语句分为以下三种类型：</p>
-<ul>
-<li><p>DML: Data Manipulation Language 数据操纵语言。<br>DML用于查询与修改数据记录，包括如下SQL语句：</p>
-<ul>
-<li>INSERT：添加数据到数据库中；</li>
-<li>UPDATE：修改数据库中的数据；</li>
-<li>DELETE：删除数据库中的数据；</li>
-<li>SELECT：选择（查询）数据。</li>
-</ul>
-</li>
-<li><p>DDL:  Data Definition Language 数据定义语言。<br>DDL用于定义数据库的结构，比如创建、修改或删除数据库对象，包括如下SQL语句：</p>
-<ul>
-<li>CREATE TABLE：创建数据库表；</li>
-<li>ALTER  TABLE：更改表结构、添加、删除、修改列长度；</li>
-<li>DROP TABLE：删除表；</li>
-<li>CREATE INDEX：在表上建立索引；</li>
-<li>DROP INDEX：删除索引。</li>
-</ul>
-</li>
-<li><p>DCL:  Data Control Language 数据控制语言。<br>DCL用来控制数据库的访问，包括如下SQL语句：</p>
-<ul>
-<li>GRANT：授予访问权限；</li>
-<li>REVOKE：撤销访问权限；</li>
-<li>COMMIT：提交事务处理；</li>
-<li>ROLLBACK：事务处理回退；</li>
-<li>SAVEPOINT：设置保存点；</li>
-<li>LOCK：对数据库的特定部分进行锁定。</li>
-</ul>
-</li>
-</ul>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2015/02/15/Database/Oracle/Oracle基础（一）：查询、过滤、排序操作/#more" class="more-link">Read More</a>
-        </div>
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/14/Java/JDBC/JDBC详解（一）/">
-  <time datetime="2015-02-14T15:03:16.000Z">
-    2月 14 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/14/Java/JDBC/JDBC详解（一）/">JDBC详解（一）</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <h2 id="JDBC_API">JDBC API</h2>
-<p>下面介绍了常用的JDBC API：</p>
-<ul>
-<li>Driver</li>
-<li>Connection</li>
-<li>DriverManager</li>
-<li>Statement</li>
-<li>PreparedStatement</li>
-<li>ResultSet</li>
-<li>ResultSetMetaData</li>
-</ul>
-<p>还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2015/02/14/Java/JDBC/JDBC详解（一）/#more" class="more-link">Read More</a>
-        </div>
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/14/使用Hexo搭建博客/">
-  <time datetime="2015-02-14T14:48:10.000Z">
-    2月 14 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/02/14/使用Hexo搭建博客/">使用Hexo搭建博客</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <h2 id="简单介绍">简单介绍</h2>
-<p>Hexo是一个快速、简单和强大的博客框架，基于Node.js技术。使用Hexo和Github可以搭建自己的博客系统。</p>
-<h2 id="软件安装">软件安装</h2>
-<h3 id="安装Node-js">安装Node.js</h3>
-<p>Node.js主要用于生成静态的HTML文件。Windows下直接下载安装文件即可。</p>
-<h3 id="安装Git">安装Git</h3>
-<p>Git的作用是把生成的静态HTML文件PUSH到你的Github上。</p>
-<h3 id="安装Hexo">安装Hexo</h3>
-<p>Windows下Node.js默认已经安装了npm，所以直接执行下面的命令即可使用npm安装Hexo：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="operator"><span class="keyword">install</span> hexo -g</span></div></pre></td></tr></table></figure>
-
-<p>参数<code>-g</code>表示全局安装。</p>
-<h2 id="创建博客">创建博客</h2>
-<h3 id="初始化博客根目录">初始化博客根目录</h3>
-<p>在某个目录下执行<code>hexo init</code>命令即可初始化博客的根目录，例如在D盘下执行：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo <span class="keyword">init</span> <span class="type">MyBlog</span></div></pre></td></tr></table></figure>
-
-<p>这时候D盘下就有名为MyBlog的文件夹，也就是需要的博客根目录。也可以先创建一个MyBlog文件夹，然后在里面执行<code>hexo init</code>就行了。</p>
-<h3 id="安装依赖包">安装依赖包</h3>
-<p>执行下面的命令安装依赖包：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="operator"><span class="keyword">install</span></span></div></pre></td></tr></table></figure>
-
-<p>（这个命令会根据package.json文件中的说明下载一些Hexo依赖的文件。）</p>
-<p>…未完</p>
-<blockquote>
-<p>参考资料<br><a href="http://www.jianshu.com/p/821fe67e712b" target="_blank" rel="external">Hexo搭建Github Pages托管的静态个人博客</a><br><a href="http://hexo.io/" target="_blank" rel="external">hexo官网</a></p>
-</blockquote>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-
-  <nav id="pagination">
-  
-  
-  <div class="clearfix"></div>
-</nav>
-
+    <body>
+      <header>
+        <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的学习笔记" title="LC的学习笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的学习笔记">LC的学习笔记</a></h1>
+				<h2 class="blog-motto">平时学习的内容整理为简单的教程，避免过目即忘</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
 </div>
-  </div>
-  <footer id="footer"><div class="copyright">
+
+      </header>
+      <div id="container">
+        
+
+<div class="archive-title" >
+  <h2 class="archive-icon">Archives</h2>
   
-  &copy; 2015 <a href="/">zlc</a>
+  <div class="archiveslist archive-float clearfix">
+   <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a><span class="archive-list-count">5</span></li></ul>
+ </div>
   
 </div>
-<div class="theme-copyright">
-  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
-   | 
-  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+<div id="main" class="archive-part clearfix">
+  <div id="archive-page">
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/02/22/Database/Oracle/Oracle基础（三）：多表查询/" title="Oracle基础（三）：多表查询" itemprop="url">
+  
+    <h1 itemprop="name">Oracle基础（三）：多表查询</h1>
+    
+    <time datetime="2015-02-22T12:56:41.000Z" itemprop="datePublished">2月 22 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/02/22/Database/Oracle/Oracle基础（二）：单行函数和分组函数/" title="Oracle基础（二）：单行函数和分组函数" itemprop="url">
+  
+    <h1 itemprop="name">Oracle基础（二）：单行函数和分组函数</h1>
+    
+    <time datetime="2015-02-21T17:12:38.000Z" itemprop="datePublished">2月 22 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/02/15/Database/Oracle/Oracle基础（一）：查询、过滤、排序操作/" title="Oracle基础（一）：查询、过滤、排序操作" itemprop="url">
+  
+    <h1 itemprop="name">Oracle基础（一）：查询、过滤、排序操作</h1>
+    
+    <time datetime="2015-02-14T17:12:38.000Z" itemprop="datePublished">2月 15 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/02/14/Java/JDBC/JDBC详解（一）/" title="JDBC详解（一）" itemprop="url">
+  
+    <h1 itemprop="name">JDBC详解（一）</h1>
+    
+    <time datetime="2015-02-14T15:03:16.000Z" itemprop="datePublished">2月 14 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/02/14/使用Hexo搭建博客/" title="使用Hexo搭建博客" itemprop="url">
+  
+    <h1 itemprop="name">使用Hexo搭建博客</h1>
+    
+    <time datetime="2015-02-14T14:48:10.000Z" itemprop="datePublished">2月 14 2015</time>
+  </a>
+</section>
+
+
+  </div>
 </div>
-<div class="clearfix"></div></footer>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-<script src="/js/scale.fix.js"></script>
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
 
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
+      </div>
+      <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+      <script src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript">
-  (function($){
-    $('.fancybox').fancybox();
-  })(jQuery);
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
 </script>
 
-</body>
-</html>
+
+
+
+
+
+
+    </body>
+   </html>

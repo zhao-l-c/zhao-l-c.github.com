@@ -1,15 +1,14 @@
-<!DOCTYPE HTML>
-<html>
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="UTF-8">
   
-  <title>JDBC详解（一） | LC的学习笔记</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  
+    <title>JDBC详解（一） | LC的学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
     <meta name="author" content="zlc">
-  
-  
+    
     <meta name="description" content="JDBC API
 下面介绍了常用的JDBC API：
 
@@ -22,104 +21,83 @@ ResultSet
 ResultSetMetaData
 
 还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！">
-  
-  <meta name="description" content="JDBC API
-下面介绍了常用的JDBC API：
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
 
-Driver
-Connection
-DriverManager
-Statement
-PreparedStatement
-ResultSet
-ResultSetMetaData
-
-还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！">
-<meta property="og:type" content="article">
-<meta property="og:title" content="JDBC详解（一）">
-<meta property="og:url" content="http://yoursite.com/2015/02/14/Java/JDBC/JDBC详解（一）/">
-<meta property="og:site_name" content="LC的学习笔记">
-<meta property="og:description" content="JDBC API
-下面介绍了常用的JDBC API：
-
-Driver
-Connection
-DriverManager
-Statement
-PreparedStatement
-ResultSet
-ResultSetMetaData
-
-还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JDBC详解（一）">
-<meta name="twitter:description" content="JDBC API
-下面介绍了常用的JDBC API：
-
-Driver
-Connection
-DriverManager
-Statement
-PreparedStatement
-ResultSet
-ResultSetMetaData
-
-还介绍了使用反射的方法，根据属性名和属性值封装实体对象（也就是根据SQL语句的查询结果封装为实例对象）！">
-
-  
-    <link rel="alternate" href="/atom.xml" title="LC的学习笔记" type="application/atom+xml">
-  
-  
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css" type="text/css">
-
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  
 </head>
 
-<body>
-  <div class="wrapper">
-    <header id="header">
-  <div class="title">
-    <h1><a href="/">LC的学习笔记</a></h1>
-    <p><a href="/">平时学习的内容整理为简单的教程，避免过目即忘</a></p>
-  </div>
-  <nav class="nav">
-    <ul>
-      
-        <li><a href="/">Home</a></li>
-      
-        <li><a href="/archives">Archives</a></li>
-      
-      
-        <li><a href="/atom.xml">RSS</a></li>
-      
-    </ul>
-    <div class="clearfix"></div>
-  </nav>
-  <div class="clearfix"></div>
-</header>
-    <div class="content"><article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/02/14/Java/JDBC/JDBC详解（一）/">
-  <time datetime="2015-02-14T15:03:16.000Z">
-    2月 14 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title">JDBC详解（一）</h1>
-  
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的学习笔记" title="LC的学习笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的学习笔记">LC的学习笔记</a></h1>
+				<h2 class="blog-motto">平时学习的内容整理为简单的教程，避免过目即忘</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
 
-  </header>
-  
-  <div class="entry">
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
     
-      <h2 id="JDBC_API">JDBC API</h2>
+      <a href="/2015/02/14/Java/JDBC/JDBC详解（一）/" title="JDBC详解（一）" itemprop="url">JDBC详解（一）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-02-14T15:03:16.000Z" itemprop="datePublished">2月 14 2015</time>
+    Updated:<time datetime="2015-02-14T15:29:30.000Z" itemprop="dateModified">2月 14 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC_API"><span class="toc-number">1.</span> <span class="toc-text">JDBC API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Driver和Connection接口"><span class="toc-number">1.1.</span> <span class="toc-text">Driver和Connection接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DriverManager类"><span class="toc-number">1.2.</span> <span class="toc-text">DriverManager类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Statement接口"><span class="toc-number">1.3.</span> <span class="toc-text">Statement接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResultSet接口"><span class="toc-number">1.4.</span> <span class="toc-text">ResultSet接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PreparedStatement"><span class="toc-number">1.5.</span> <span class="toc-text">PreparedStatement</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResultSetMetaData"><span class="toc-number">1.6.</span> <span class="toc-text">ResultSetMetaData</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CallableStatement"><span class="toc-number">1.7.</span> <span class="toc-text">CallableStatement</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="JDBC_API">JDBC API</h2>
 <p>下面介绍了常用的JDBC API：</p>
 <ul>
 <li>Driver</li>
@@ -221,50 +199,218 @@ ResultSetMetaData
 <p>示例代码中调用的MySQL函数为：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">DELIMITER $$</div><div class="line"> </div><div class="line">USE `java3`$$</div><div class="line"> </div><div class="line">DROP <span class="keyword">FUNCTION</span> <span class="keyword">IF</span> EXISTS `fn_max`$$</div><div class="line"> </div><div class="line">CREATE DEFINER=`root`@`localhost` <span class="keyword">FUNCTION</span> `fn_max`(</div><div class="line">    param1 <span class="built_in">DOUBLE</span>,</div><div class="line">    param2 <span class="built_in">DOUBLE</span>,</div><div class="line">    param3 <span class="built_in">DOUBLE</span></div><div class="line">) RETURNS <span class="built_in">DOUBLE</span></div><div class="line">BEGIN</div><div class="line">    <span class="keyword">DECLARE</span> max_val <span class="built_in">DOUBLE</span>;</div><div class="line">    <span class="keyword">IF</span> param1 &gt; param2 <span class="keyword">THEN</span></div><div class="line">    <span class="keyword">SET</span> max_val = param1;</div><div class="line">    <span class="keyword">ELSE</span></div><div class="line">        <span class="keyword">SET</span> max_val = param2;</div><div class="line">    <span class="keyword">END</span> <span class="keyword">IF</span>;</div><div class="line"> </div><div class="line">    <span class="keyword">IF</span> param3 &gt; max_val <span class="keyword">THEN</span></div><div class="line">        <span class="keyword">SET</span> max_val = param3;</div><div class="line">    <span class="keyword">END</span> <span class="keyword">IF</span>;</div><div class="line">    <span class="keyword">RETURN</span> max_val;</div><div class="line"><span class="keyword">END</span>$$</div><div class="line"> </div><div class="line">DELIMITER ;</div></pre></td></tr></table></figure>
 
-
-    
-  </div>
-  <footer>
-    
-      
-      
-  <div class="tags">
-    <a class="tags-link" href="/tags/Java-JDBC/">Java JDBC</a>
-  </div>
-
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-</div>
-  </div>
-  <footer id="footer"><div class="copyright">
   
-  &copy; 2015 <a href="/">zlc</a>
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
   
+  <span></span> <a href="/tags/Java-JDBC/">Java JDBC</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/02/14/Java/JDBC/JDBC详解（一）/" data-title="JDBC详解（一） | LC的学习笔记" data-tsina="null" class="share clearfix">
+  </div>
+
 </div>
-<div class="theme-copyright">
-  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
-   | 
-  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/02/15/Database/Oracle/Oracle基础（一）：查询、过滤、排序操作/" title="Oracle基础（一）：查询、过滤、排序操作">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Oracle基础（一）：查询、过滤、排序操作</span>
+</a>
 </div>
-<div class="clearfix"></div></footer>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-<script src="/js/scale.fix.js"></script>
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
 
 
+<div class="next">
+<a href="/2015/02/14/使用Hexo搭建博客/"  title="使用Hexo搭建博客">
+ <strong>NEXT:</strong><br/> 
+ <span>使用Hexo搭建博客
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JDBC_API"><span class="toc-number">1.</span> <span class="toc-text">JDBC API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Driver和Connection接口"><span class="toc-number">1.1.</span> <span class="toc-text">Driver和Connection接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DriverManager类"><span class="toc-number">1.2.</span> <span class="toc-text">DriverManager类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Statement接口"><span class="toc-number">1.3.</span> <span class="toc-text">Statement接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResultSet接口"><span class="toc-number">1.4.</span> <span class="toc-text">ResultSet接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PreparedStatement"><span class="toc-number">1.5.</span> <span class="toc-text">PreparedStatement</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResultSetMetaData"><span class="toc-number">1.6.</span> <span class="toc-text">ResultSetMetaData</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CallableStatement"><span class="toc-number">1.7.</span> <span class="toc-text">CallableStatement</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Java-JDBC/" title="Java JDBC">Java JDBC<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Oracle-SQL/" title="Oracle SQL">Oracle SQL<sup>3</sup></a></li>
+		
+		</ul>
+</div>
 
 
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript">
-  (function($){
-    $('.fancybox').fancybox();
-  })(jQuery);
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
 </script>
 
-</body>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
 </html>
