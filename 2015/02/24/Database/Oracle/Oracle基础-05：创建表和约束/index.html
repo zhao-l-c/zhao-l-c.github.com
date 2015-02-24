@@ -9,6 +9,8 @@
     
     <meta name="author" content="zlc">
     
+    <meta name="description" itemprop="description" content="介绍Oracle使用约束的方法。">
+    
     
     
     
@@ -72,7 +74,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-02-24T04:47:07.000Z" itemprop="datePublished">2月 24 2015</time>
-    Updated:<time datetime="2015-02-24T04:47:07.000Z" itemprop="dateModified">2月 24 2015</time>
+    Updated:<time datetime="2015-02-24T05:13:30.000Z" itemprop="dateModified">2月 24 2015</time>
     
   </p>
 </header>
@@ -81,12 +83,160 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#创建表"><span class="toc-number">1.</span> <span class="toc-text">创建表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#约束"><span class="toc-number">2.</span> <span class="toc-text">约束</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#约束的创建"><span class="toc-number">2.1.</span> <span class="toc-text">约束的创建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#PRIMARY_KEY"><span class="toc-number">2.1.1.</span> <span class="toc-text">PRIMARY KEY</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NOT_NULL"><span class="toc-number">2.1.2.</span> <span class="toc-text">NOT NULL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UNIQUE"><span class="toc-number">2.1.3.</span> <span class="toc-text">UNIQUE</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#FOREIGN_KEY"><span class="toc-number">2.1.4.</span> <span class="toc-text">FOREIGN KEY</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CHECK"><span class="toc-number">2.1.5.</span> <span class="toc-text">CHECK</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改已创建表的约束"><span class="toc-number">2.2.</span> <span class="toc-text">修改已创建表的约束</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#添加或删除约束"><span class="toc-number">2.2.1.</span> <span class="toc-text">添加或删除约束</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#有效化或无效化约束"><span class="toc-number">2.2.2.</span> <span class="toc-text">有效化或无效化约束</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询约束"><span class="toc-number">2.3.</span> <span class="toc-text">查询约束</span></a></li></ol></li></ol>
 		</div>
 		
-		  
+		<h2 id="创建表">创建表</h2>
+<p>Oracle数据库的常见数据库对象包括：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表</td>
+<td>基本的数据存储集合，由行和列组成</td>
+</tr>
+<tr>
+<td>视图</td>
+<td>从表中抽出的逻辑上相关的数据集合</td>
+</tr>
+<tr>
+<td>序列</td>
+<td>提供有规律的数值</td>
+</tr>
+<tr>
+<td>索引</td>
+<td>提高查询的效率</td>
+</tr>
+<tr>
+<td>同义词</td>
+<td>给对象起别名</td>
+</tr>
+</tbody>
+</table>
+<p>这里将对表进行说明。</p>
+<p>Oracle数据库中的表包括：</p>
+<ul>
+<li><p>用户定义的表:<br>用户自己创建并维护的一组表，包含了用户所需的信息。<br>如：<code>SELECT * FROM user_tables;</code>查看用户创建的表。</p>
+</li>
+<li><p>数据字典：<br>由Oracle自动创建的一组表，包含数据库信息。<br>查看用户定义的表：</p>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> user_tables;</span></div></pre></td></tr></table></figure>
+
+<p>查看用户定义的各种数据库对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> user_objects;</span></div></pre></td></tr></table></figure>
+
+<p>查看用户定义的表，视图，同义词和序列：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> user_catalog;</span></div></pre></td></tr></table></figure>
+
+<blockquote>
+<p>创建表的方法省略，后面补充。</p>
+</blockquote>
+<h2 id="约束">约束</h2>
+<p>Oracle有以下五种约束：</p>
+<ul>
+<li>NOT NULL：非空。</li>
+<li>UNIQUE：唯一。</li>
+<li>PRIMARY KEY：主键。</li>
+<li>FOREIGN KEY：外键。</li>
+<li>CHECK：校验，例如性别只有男和女，年龄大于等于0等这些情况。</li>
+</ul>
+<p>定义约束时如果不指定约束名 ，Oracle 自动按照 SYS_Cn 的格式指定约束名。</p>
+<h3 id="约束的创建">约束的创建</h3>
+<p>创建表的同时定义约束的格式为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">column [CONSTRAINT constraint_name] constraint_<span class="built_in">type</span></div></pre></td></tr></table></figure>
+
+<p>这种方法称为列级约束，也就是分别在每一列的后面添加相应的约束。<br>还有一种方式为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">column,<span class="keyword">...</span>   [CONSTRAINT constraint_name] constraint_type   (column, <span class="keyword">...</span>)</div></pre></td></tr></table></figure>
+
+<p>这叫做表级约束，也就是定义完列后接着定义各种约束。</p>
+<p><strong>注意，NOT NULL只能以列级约束的格式定义。</strong></p>
+<p>列级约束举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span>  TABBLE  employees1(</span></div><div class="line">    employee_id <span class="built_in">NUMBER</span>(<span class="number">10</span>) <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>,</div><div class="line">    first_name VARCHAR2(<span class="number">20</span>)</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<p>表级约束举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> employees(</span></div><div class="line">    employee_id  <span class="built_in">NUMBER</span>(<span class="number">10</span>),</div><div class="line">    first_name   VARCHAR2(<span class="number">20</span>),</div><div class="line">    <span class="keyword">CONSTRAINT</span>   emp_emp_id_pk <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span> (EMPLOYEE_ID)</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<p>其中 emp_emp_id_pk 是为约束命名。</p>
+<h4 id="PRIMARY_KEY">PRIMARY KEY</h4>
+<p>举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>   departments(</span></div><div class="line">     department_id        <span class="built_in">NUMBER</span>(<span class="number">4</span>),</div><div class="line">     department_name      VARCHAR2(<span class="number">30</span>)       <span class="keyword">CONSTRAINT</span> dept_name_nn <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">     manager_id           <span class="built_in">NUMBER</span>(<span class="number">6</span>),</div><div class="line">     location_id          <span class="built_in">NUMBER</span>(<span class="number">4</span>),</div><div class="line">     <span class="keyword">CONSTRAINT</span> dept_id_pk <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>(department_id)</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<p><strong>注意，主键一定非空并且不能为NULL。</strong></p>
+<h4 id="NOT_NULL">NOT NULL</h4>
+<p>举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> employees(</span></div><div class="line">     employee_id    <span class="built_in">NUMBER</span>(<span class="number">6</span>),</div><div class="line">     last_name      VARCHAR2(<span class="number">25</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">     salary         <span class="built_in">NUMBER</span>(<span class="number">8</span>,<span class="number">2</span>),</div><div class="line">     commission_pct <span class="built_in">NUMBER</span>(<span class="number">2</span>,<span class="number">2</span>),</div><div class="line">     hire_date      <span class="built_in">DATE</span></div><div class="line">                    <span class="keyword">CONSTRAINT</span> emp_hire_date_nn</div><div class="line">                    <span class="keyword">NOT</span> <span class="literal">NULL</span></div></pre></td></tr></table></figure>
+
+
+
+<h4 id="UNIQUE">UNIQUE</h4>
+<p>举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> employees(</span></div><div class="line">     employee_id      <span class="built_in">NUMBER</span>(<span class="number">6</span>),</div><div class="line">     last_name        VARCHAR2(<span class="number">25</span>) <span class="keyword">UNIQUE</span>,</div><div class="line">     email            VARCHAR2(<span class="number">25</span>),</div><div class="line">     salary           <span class="built_in">NUMBER</span>(<span class="number">8</span>,<span class="number">2</span>),</div><div class="line">     commission_pct   <span class="built_in">NUMBER</span>(<span class="number">2</span>,<span class="number">2</span>),</div><div class="line">     hire_date        <span class="built_in">DATE</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">     <span class="keyword">CONSTRAINT</span> emp_email_uk <span class="keyword">UNIQUE</span>(email));</div></pre></td></tr></table></figure>
+
+<p><strong>注意，约束为UNIQUE的列可以插入值为NULL的字段，而且可以插入多行这样的记录。因为NULL和NULL之间并不能比较。</strong></p>
+<h4 id="FOREIGN_KEY">FOREIGN KEY</h4>
+<p>举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> employees(</span></div><div class="line">     employee_id      <span class="built_in">NUMBER</span>(<span class="number">6</span>),</div><div class="line">     last_name        VARCHAR2(<span class="number">25</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">     email            VARCHAR2(<span class="number">25</span>),</div><div class="line">     salary           <span class="built_in">NUMBER</span>(<span class="number">8</span>,<span class="number">2</span>),</div><div class="line">     commission_pct   <span class="built_in">NUMBER</span>(<span class="number">2</span>,<span class="number">2</span>),</div><div class="line">     hire_date        <span class="built_in">DATE</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">     department_id    <span class="built_in">NUMBER</span>(<span class="number">4</span>),</div><div class="line">     <span class="keyword">CONSTRAINT</span> emp_dept_fk <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (department_id) <span class="keyword">REFERENCES</span> departments(department_id) <span class="keyword">on</span> <span class="keyword">delete</span> <span class="keyword">cascade</span>,</div><div class="line">     <span class="keyword">CONSTRAINT</span> emp_email_uk <span class="keyword">UNIQUE</span>(email));</div></pre></td></tr></table></figure>
+
+<p><strong>外键格式稍复杂，需要用<code>REFERENCES</code>定义引用的父表中的哪个列。最后还要定义父表删除记录时子表记录的规则。</strong>包括：</p>
+<ul>
+<li>ON DELETE CASCADE：当父表中的列被删除时，子表中相对应的列也被删除；</li>
+<li>ON DELETE SET NULL：子表中相应的列置空。</li>
+</ul>
+<p><strong>注意却分此时哪个是父表，哪个是子表。</strong></p>
+<h4 id="CHECK">CHECK</h4>
+<p>举例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">create</span> <span class="keyword">table</span> test2(</span></div><div class="line">    tid <span class="built_in">number</span>,</div><div class="line">    tname varchar2(<span class="number">20</span>),</div><div class="line">    gender varchar2(<span class="number">4</span>) <span class="keyword">check</span> (gender <span class="keyword">in</span> (<span class="string">'男'</span>,<span class="string">'女'</span>)),</div><div class="line">    age <span class="built_in">number</span> <span class="keyword">check</span> (age &gt;=<span class="number">0</span> ),</div><div class="line">    sal <span class="built_in">number</span> <span class="keyword">check</span> (sal &gt; <span class="number">0</span>)</div><div class="line">);</div></pre></td></tr></table></figure>
+
+<h3 id="修改已创建表的约束">修改已创建表的约束</h3>
+<p>基本语法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="keyword">table</span></span></div><div class="line">  <span class="keyword">ADD</span>|<span class="keyword">DROP</span>|ENABLE|DISABLE [<span class="keyword">CONSTRAINT</span> <span class="keyword">constraint</span>] type (<span class="keyword">column</span>);</div></pre></td></tr></table></figure>
+
+<p>使用基本的语法<code>ALTER TABLE</code>可以：</p>
+<ul>
+<li>添加或者删除约束，但是不能修改约束；</li>
+<li>有效化或者无效化约束；</li>
+<li>例外的是，添加NOT NULL约束要加上<code>MODIFY</code>。</li>
+</ul>
+<h4 id="添加或删除约束">添加或删除约束</h4>
+<p>添加NOT NULL约束：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">alter</span> <span class="keyword">table</span> emp modify (empname varchar2(<span class="number">50</span>) <span class="keyword">not</span> <span class="literal">null</span>);</span></div></pre></td></tr></table></figure>
+
+<p>添加FOREIGN KEY约束：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> employees</span></div><div class="line"><span class="keyword">ADD</span> <span class="keyword">CONSTRAINT</span>  emp_manager_fk</div><div class="line">   <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span>(manager_id)</div><div class="line">   <span class="keyword">REFERENCES</span> employees(employee_id);</div></pre></td></tr></table></figure>
+
+<p>删除FOREIGIN KEY约束：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> employees</span></div><div class="line"><span class="keyword">DROP</span> <span class="keyword">CONSTRAINT</span> emp_manager_fk;</div></pre></td></tr></table></figure>
+
+<h4 id="有效化或无效化约束">有效化或无效化约束</h4>
+<p>无效化约束：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> employees</span></div><div class="line">DISABLE <span class="keyword">CONSTRAINT</span> emp_emp_id_pk;</div></pre></td></tr></table></figure>
+
+<p>激活约束：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> employees</span></div><div class="line">ENABLE <span class="keyword">CONSTRAINT</span> emp_emp_id_pk;</div></pre></td></tr></table></figure>
+
+<p><strong>注意，激活约束时，数据表中的数据要满足约束的条件。</strong><br>例如表中的某个字段的UNIQUE约束被DISABLE，然后插入重复数据。这是要重新激活UNIQUE约束，则必须先修改数据，保证该字段是唯一的。</p>
+<h3 id="查询约束">查询约束</h3>
+<p>要查询某个数据表中的约束，可以通过数据字典视图 USER_CONSTRAINTS，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> constraint_name, constraint_type, search_condition</span></div><div class="line"><span class="keyword">FROM</span> user_constraints</div><div class="line"><span class="keyword">WHERE</span> table_name = <span class="string">'EMPLOYEES'</span>;</div></pre></td></tr></table></figure>
+
+<p><strong>注意：table_name 的值要大写。</strong></p>
+<p>或者另一个数据字典USER_CONS_COLUMNS，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> constraint_name, column_name</span></div><div class="line">  <span class="keyword">FROM</span> user_cons_columns e</div><div class="line"><span class="keyword">WHERE</span> table_name = <span class="string">'EMPLOYEES'</span>;</div></pre></td></tr></table></figure>
+
+  
 	</div>
 		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Oracle/">Oracle</a><a href="/tags/SQL/">SQL</a>
+  </div>
 
 
 
@@ -127,7 +277,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#创建表"><span class="toc-number">1.</span> <span class="toc-text">创建表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#约束"><span class="toc-number">2.</span> <span class="toc-text">约束</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#约束的创建"><span class="toc-number">2.1.</span> <span class="toc-text">约束的创建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#PRIMARY_KEY"><span class="toc-number">2.1.1.</span> <span class="toc-text">PRIMARY KEY</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NOT_NULL"><span class="toc-number">2.1.2.</span> <span class="toc-text">NOT NULL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UNIQUE"><span class="toc-number">2.1.3.</span> <span class="toc-text">UNIQUE</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#FOREIGN_KEY"><span class="toc-number">2.1.4.</span> <span class="toc-text">FOREIGN KEY</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CHECK"><span class="toc-number">2.1.5.</span> <span class="toc-text">CHECK</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改已创建表的约束"><span class="toc-number">2.2.</span> <span class="toc-text">修改已创建表的约束</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#添加或删除约束"><span class="toc-number">2.2.1.</span> <span class="toc-text">添加或删除约束</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#有效化或无效化约束"><span class="toc-number">2.2.2.</span> <span class="toc-text">有效化或无效化约束</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询约束"><span class="toc-number">2.3.</span> <span class="toc-text">查询约束</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">
@@ -143,11 +293,11 @@
 		
 			<li><a href="/tags/Java-JDBC/" title="Java JDBC">Java JDBC<sup>1</sup></a></li>
 		
-			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>2</sup></a></li>
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
 		
-			<li><a href="/tags/Oracle-SQL/" title="Oracle SQL">Oracle SQL<sup>1</sup></a></li>
+			<li><a href="/tags/Oracle-SQL/" title="Oracle SQL">Oracle SQL<sup>0</sup></a></li>
 		
-			<li><a href="/tags/SQL/" title="SQL">SQL<sup>2</sup></a></li>
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
 		
 		</ul>
 </div>

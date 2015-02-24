@@ -9,6 +9,8 @@
     
     <meta name="author" content="zlc">
     
+    <meta name="description" itemprop="description" content="介绍Oracle的视图、序列和索引的使用。">
+    
     
     
     
@@ -72,7 +74,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-02-24T04:47:21.000Z" itemprop="datePublished">2月 24 2015</time>
-    Updated:<time datetime="2015-02-24T04:47:21.000Z" itemprop="dateModified">2月 24 2015</time>
+    Updated:<time datetime="2015-02-24T05:14:27.000Z" itemprop="dateModified">2月 24 2015</time>
     
   </p>
 </header>
@@ -81,12 +83,218 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#视图"><span class="toc-number">1.</span> <span class="toc-text">视图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建视图"><span class="toc-number">1.1.</span> <span class="toc-text">创建视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改视图"><span class="toc-number">1.2.</span> <span class="toc-text">修改视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#只读视图"><span class="toc-number">1.3.</span> <span class="toc-text">只读视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复杂视图"><span class="toc-number">1.4.</span> <span class="toc-text">复杂视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除视图"><span class="toc-number">1.5.</span> <span class="toc-text">删除视图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#序列"><span class="toc-number">2.</span> <span class="toc-text">序列</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的概念"><span class="toc-number">2.1.</span> <span class="toc-text">序列的概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的使用"><span class="toc-number">2.2.</span> <span class="toc-text">序列的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CURRVAL和NEXTVAL值"><span class="toc-number">2.3.</span> <span class="toc-text">CURRVAL和NEXTVAL值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的裂缝"><span class="toc-number">2.4.</span> <span class="toc-text">序列的裂缝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改序列"><span class="toc-number">2.5.</span> <span class="toc-text">修改序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除序列"><span class="toc-number">2.6.</span> <span class="toc-text">删除序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据字典中查询序列"><span class="toc-number">2.7.</span> <span class="toc-text">数据字典中查询序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CACHE选项的补充说明"><span class="toc-number">2.8.</span> <span class="toc-text">CACHE选项的补充说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#索引"><span class="toc-number">3.</span> <span class="toc-text">索引</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#索引的概念"><span class="toc-number">3.1.</span> <span class="toc-text">索引的概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建索引"><span class="toc-number">3.2.</span> <span class="toc-text">创建索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询索引"><span class="toc-number">3.3.</span> <span class="toc-text">查询索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除索引"><span class="toc-number">3.4.</span> <span class="toc-text">删除索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#同义词"><span class="toc-number">4.</span> <span class="toc-text">同义词</span></a></li></ol>
 		</div>
 		
-		  
+		<p>前面提到Oracle数据库的常见数据库对象包括：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表</td>
+<td>基本的数据存储集合，由行和列组成</td>
+</tr>
+<tr>
+<td>视图</td>
+<td>从表中抽出的逻辑上相关的数据集合</td>
+</tr>
+<tr>
+<td>序列</td>
+<td>提供有规律的数值</td>
+</tr>
+<tr>
+<td>索引</td>
+<td>提高查询的效率</td>
+</tr>
+<tr>
+<td>同义词</td>
+<td>给对象起别名</td>
+</tr>
+</tbody>
+</table>
+<p>这里将对序列、索引和同义词进行说明。</p>
+<h2 id="视图">视图</h2>
+<p>视图是一种虚表，它建立在已有表的基础上, 视图赖以建立的这些表称为<strong>基表</strong>。向视图提供数据内容的语句为SELECT语句，可以将视图理解为存储起来的 SELECT 语句。</p>
+<p>使用视图的目的：</p>
+<ul>
+<li>控制数据访问权限：数据表中可能某些敏感的数据列并不想被其它人访问，视图可以把允许访问的列的数据分离出来；</li>
+<li>同步修改：如果使用字表的方式实现类似功能，当修改了基表数据时并不能同步到字表中，但使用视图确可以解决这个问题；</li>
+<li>简化查询：视图中的数据可以从多表查询中得到，这样就避免了每次都使用多表查询。</li>
+</ul>
+<h3 id="创建视图">创建视图</h3>
+<p>基本的语法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> [<span class="keyword">OR</span> <span class="keyword">REPLACE</span>] [<span class="keyword">FORCE</span>|NOFORCE] <span class="keyword">VIEW</span> <span class="keyword">view</span></span></div><div class="line">  [(alias[, alias]...)]</div><div class="line"><span class="keyword">AS</span> subquery</div><div class="line">[<span class="keyword">WITH</span> <span class="keyword">CHECK</span> <span class="keyword">OPTION</span> [<span class="keyword">CONSTRAINT</span> <span class="keyword">constraint</span>]]</div><div class="line">[<span class="keyword">WITH</span> <span class="keyword">READ</span> <span class="keyword">ONLY</span> [<span class="keyword">CONSTRAINT</span> <span class="keyword">constraint</span>]];</div></pre></td></tr></table></figure>
+
+<blockquote>
+<p>准备测试的基表。<br>为了保证最原始的数据表不被修改，这里准备了2个新的数据表作为测试视图的基表，执行下面的代码即可：</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- emp_base</span></div><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp_base</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> employee_id, first_name, last_name, email, salary, department_id</div><div class="line">  <span class="keyword">FROM</span> employees;</div><div class="line"><span class="comment">-- dept_base</span></div><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept_base</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> department_id dept_id, department_name dept_name <span class="keyword">FROM</span> departments;</div></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">VIEW</span> emp_view</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> employee_id, first_name, salary</div><div class="line">  <span class="keyword">FROM</span> emp_base</div><div class="line"><span class="keyword">WHERE</span> department_id = <span class="number">80</span>;</div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>创建视图需要相应的权限，可以使用system用户执行下面命令为SCOTT用户赋予权限：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">grant</span> <span class="keyword">create</span> <span class="keyword">view</span> <span class="keyword">to</span> scott</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li>前面说过，视图会随基表的变化而变化，同样视图改变后基表中的数据也会改变。<br>例如修改视图的数据，此时查询发现基表的对应记录也变了：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">UPDATE</span> emp_view <span class="keyword">SET</span> salary = <span class="number">20000</span> <span class="keyword">WHERE</span> employee_id = <span class="number">150</span>;</span></div><div class="line"><span class="operator"><span class="keyword">COMMIT</span>;</span></div></pre></td></tr></table></figure>
+
+
+<p>同样修改基表的时候，视图中数据也会改变：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> emp_view;</span> <span class="comment">-- 34</span></div><div class="line"><span class="comment">-- 基表中插入一条新记录</span></div><div class="line"><span class="operator"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp_base <span class="keyword">VALUES</span>(<span class="number">208</span>, <span class="string">'Shelley'</span>, <span class="string">'Hartstein'</span>, <span class="string">'Hartstein'</span>, <span class="number">9000</span>, <span class="number">80</span>);</span></div><div class="line"><span class="operator"><span class="keyword">COMMIT</span>;</span></div><div class="line"><span class="comment">-- 视图也会多一条记录</span></div><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> emp_view;</span> <span class="comment">-- 35</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li>最后要注意的是，无论对基表还是视图的修改，都有满足约束的条件。例如从基表A中查询了3个字段作为视图B，这时候往视图B中插入记录，除了要满足视图B的约束条件外，还要满足基表A的约束条件，因为插入的记录最终是插入到基表中的（也就是增、删、改操作都是以基表为主）。</li>
+</ul>
+<h3 id="修改视图">修改视图</h3>
+<p>使用<code>CREATE OR REPLACE VIEW</code>语法格式即可修改视图，这里不做演示。</p>
+<h3 id="只读视图">只读视图</h3>
+<p>添加``的视图是只读视图，不能被修改。<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">VIEW</span> dept_readonly_view</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> dept_base <span class="keyword">WHERE</span> <span class="keyword">MOD</span>(dept_id/<span class="number">10</span>, <span class="number">2</span>) = <span class="number">0</span></div><div class="line"><span class="keyword">WITH</span> <span class="keyword">READ</span> <span class="keyword">ONLY</span>;</div><div class="line"><span class="comment">-- 不能执行修改操作</span></div><div class="line"><span class="operator"><span class="keyword">DELETE</span> <span class="keyword">from</span> dept_readonly_view <span class="keyword">WHERE</span> dept_id = <span class="number">20</span>;</span></div></pre></td></tr></table></figure>
+
+<h3 id="复杂视图">复杂视图</h3>
+<p>一般创建视图时使用了分组功能的都认为是复杂视图。<br>例如下面根据部门的平均工资创建视图：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">VIEW</span> dept_salary_view</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> e.department_id dept_id, d.dept_name, trunc(<span class="keyword">avg</span>(e.salary), <span class="number">2</span>) sal_avg</div><div class="line">  <span class="keyword">FROM</span> emp_base e, dept_base d</div><div class="line"><span class="keyword">WHERE</span> e.department_id = d.dept_id</div><div class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> e.department_id, d.dept_name;</div></pre></td></tr></table></figure>
+
+<p>复杂视图一般不能执行DML操作（增、删、改），也就是创建视图时使用了下面的元素：</p>
+<ul>
+<li>分组函数</li>
+<li>GROUP BY 子句</li>
+<li>DISTINCT 关键字</li>
+<li>ROWNUM 伪列</li>
+</ul>
+<p>除了ROWNUM外，其它都与分组有关。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">VIEW</span> sophisticated_emp_view</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span>(e.department_id), e.salary</div><div class="line"><span class="keyword">FROM</span> emp_base e;</div><div class="line"><span class="comment">-- 非法操作</span></div><div class="line"><span class="operator"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> sophisticated_emp_view <span class="keyword">WHERE</span> ROWNUM = <span class="number">1</span>;</span></div><div class="line"> </div><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">VIEW</span> sophisticated_dept_view</span></div><div class="line"><span class="keyword">AS</span></div><div class="line"><span class="keyword">SELECT</span> ROWNUM rn, d.*</div><div class="line"><span class="keyword">FROM</span> dept_base d;</div><div class="line"><span class="comment">-- 非法操作</span></div><div class="line"><span class="operator"><span class="keyword">UPDATE</span> sophisticated_dept_view <span class="keyword">SET</span> dept_name = <span class="string">'ITU'</span> <span class="keyword">WHERE</span> dept_id = <span class="number">280</span>;</span></div></pre></td></tr></table></figure>
+
+<h3 id="删除视图">删除视图</h3>
+<p>使用<code>DROP VIEW</code>命令即可删除视图。</p>
+<hr>
+<h2 id="序列">序列</h2>
+<h3 id="序列的概念">序列的概念</h3>
+<p>序列是可供多个用户用来产生唯一数值的数据库对象，它有下面的特点：</p>
+<ul>
+<li>自动提供唯一的数值；</li>
+<li>共享对象；</li>
+<li>主要用于提供主键值；</li>
+<li>将序列值装入内存可以提高访问效率；</li>
+</ul>
+<h3 id="序列的使用">序列的使用</h3>
+<p>创建序列的语法格式为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> SEQUENCE sequence</span></div><div class="line">       [INCREMENT <span class="keyword">BY</span> n]  <span class="comment">--每次增长的数值</span></div><div class="line">       [<span class="keyword">START</span> <span class="keyword">WITH</span> n]    <span class="comment">--从哪个值开始</span></div><div class="line">       [{MAXVALUE n | NOMAXVALUE}]</div><div class="line">       [{MINVALUE n | NOMINVALUE}]</div><div class="line">       [{CYCLE | NOCYCLE}]     <span class="comment">--是否需要循环</span></div><div class="line">       [{<span class="keyword">CACHE</span> n | NOCACHE}];  <span class="comment">--是否缓存登录</span></div></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> SEQUENCE test_seq</span></div><div class="line">INCREMENT <span class="keyword">BY</span> <span class="number">10</span></div><div class="line"><span class="keyword">START</span> <span class="keyword">WITH</span> <span class="number">10</span></div><div class="line"><span class="comment">-- 当序列的值超过50后并且设置了cycle，新的值为1，而不是10</span></div><div class="line">MAXVALUE <span class="number">50</span></div><div class="line">CYCLE</div><div class="line">NOCACHE;</div></pre></td></tr></table></figure>
+
+<h3 id="CURRVAL和NEXTVAL值">CURRVAL和NEXTVAL值</h3>
+<p><code>NEXTVAL</code>返回序列中下一个有效的值。<code>CURRVAL</code>中存放序列的当前值。</p>
+<p><strong>注意，<code>NEXTVAL</code>应在<code>CURRVAL</code>之前指定，否则会报<code>CURRVAL</code>尚未在此会话中定义的错误。</strong></p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> test_seq.nextval <span class="string">"next"</span>,test_seq.currval <span class="string">"curr"</span> <span class="keyword">FROM</span> dual;</span></div></pre></td></tr></table></figure>
+
+<p>前面说过，序列一般作为主键使用，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- 创建表</span></div><div class="line"><span class="operator"><span class="keyword">create</span> <span class="keyword">table</span> DEMO(</span></div><div class="line">  x <span class="built_in">NUMBER</span>(<span class="number">38</span>) <span class="keyword">not</span> <span class="literal">NULL</span> <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span></div><div class="line">);</div><div class="line"> </div><div class="line"><span class="comment">-- 创建序列</span></div><div class="line"><span class="operator"><span class="keyword">CREATE</span> SEQUENCE demo_seq</span></div><div class="line">INCREMENT <span class="keyword">BY</span> <span class="number">1</span></div><div class="line"><span class="keyword">START</span> <span class="keyword">WITH</span> <span class="number">1</span></div><div class="line">MAXVALUE <span class="number">100</span></div><div class="line">CYCLE</div><div class="line">NOCACHE;</div><div class="line"> </div><div class="line"><span class="comment">-- 使用序列插入主键</span></div><div class="line"><span class="operator"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> demo(x) <span class="keyword">VALUES</span>(demo_seq.nextval);</span></div><div class="line"><span class="operator"><span class="keyword">COMMIT</span>;</span></div><div class="line"> </div><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> demo;</span></div></pre></td></tr></table></figure>
+
+<h3 id="序列的裂缝">序列的裂缝</h3>
+<p>序列的裂缝即出现不连续递增的情况（即跳号），序列在下列情况下出现裂缝：</p>
+<ul>
+<li>回滚；</li>
+<li>系统异常；</li>
+<li>多个表同时使用同一序列。</li>
+</ul>
+<h3 id="修改序列">修改序列</h3>
+<p>使用<code>ALTER SEQUENCE</code>修改序列。</p>
+<p>可以修改序列的的增量，最大值，最小值，循环选项，或是否装入内存，<strong>但不能修改序列的初始值，除非先删除序列，然后重新创建序列。</strong></p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">ALTER</span> SEQUENCE demo_seq</span></div><div class="line">INCREMENT <span class="keyword">BY</span> <span class="number">2</span></div><div class="line">MAXVALUE <span class="number">1000</span></div><div class="line">NOCYCLE</div><div class="line"><span class="keyword">CACHE</span> <span class="number">10</span>;</div></pre></td></tr></table></figure>
+
+<h3 id="删除序列">删除序列</h3>
+<p>使用<code>DROP SEQUENCE</code>语句删除序列，删除之后，序列不能再次被引用。</p>
+<h3 id="数据字典中查询序列">数据字典中查询序列</h3>
+<p>可以查询数据字典视图 USER_SEQUENCES 获取序列定义信息。</p>
+<p>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- 查询数据字典中的序列</span></div><div class="line"><span class="operator"><span class="keyword">SELECT</span> *</span></div><div class="line">  <span class="keyword">FROM</span> user_sequences <span class="keyword">WHERE</span> sequence_name = <span class="string">'DEMO_SEQ'</span>;</div></pre></td></tr></table></figure>
+
+<p><strong>如果指定NOCACHE 选项，则列LAST_NUMBER 显示序列中下一个有效的值；如果设置了CACHE选项，则LAST_NUMBER 的值为缓存分配数字的值，对这个值的理解有助于理解CACHE的作用。</strong></p>
+<h3 id="CACHE选项的补充说明">CACHE选项的补充说明</h3>
+<blockquote>
+<p>参考资料<br><a href="http://blog.itpub.net/17203031/viewspace-717042/" target="_blank" rel="external">Oracle Sequence不设置cache参数的几个潜在问题 </a></p>
+</blockquote>
+<p>简单总结：CACHE就是Oracle每次向Sequence进行请求时，分配出的独立数字数量。例如，当我们使用NEXTVAL获取一个独立值时，Oracle需要将序列对象的数据字典信息更新。如果我们设置CACHE为10，那么第一次请求NEXTVAL的时候，就更新数据字典信息增加10，取出的10个号放在Oracle服务器的缓存中。</p>
+<p>在以后每次请求NEXTVAL的时候，Oracle就从服务器缓存中去获取序列值。而不需要更新数据字典信息。只有在分配到缓存的10个数字都已经分配完，或者因为缓存刷新操作剩余数字被清理的情况下，才会再次调用Sequence分配机制，再次分出CACHE个数字。</p>
+<p>显然，CACHE选项是为了效率而设置的。</p>
+<hr>
+<h2 id="索引">索引</h2>
+<h3 id="索引的概念">索引的概念</h3>
+<p>索引是一种独立于表的对象，可以存储在与表不同的磁盘或者表空间中。它有下面的一些特点：</p>
+<ul>
+<li>索引被删除或损坏，不会对表产生影响，其影响的只是查询的速度；</li>
+<li>索引一旦建立，Oracle 管理系统会对其进行自动维护，而且由 Oracle 管理系统决定何时使用索引；</li>
+<li>在删除一个表时，所有基于该表的索引会自动被删除。</li>
+</ul>
+<h3 id="创建索引">创建索引</h3>
+<p>索引可以自动创建，也可以手动创建：</p>
+<ul>
+<li><p>自动创建：<strong>在定义<code>PRIMARY KEY</code>或<code>UNIQUE</code>约束后系统自动在相应的列上创建唯一性索引</strong>；</p>
+</li>
+<li><p>手动创建：用户可以在一个或多个列上创建索引，以加速查询。方法是：</p>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CREATE INDEX index_name ON table (column[, column]<span class="keyword">...</span>);</div></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">INDEX</span> emp_last_name_idx <span class="keyword">ON</span> employees(last_name);</span></div></pre></td></tr></table></figure>
+
+<blockquote>
+<p>什么时候创建索引<br>以下情况可以创建索引：</p>
+<ul>
+<li>列中数据值分布范围很广；</li>
+<li>列经常在 WHERE 子句或连接条件中出现；</li>
+<li>表经常被访问而且数据量很大 。</li>
+</ul>
+<p>什么时候不要创建索引<br>下列情况不要创建索引：</p>
+<ul>
+<li>表很小；</li>
+<li>列不经常作为连接条件或出现在WHERE子句中；</li>
+<li>表经常更新。</li>
+</ul>
+</blockquote>
+<h3 id="查询索引">查询索引</h3>
+<p>可以使用数据字典视图 USER_INDEXES 和 USER_IND_COLUMNS 查看索引的信息。<br>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">SELECT</span> ic.index_name,</span></div><div class="line">       ic.column_name,</div><div class="line">       ic.column_position col_pos,</div><div class="line">       ix.uniqueness</div><div class="line">  <span class="keyword">FROM</span> user_indexes ix, user_ind_columns ic</div><div class="line"><span class="keyword">WHERE</span> ic.index_name = ix.index_name</div><div class="line">   <span class="keyword">AND</span> ic.table_name = <span class="string">'EMPLOYEES'</span>;</div></pre></td></tr></table></figure>
+
+<h3 id="删除索引">删除索引</h3>
+<p>使用<code>DROP INDEX index_name</code>删除索引。</p>
+<hr>
+<h2 id="同义词">同义词</h2>
+<p>创建同义词：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> [<span class="keyword">PUBLIC</span>] SYNONYM synonym <span class="keyword">FOR</span> object;</span></div></pre></td></tr></table></figure>
+
+<p>注意，需要权限。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">CREATE</span> SYNONYM e <span class="keyword">FOR</span> employees;</span></div><div class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> e;</span></div></pre></td></tr></table></figure>
+
+<p>删除同义词：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="operator"><span class="keyword">DROP</span> SYNONYM e;</span></div></pre></td></tr></table></figure>
+
+  
 	</div>
 		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Oracle/">Oracle</a><a href="/tags/SQL/">SQL</a>
+  </div>
 
 
 
@@ -119,7 +327,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#视图"><span class="toc-number">1.</span> <span class="toc-text">视图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建视图"><span class="toc-number">1.1.</span> <span class="toc-text">创建视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改视图"><span class="toc-number">1.2.</span> <span class="toc-text">修改视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#只读视图"><span class="toc-number">1.3.</span> <span class="toc-text">只读视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复杂视图"><span class="toc-number">1.4.</span> <span class="toc-text">复杂视图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除视图"><span class="toc-number">1.5.</span> <span class="toc-text">删除视图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#序列"><span class="toc-number">2.</span> <span class="toc-text">序列</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的概念"><span class="toc-number">2.1.</span> <span class="toc-text">序列的概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的使用"><span class="toc-number">2.2.</span> <span class="toc-text">序列的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CURRVAL和NEXTVAL值"><span class="toc-number">2.3.</span> <span class="toc-text">CURRVAL和NEXTVAL值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列的裂缝"><span class="toc-number">2.4.</span> <span class="toc-text">序列的裂缝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改序列"><span class="toc-number">2.5.</span> <span class="toc-text">修改序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除序列"><span class="toc-number">2.6.</span> <span class="toc-text">删除序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据字典中查询序列"><span class="toc-number">2.7.</span> <span class="toc-text">数据字典中查询序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CACHE选项的补充说明"><span class="toc-number">2.8.</span> <span class="toc-text">CACHE选项的补充说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#索引"><span class="toc-number">3.</span> <span class="toc-text">索引</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#索引的概念"><span class="toc-number">3.1.</span> <span class="toc-text">索引的概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建索引"><span class="toc-number">3.2.</span> <span class="toc-text">创建索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询索引"><span class="toc-number">3.3.</span> <span class="toc-text">查询索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除索引"><span class="toc-number">3.4.</span> <span class="toc-text">删除索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#同义词"><span class="toc-number">4.</span> <span class="toc-text">同义词</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -135,11 +343,11 @@
 		
 			<li><a href="/tags/Java-JDBC/" title="Java JDBC">Java JDBC<sup>1</sup></a></li>
 		
-			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>2</sup></a></li>
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
 		
-			<li><a href="/tags/Oracle-SQL/" title="Oracle SQL">Oracle SQL<sup>1</sup></a></li>
+			<li><a href="/tags/Oracle-SQL/" title="Oracle SQL">Oracle SQL<sup>0</sup></a></li>
 		
-			<li><a href="/tags/SQL/" title="SQL">SQL<sup>2</sup></a></li>
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
 		
 		</ul>
 </div>
