@@ -74,7 +74,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-02-14T14:48:10.000Z" itemprop="datePublished">2月 14 2015</time>
-    Updated:<time datetime="2015-04-27T09:02:57.000Z" itemprop="dateModified">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T09:04:42.000Z" itemprop="dateModified">4月 27 2015</time>
     
   </p>
 </header>
@@ -124,13 +124,15 @@
 <p>Hexo使用<code>hexo new</code>命令创建空的文章模板，或者直接在_posts目录下创建文件也可以。Hexo是用Markdown语法编辑文件的，<br>而且可以识别一些标记文件信息的特殊标记，例如下面的内容一般可以加到文章前面：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">title: 使用Hexo搭建个人静态博客  #文章页面上的显示名称，可以任意修改，不会出现在URL中</div><div class="line">layout: post</div><div class="line">date: 2014-11-10 10:07:43  #文章生成时间，一般不改，当然也可以任意修改</div><div class="line">updated: 2014-11-12 13:24</div><div class="line">comments: true</div><div class="line"><span class="header">categories: </span></div><div class="line">---</div></pre></td></tr></table></figure>
 
-<p>**注意，最后用<code>---</code>标记结束。</p>
+<p><strong>注意，最后用<code>---</code>标记结束。</strong></p>
 <h3 id="文章摘要">文章摘要</h3>
-<p>在首页显示的时候，一般会显示文章的摘要内容，此时在需要显示摘要的地方添加如下代码即可：<br>``<br>以上是摘要<br><a id="more"></a><br>以下是余下全文</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">发布博客</div><div class="line">这里的发布也是十分简单的，首先在github上创建名为yourname.github.<span class="built_in">io</span>的repo，接着修改_config.yml中的deploy字段：</div></pre></td></tr></table></figure>
+<p>在首页显示的时候，一般会显示文章的摘要内容，此时在需要显示摘要的地方添加如下代码即可：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">以上是摘要</div><div class="line"><span class="comment">&lt;!--more--&gt;</span></div><div class="line">以下是余下全文</div></pre></td></tr></table></figure>
 
-<p>deploy:<br>type: github<br>repo: git@github.com:yourname/yourname.github.io.git<br>branch: master<br><code>``
-最后在本地执行</code>hexo d`命令（前提是GIT已经配置好可以正常push文件到远程远程git服务器）。<br>OK，现在通过<strong>yourname.github.io</strong>就可以访问你的博客了。</p>
+<p>发布博客<br>这里的发布也是十分简单的，首先在github上创建名为yourname.github.io的repo，接着修改_config.yml中的deploy字段：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="label">deploy:</span></div><div class="line"><span class="label">type:</span> github</div><div class="line"><span class="label">repo:</span> git@github.com:yourname/yourname.github.io.git</div><div class="line"><span class="label">branch:</span> master</div></pre></td></tr></table></figure>
+
+<p>最后在本地执行<code>hexo d</code>命令（前提是GIT已经配置好可以正常push文件到远程远程git服务器）。<br>OK，现在通过<strong>yourname.github.io</strong>就可以访问你的博客了。</p>
 <blockquote>
 <p>参考资料<br><a href="http://www.jianshu.com/p/821fe67e712b" target="_blank" rel="external">Hexo搭建Github Pages托管的静态个人博客</a><br><a href="http://hexo.io/" target="_blank" rel="external">hexo官网</a></p>
 </blockquote>
