@@ -1,0 +1,354 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Scatter-Gather | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="原文 http://ifeve.com/java-nio-scattergather/
+概述
+Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel中读取或者写入到Channel的操作。分散（scatter）从Channel中读取是指在读操作时将读">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/NIO/Scatter-Gather/" title="Scatter-Gather" itemprop="url">Scatter-Gather</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scattering_Reads"><span class="toc-number">2.</span> <span class="toc-text">Scattering Reads</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gathering_Writes"><span class="toc-number">3.</span> <span class="toc-text">Gathering Writes</span></a></li></ol>
+		</div>
+		
+		<p>原文 <a href="http://ifeve.com/java-nio-scattergather/" target="_blank" rel="external">http://ifeve.com/java-nio-scattergather/</a></p>
+<h2 id="概述">概述</h2>
+<p>Java NIO开始支持scatter/gather，scatter/gather用于描述从Channel中读取或者写入到Channel的操作。<br><strong>分散（scatter）</strong>从Channel中读取是指在读操作时将读取的数据写入多个buffer中。因此，Channel将从Channel中读取的数据“分散（scatter）”到多个Buffer中。<br><strong>聚集（gather）</strong>写入Channel是指在写操作时将多个buffer的数据写入同一个Channel，因此，Channel 将多个Buffer中的数据“聚集（gather）”后发送到Channel。</p>
+<p>scatter / gather经常用于需要将传输的数据分开处理的场合，例如传输一个由消息头和消息体组成的消息，你可能会将消息体和消息头分散到不同的buffer中，这样你可以方便的处理消息头和消息体。</p>
+<h2 id="Scattering_Reads">Scattering Reads</h2>
+<p>Scattering Reads是指数据从一个channel读取到多个buffer中。如下图描述：</p>
+<p>代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ByteBuffer header = ByteBuffer.allocate(<span class="number">128</span>);</div><div class="line">ByteBuffer body   = ByteBuffer.allocate(<span class="number">1024</span>);</div><div class="line"> </div><div class="line">ByteBuffer[] bufferArray = { header, body };</div><div class="line"> </div><div class="line">channel.read(bufferArray);</div></pre></td></tr></table></figure>
+
+<p>注意buffer首先被插入到数组，然后再将数组作为channel.read() 的输入参数。read()方法按照buffer在数组中的顺序将从channel中读取的数据写入到buffer，当一个buffer被写满后，channel紧接着向另一个buffer中写。</p>
+<p>Scattering Reads在移动下一个buffer前，必须填满当前的buffer，这也意味着它不适用于动态消息(译者注：消息大小不固定)。换句话说，如果存在消息头和消息体，消息头必须完成填充（例如 128byte），Scattering Reads才能正常工作。</p>
+<h2 id="Gathering_Writes">Gathering Writes</h2>
+<p>Gathering Writes是指数据从多个buffer写入到同一个channel。如下图描述：</p>
+<p>代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">ByteBuffer header = ByteBuffer.allocate(<span class="number">128</span>);</div><div class="line">ByteBuffer body   = ByteBuffer.allocate(<span class="number">1024</span>);</div><div class="line"> </div><div class="line"><span class="comment">//write data into buffers</span></div><div class="line"> </div><div class="line">ByteBuffer[] bufferArray = { header, body };</div><div class="line"> </div><div class="line">channel.write(bufferArray);</div></pre></td></tr></table></figure>
+
+<p>buffers数组是write()方法的入参，write()方法会按照buffer在数组中的顺序，将数据写入到channel，注意只有position和limit之间的数据才会被写入。因此，如果一个buffer的容量为128byte，但是仅仅包含58byte的数据，那么这58byte的数据将被写入到channel中。因此与Scattering Reads相反，Gathering Writes能较好的处理动态消息。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/NIO/">NIO</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/NIO/Scatter-Gather/" data-title="Scatter-Gather | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/NIO/Selector/" title="Selector">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Selector</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/NIO/FileChannel/"  title="FileChannel">
+ <strong>NEXT:</strong><br/> 
+ <span>FileChannel
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scattering_Reads"><span class="toc-number">2.</span> <span class="toc-text">Scattering Reads</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gathering_Writes"><span class="toc-number">3.</span> <span class="toc-text">Gathering Writes</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

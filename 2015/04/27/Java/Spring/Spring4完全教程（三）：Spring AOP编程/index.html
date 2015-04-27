@@ -1,0 +1,453 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spring4完全教程（三）：Spring AOP编程 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="AOP
+对目标方法进行统一的日志、异常捕获等处理时，每个方法都要加上类似的代码。即繁琐也不利于重构。
+代理模式解决
+代理模式可以参考笔记“设计模式-代理模式”里面的说明。
+下面提供使用代理模式提供输出日志的示例：
+1234567891011121314151617181920212223242526">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Spring/Spring4完全教程（三）：Spring AOP编程/" title="Spring4完全教程（三）：Spring AOP编程" itemprop="url">Spring4完全教程（三）：Spring AOP编程</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AOP"><span class="toc-number">1.</span> <span class="toc-text">AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#代理模式解决"><span class="toc-number">1.1.</span> <span class="toc-text">代理模式解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP简介"><span class="toc-number">1.2.</span> <span class="toc-text">AOP简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring_AOP示例"><span class="toc-number">1.3.</span> <span class="toc-text">Spring AOP示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通知种类"><span class="toc-number">1.4.</span> <span class="toc-text">通知种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切点表达式（pointcut_expression）"><span class="toc-number">1.5.</span> <span class="toc-text">切点表达式（pointcut expression）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#合并切点表达式"><span class="toc-number">1.6.</span> <span class="toc-text">合并切点表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切面的优先级"><span class="toc-number">1.7.</span> <span class="toc-text">切面的优先级</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="AOP">AOP</h2>
+<p>对目标方法进行统一的日志、异常捕获等处理时，每个方法都要加上类似的代码。即繁琐也不利于重构。</p>
+<h3 id="代理模式解决">代理模式解决</h3>
+<p>代理模式可以参考笔记<em>“设计模式-代理模式”</em>里面的说明。</p>
+<p>下面提供使用代理模式提供输出日志的示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">// 接口</div><div class="line">public <span class="keyword">interface</span> <span class="type">Calculator</span> {</div><div class="line"> </div><div class="line">    <span class="type">int</span> add(<span class="type">int</span> i, <span class="type">int</span> j);</div><div class="line">    <span class="type">int</span> sub(<span class="type">int</span> i, <span class="type">int</span> j);</div><div class="line">    <span class="type">int</span> mul(<span class="type">int</span> i, <span class="type">int</span> j);</div><div class="line">    <span class="type">int</span> <span class="keyword">div</span>(<span class="type">int</span> i, <span class="type">int</span> j);</div><div class="line">}</div><div class="line">// 接口的实现类</div><div class="line">public class <span class="type">CalculatorImpl</span> implements <span class="type">Calculator</span> {</div><div class="line"> </div><div class="line">    @<span class="type">Override</span></div><div class="line">    public <span class="type">int</span> add(<span class="type">int</span> i, <span class="type">int</span> j) {</div><div class="line">        <span class="type">int</span> <span class="literal">result</span> = i + j;</div><div class="line">        <span class="keyword">return</span> <span class="literal">result</span>;</div><div class="line">    }</div><div class="line">    // 省略……</div><div class="line">}</div><div class="line">// 创建代理的核心类</div><div class="line">public class <span class="type">CalculatorLoggingHandler</span> implements <span class="type">InvocationHandler</span> {</div><div class="line"> </div><div class="line">    private <span class="type">Calculator</span> target;</div><div class="line"> </div><div class="line">    public <span class="type">CalculatorLoggingHandler</span>(<span class="type">Calculator</span> target) {</div><div class="line">        this.target = target;</div><div class="line">    }</div><div class="line"> </div><div class="line">    @<span class="type">Override</span></div><div class="line">    public <span class="type">Object</span> invoke(<span class="type">Object</span> proxy, <span class="type">Method</span> <span class="keyword">method</span>, <span class="type">Object</span>[] args) throws <span class="type">Throwable</span> {</div><div class="line">        <span class="type">Object</span> <span class="literal">result</span> = null;</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            // 前置通知</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"logging start..."</span>);</div><div class="line">            <span class="literal">result</span> = <span class="keyword">method</span>.invoke(target, args);</div><div class="line">            // 返回通知</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"logging end  ..."</span>);</div><div class="line">        } catch (<span class="type">Exception</span> e) {</div><div class="line">            // 异常通知</div><div class="line">        } <span class="keyword">finally</span> {</div><div class="line">            // 后置通知</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> <span class="literal">result</span>;</div><div class="line">    }</div><div class="line"> </div><div class="line">    public <span class="keyword">static</span> <span class="type">Calculator</span> getInstance(<span class="type">Calculator</span> calculator) {</div><div class="line">        <span class="keyword">return</span> (<span class="type">Calculator</span>)<span class="type">Proxy</span>.newProxyInstance(calculator.getClass().getClassLoader(),</div><div class="line">                    calculator.getClass().getInterfaces(),</div><div class="line">                    new <span class="type">CalculatorLoggingHandler</span>(calculator));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="AOP简介">AOP简介</h3>
+<p>AOP主要实现的目的是针对业务处理过程中的<strong>切面</strong>进行提取，它所面对的是处理过程中的某个步骤或阶段，以获得逻辑过程中各部分之间低耦合性的隔离效果。AOP中经常使用到下面的术语：</p>
+<ul>
+<li>aspect（切面）：被模块化的特殊对象。例如最常见的logging功能，一个logging切面就可以使用AOP来实现相同的功能了。</li>
+</ul>
+<ul>
+<li>jointpoint（连接点）：程序执行的某个特定位置。连接点是应用程序提供给切面插入的地方。</li>
+</ul>
+<ul>
+<li>pointcut（切点）： AOP 通过切点定位到特定的连接点。可以有这样的类比：连接点相当于数据库中的记录，<strong>切点相当于查询条件</strong>。</li>
+</ul>
+<h3 id="Spring_AOP示例">Spring AOP示例</h3>
+<p>Spring AOP使用<strong>AspectJ</strong>注解实现，具体步骤为：<br>（1）：加入和AOP相关的jar包，包括：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">com</span>.springsource.net.sf.cglib-<span class="number">2.2</span><span class="number">.0</span>.jar</div><div class="line"><span class="keyword">com</span>.springsource<span class="preprocessor">.org</span>.aopalliance-<span class="number">1.0</span><span class="number">.0</span>.jar</div><div class="line"><span class="keyword">com</span>.springsource<span class="preprocessor">.org</span>.aspectj.weaver-<span class="number">1.6</span><span class="number">.8</span>.RELEASE.jar</div><div class="line">spring-aspects-<span class="number">4.0</span><span class="number">.0</span>.RELEASE.jar</div></pre></td></tr></table></figure>
+
+<p>（2）：配置<strong>切面类</strong><br><strong>切面类是AOP编程中的核心类，它是一个Java类，这个类中的方法就是各种前置、后置、异常通知等方法。</strong>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@<span class="type">Aspect</span></div><div class="line">@<span class="type">Component</span></div><div class="line">public class <span class="type">LogginAspect</span> {</div><div class="line"> </div><div class="line">    @<span class="type">Before</span>(<span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> beforeMethod(<span class="type">JoinPoint</span> joinpoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinpoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinpoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意，一定要加上@Aspect和@Component两个注解</strong>，因为：</p>
+<ul>
+<li>@Aspect声明这是一个切面类；</li>
+<li>声明为@Aspect的类会从自动代理排除（无法在IOC容器自动创建），所以需要加上@Component注解，以便加入到IOC容器中。</li>
+</ul>
+<p>（3）：配置通知方法<br>使用<code>@Before</code>、 <code>@After</code>、 <code>@AfterReturning</code>、<code>@AfterThrowing</code>和 <code>@Around</code>等注解声明通知方法，后面还会详细介绍这些方法。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@<span class="type">Before</span>(<span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)     </div><div class="line">public <span class="type">void</span> beforeMethod(<span class="type">JoinPoint</span> joinpoint) {                              </div><div class="line">    <span class="type">String</span> <span class="keyword">method</span> = joinpoint.getSignature().getName();                      </div><div class="line">    <span class="type">Object</span>[] args = joinpoint.getArgs();                                     </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>（4）：配置AOP并执行<br>前面已经提供了<strong>切面类</strong>和<strong>通知方法</strong>，首先下面是供测试使用的接口和接口的实现类：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 接口</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Calculator</span> </span>{</div><div class="line">    <span class="keyword">int</span> add(<span class="keyword">int</span> i, <span class="keyword">int</span> j);</div><div class="line">    <span class="keyword">int</span> sub(<span class="keyword">int</span> i, <span class="keyword">int</span> j);</div><div class="line">    <span class="keyword">int</span> mul(<span class="keyword">int</span> i, <span class="keyword">int</span> j);</div><div class="line">    <span class="keyword">int</span> div(<span class="keyword">int</span> i, <span class="keyword">int</span> j);</div><div class="line">}</div><div class="line"><span class="comment">// 实现类</span></div><div class="line"><span class="annotation">@Component</span>(<span class="string">"calculatorImpl"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CalculatorImpl</span> <span class="keyword">implements</span> <span class="title">Calculator</span> </span>{</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span>(<span class="keyword">int</span> i, <span class="keyword">int</span> j) {</div><div class="line">        <span class="keyword">int</span> result = i + j;</div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    }</div><div class="line">    <span class="comment">// 省略……</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意，这里实现类用@Component标志，以便在IOC容器中自动创建。</strong></p>
+<p>此时可以使用XML配置文件打开AOP或者是零配置的注解方式，方法分别是：</p>
+<ul>
+<li>使用XML需要配置2项内容，分别是<strong>自动扫描包</strong>和<strong>启动自动代理</strong>，所以此时的配置内容为：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--自动扫描包--&gt;</span>                                                  </div><div class="line"><span class="tag">&lt;<span class="title">context:component-scan</span> <span class="attribute">base-package</span>=<span class="value">"section04.aspect"</span>/&gt;</span>     </div><div class="line"><span class="comment">&lt;!-- 打开自动代理 --&gt;</span>                                               </div><div class="line"><span class="tag">&lt;<span class="title">aop:aspectj-autoproxy</span> /&gt;</span></div></pre></td></tr></table></figure>
+
+<p>测试类为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> XmlConfigTest {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args){</div><div class="line">        ApplicationContext ctx = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"spring-aop.xml"</span>);</div><div class="line">        Calculator calculator = ctx.getBean(<span class="string">"calculatorImpl"</span>, CalculatorImpl.class);</div><div class="line">        System.<span class="keyword">out</span>.println(calculator.add(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看到这是前面常见的做法，即使用<code>ClassPathXmlApplicationContext</code>获取IOC容器，而IOC容器通过扫描的方式创建Bean对象。这里CalculatorImpl实现类已经加上了@Component注解，所以可以从IOC容器中获取。</p>
+<ul>
+<li>使用零配置的方式，<strong>需要用注解类来代替上面XML中的2项配置</strong>，所以是这样的：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Configuration</span></div><div class="line"><span class="annotation">@ComponentScan</span>(basePackages = <span class="string">"section04.aspect"</span>)</div><div class="line"><span class="annotation">@EnableAspectJAutoProxy</span>(proxyTargetClass = <span class="keyword">true</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args){</div><div class="line">        AnnotationConfigApplicationContext ctx =</div><div class="line">                <span class="keyword">new</span> AnnotationConfigApplicationContext(AspectTest.class);</div><div class="line">        Calculator calculator = ctx.getBean(<span class="string">"calculatorImpl"</span>, CalculatorImpl.class);</div><div class="line">        System.out.println(calculator.add(<span class="number">1</span>, <span class="number">3</span>));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这里简单说明一下：</p>
+<pre><code>+ <span class="property">@Configuration</span>声明当前类是注解类，对应XML配置文件；
++ <span class="property">@ComponentScan</span>声明扫描的包，对应XML配置中的`<span class="javascript">&lt;context:component-scan base-package=<span class="string">""</span>/&gt;</span>`；
++ <span class="property">@EnableAspectJAutoProxy</span>(proxyTargetClass = <span class="literal">true</span>)：开启自动代理，对应`<span class="javascript">&lt;aop:aspectj-autoproxy /&gt; </span>`，注意proxyTargetClass 一定要设置为<span class="literal">true</span>，因为默认为<span class="literal">false</span>；
++ 最后用`<span class="javascript">AnnotationConfigApplicationContext</span>`获取当前的类，创建IOC容器。在前面的笔记中介绍了这个类的使用。
+</code></pre><h3 id="通知种类">通知种类</h3>
+<p>AspectJ 支持 5 种类型的通知注解:</p>
+<ul>
+<li>@Before：前置通知，在方法执行之前执行。<strong>通知方法可以接收<code>JoinPoint</code>类型参数，下同。</strong></li>
+</ul>
+<ul>
+<li>@After：后置通知，在方法执行之后执行。<br><strong>后置通知的特点是 无论目标方法是正常返回还是抛出异常，后置通知都会执行</strong>。所以后置通知 不能获取目标方法的返回值，因为不知道是否会执行异常；</li>
+</ul>
+<ul>
+<li>@AfterRunning：返回通知。<br><strong>特点是正常执行结束后调用， 返回通知可以获取目标方法的返回值 </strong>。<br><strong><code>@AfterRunning</code> 可以使用<code>returning</code>属性声明返回值，作为通知方法的入参。</strong></li>
+</ul>
+<ul>
+<li>@AfterThrowing：异常通知，在方法抛出异常之后。<br><strong><code>@AfterThrowing</code>可以使用<code>throwing</code>声明捕获的异常，作为通知方法的入参。</strong></li>
+</ul>
+<ul>
+<li>@Around：环绕通知，可以自由选择实现前面的4个通知类型。<br><strong>环绕通知方法的参数可以是<code>ProceedingJoinPoint</code>类型，它是<code>JoinPoint</code>的子类，提供了<code>proceed()</code>方法执行目标方法，并且通知方法一定要有返回值。</strong></li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">@<span class="type">Aspect</span></div><div class="line">@<span class="type">Component</span></div><div class="line">public class <span class="type">LogginAspect</span> {</div><div class="line">    // 前置通知</div><div class="line">    @<span class="type">Before</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> beforeMethod(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"before method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line"> </div><div class="line">    // 后置通知</div><div class="line">    @<span class="type">After</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> afterMethod(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"after method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line"> </div><div class="line">    // 返回通知</div><div class="line">    @<span class="type">AfterReturning</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>,</div><div class="line">            returning = <span class="string">"result"</span>)</div><div class="line">    public <span class="type">void</span> afterReturning(<span class="type">JoinPoint</span> joinPoint, <span class="type">Object</span> <span class="literal">result</span>) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"afterReturning method["</span> + <span class="keyword">method</span> + <span class="string">"("</span></div><div class="line">                + <span class="type">Arrays</span>.asList(args) + <span class="string">")] return:"</span> + <span class="literal">result</span>);</div><div class="line"> </div><div class="line">    }</div><div class="line"> </div><div class="line">    // 异常通知</div><div class="line">    @<span class="type">AfterThrowing</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>,</div><div class="line">            throwing = <span class="string">"e"</span>)</div><div class="line">    public <span class="type">void</span> afterThrowing(<span class="type">JoinPoint</span> joinPoint, <span class="type">Exception</span> e) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"afterThrowing method["</span> + <span class="keyword">method</span> + <span class="string">"("</span></div><div class="line">                + <span class="type">Arrays</span>.asList(args) + <span class="string">")] exception:"</span> + e.getMessage());</div><div class="line">    }</div><div class="line"> </div><div class="line">    // 环绕通知</div><div class="line">    @<span class="type">Around</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">Object</span> aroundMethod(<span class="type">ProceedingJoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">Object</span> <span class="literal">result</span> = null;</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            // 前置通知</div><div class="line">            <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">            <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"前置通知"</span>);</div><div class="line">            // 执行目标方法</div><div class="line">            <span class="literal">result</span> = joinPoint.proceed();</div><div class="line">            // 返回通知</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"返回通知"</span>);</div><div class="line">        } catch (<span class="type">Throwable</span> e) {</div><div class="line">            // 异常通知</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"异常通知"</span>);</div><div class="line">        } <span class="keyword">finally</span> {</div><div class="line">            // 后置通知</div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"后置通知"</span>);</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> <span class="literal">result</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="切点表达式（pointcut_expression）">切点表达式（pointcut expression）</h3>
+<p>前面说过，<strong>切点就是连接点的查询条件。</strong>在配置通知方法时，通过切点表达式匹配具体的目标方法，例如前面示例中的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">execution(<span class="keyword">public</span> <span class="keyword">int</span> section04.aspect.Calculator.*(<span class="keyword">int</span>, <span class="keyword">int</span>))</div></pre></td></tr></table></figure>
+
+<p><strong>其中<code>*</code>号表示匹配任意的public方法，<code>*</code>号 还可以对</strong>访问权限<strong>和</strong>返回值类型<strong>进行通配。</strong>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">execution(* <span class="keyword">int</span> section04.aspect.Calculator.*(<span class="keyword">int</span>, <span class="keyword">int</span>))</div></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">execution(<span class="keyword">*</span> <span class="keyword">*</span> section04.aspect.Calculator.<span class="keyword">*</span>(int, int))</div></pre></td></tr></table></figure>
+
+<p><strong>如果要匹配任意数目任意类型的参数，可以使用<code>..</code>。</strong>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">execution(<span class="keyword">public</span> <span class="keyword">int</span> section04.aspect.Calculator.*(..))</div></pre></td></tr></table></figure>
+
+<p>其实Spring AOP支持以下的标志符：</p>
+<ul>
+<li>execution - for matching method execution join points, this is the primary pointcut designator you will use when working with Spring AOP</li>
+<li>within - limits matching to join points within certain types (simply the execution of a method declared within a matching type when using Spring AOP)</li>
+<li>this - limits matching to join points (the execution of methods when using Spring AOP) where the bean reference (Spring AOP proxy) is an instance of the given type</li>
+<li>target - limits matching to join points (the execution of methods when using Spring AOP) where the target object (application object being proxied) is an instance of the given type</li>
+<li>args - limits matching to join points (the execution of methods when using Spring AOP) where the arguments are instances of the given types</li>
+<li>@target - limits matching to join points (the execution of methods when using Spring AOP) where the class of the executing object has an annotation of the given type</li>
+<li>@args - limits matching to join points (the execution of methods when using Spring AOP) where the runtime type of the actual arguments passed have annotations of the given type(s)</li>
+<li>@within - limits matching to join points within types that have the given annotation (the execution of methods declared in types with the given annotation when using Spring AOP)</li>
+<li>@annotation - limits matching to join points where the subject of the join point (method being executed in Spring AOP) has the given annotation</li>
+</ul>
+<p>具体可以参考<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/aop.html" target="_blank" rel="external">Supported Pointcut Designators</a></p>
+<h3 id="合并切点表达式">合并切点表达式</h3>
+<p>切点表达式可以直接在通知方法的注解中书写，但同一个切点表达式可能会在多个通知中重复出现。<br><strong>此时可以通过<code>@Pointcut</code>注解将一个切点声明成简单的方法，切点的方法体通常是空的。后面使用同样的该切点表达式的通知方法直接引用<code>@Pointcut</code>注解的方法名即可。</strong></p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">@<span class="type">Aspect</span></div><div class="line">@<span class="type">Component</span></div><div class="line">public class <span class="type">PointCutTest</span> {</div><div class="line">    @<span class="type">Pointcut</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> pointCutMethod() {}</div><div class="line"> </div><div class="line">    @<span class="type">Before</span>(value = <span class="string">"pointCutMethod()"</span>)</div><div class="line">    public <span class="type">void</span> before(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"PointCutTest before method["</span> + <span class="keyword">method</span></div><div class="line">                + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line"> </div><div class="line">    @<span class="type">After</span>(value = <span class="string">"pointCutMethod()"</span>)</div><div class="line">    public <span class="type">void</span> afterMethod(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"PointCutTest after method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>示例中用<code>@Pointcut(value = &quot;execution(public int section04.aspect.Calculator.*(int, int))&quot;)</code>声明了切点方法，所以前置通知和后置通知中可以直接引用<code>@Before(value = &quot;pointCutMethod()&quot;)</code>。</p>
+<h3 id="切面的优先级">切面的优先级</h3>
+<p>多个切面对同一个方法生效，这时候就有优先级问题。<br><strong>使用注解<code>@Order</code>声明切面的优先级，属性value的值越小，则优先级越高。</strong><br>示例，下面的LoggingAspect的前置通知的优先级比LoggingAspect2 高：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">@<span class="type">Order</span>(value = <span class="number">1</span>)</div><div class="line">@<span class="type">Aspect</span></div><div class="line">@<span class="type">Component</span></div><div class="line">public class <span class="type">LoggingAspect</span> {</div><div class="line">    // 前置通知</div><div class="line">    @<span class="type">Before</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> beforeMethod(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"LoggingAspect before method["</span> + <span class="keyword">method</span> + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line">@<span class="type">Order</span>(value = <span class="number">2</span>)</div><div class="line">@<span class="type">Aspect</span></div><div class="line">@<span class="type">Component</span></div><div class="line">public class <span class="type">LoggingAspect2</span> {</div><div class="line">    @<span class="type">Before</span>(value = <span class="string">"execution(public int section04.aspect.Calculator.*(int, int))"</span>)</div><div class="line">    public <span class="type">void</span> beforeMethod(<span class="type">JoinPoint</span> joinPoint) {</div><div class="line">        <span class="type">String</span> <span class="keyword">method</span> = joinPoint.getSignature().getName();</div><div class="line">        <span class="type">Object</span>[] args = joinPoint.getArgs();</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"LoggingAspect2 before method["</span> + <span class="keyword">method</span></div><div class="line">                + <span class="string">"("</span> + <span class="type">Arrays</span>.asList(args) + <span class="string">")]"</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spring/">Spring</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Spring/Spring4完全教程（三）：Spring AOP编程/" data-title="Spring4完全教程（三）：Spring AOP编程 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Spring/Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置/" title="Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Spring/Spring4完全教程（一）：基于XML的Bean配置/"  title="Spring4完全教程（一）：基于XML的Bean配置">
+ <strong>NEXT:</strong><br/> 
+ <span>Spring4完全教程（一）：基于XML的Bean配置
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AOP"><span class="toc-number">1.</span> <span class="toc-text">AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#代理模式解决"><span class="toc-number">1.1.</span> <span class="toc-text">代理模式解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP简介"><span class="toc-number">1.2.</span> <span class="toc-text">AOP简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring_AOP示例"><span class="toc-number">1.3.</span> <span class="toc-text">Spring AOP示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通知种类"><span class="toc-number">1.4.</span> <span class="toc-text">通知种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切点表达式（pointcut_expression）"><span class="toc-number">1.5.</span> <span class="toc-text">切点表达式（pointcut expression）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#合并切点表达式"><span class="toc-number">1.6.</span> <span class="toc-text">合并切点表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#切面的优先级"><span class="toc-number">1.7.</span> <span class="toc-text">切面的优先级</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,394 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Maven（四）：仓库管理和发布项目 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="Nexus
+Nexus 是Maven仓库管理器，Maven可以从Maven中央仓库 下载所需要的构件（artifact），但这通常不是一个好的做法，你应该在本地架设一个Maven仓库服务器，在代理远程仓库的同时维护本地仓库，以节省带宽和时间，Nexus就可以满足这样的需要。此外，他还提供了强大的仓库">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Maven/Maven（四）：仓库管理和发布项目/" title="Maven（四）：仓库管理和发布项目" itemprop="url">Maven（四）：仓库管理和发布项目</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Nexus"><span class="toc-number">1.</span> <span class="toc-text">Nexus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Nexus安装使用"><span class="toc-number">1.1.</span> <span class="toc-text">Nexus安装使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nexus仓库介绍"><span class="toc-number">1.2.</span> <span class="toc-text">Nexus仓库介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Maven使用私有Nexus服务"><span class="toc-number">1.3.</span> <span class="toc-text">Maven使用私有Nexus服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#发布项目到私有服务器"><span class="toc-number">1.4.</span> <span class="toc-text">发布项目到私有服务器</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="Nexus">Nexus</h2>
+<p>Nexus 是Maven仓库管理器，Maven可以从Maven中央仓库 下载所需要的<strong>构件（artifact）</strong>，但这通常不是一个好的做法，你应该在本地架设一个Maven仓库服务器，在代理远程仓库的同时维护本地仓库，以节省带宽和时间，Nexus就可以满足这样的需要。此外，他还提供了强大的仓库管理功能，构件搜索功能，它基于REST，友好的UI是一个extjs的REST客户端，它占用较少的内存，基于简单文件系统而非数据库。这些优点使其日趋成为最流行的Maven仓库管理器。</p>
+<h3 id="Nexus安装使用">Nexus安装使用</h3>
+<p>1）下载Nexus的压缩包，并解压，把bin目录添加到系统环境变量中；</p>
+<p>2）修改Nexus解压目录下的nexus-2.11.1-01\bin\jsw\conf\wrapper.conf文件，指定java.exe工具的具体执行路径，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wrapper.java.command=D:<span class="command">\program</span><span class="command">\Java</span><span class="command">\jkd</span>1.7.0_51<span class="command">\bin</span><span class="command">\java</span></div></pre></td></tr></table></figure>
+
+<p>3）在命令行下安装Nexus（直接输入nexus时会提示常用命令）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nexus <span class="operator"><span class="keyword">install</span></span></div></pre></td></tr></table></figure>
+
+<p>然后启动Nexus：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nexus <span class="operator"><span class="keyword">start</span></span></div></pre></td></tr></table></figure>
+
+<p>4）浏览器进入<code>localhost:8081/nexus/</code>即可访问Nexus的服务，注意端口为8081。最后点击右上角的Log In，用户名admin，密码admin123，即可进入管理界面。</p>
+<h3 id="Nexus仓库介绍">Nexus仓库介绍</h3>
+<p>打开浏览器访问Nexus仓库，此时可以看到有下列的repositories：</p>
+<p>其中，第一列Repositories对应的是Nexus解压文件<code>sonatype-work\nexus\storage</code>目录下的文件夹，如图：<br>仓库有几种类型，分别是：</p>
+<ul>
+<li>hosted：多人开发过程中，把项目的jar包发布到这里，可以发布Release或者Snapshots版本的jar包，分别对应Release和Snapshots仓库；对应第三方的jar包，就发布到3rd party下；<br>例如下列配置的version为SNAPSHOT：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-guide<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="title">packaging</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>所以发布是会发布到 Snapshots仓库。</p>
+<ul>
+<li>proxy：代表从外网服务器上下载jar包保存的仓库，例如Apache Snapshots仓库就保存从Apache中下载的jar包；</li>
+</ul>
+<ul>
+<li>virtual：一般不用；</li>
+</ul>
+<ul>
+<li>group：把多个仓库分为同一个组，所以在pom.xml中配置为组仓库，下载jar包时就会分别从组成员中寻找。</li>
+</ul>
+<h3 id="Maven使用私有Nexus服务">Maven使用私有Nexus服务</h3>
+<p>Maven一般从外网服务器中下载依赖jar包，<strong>**默认路径为Maven解压目录下的/lib/maven-model-builder-3.2.1.jar里面的pom.xml文件中配置的路径。</strong></p>
+<p>在Maven项目pom.xml文件中可以配置使用Nexus服务器的仓库，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">repositories</span>&gt;</span>                                                        </div><div class="line">    <span class="tag">&lt;<span class="title">repository</span>&gt;</span>                                                      </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>NexusRepo<span class="tag">&lt;/<span class="title">id</span>&gt;</span>                                            </div><div class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>NexusRepo<span class="tag">&lt;/<span class="title">name</span>&gt;</span>                                        </div><div class="line">        <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/groups/public/<span class="tag">&lt;/<span class="title">url</span>&gt;</span> </div><div class="line">    <span class="tag">&lt;/<span class="title">repository</span>&gt;</span>                                                     </div><div class="line"><span class="tag">&lt;/<span class="title">repositories</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在<code>repositories</code>下可以配置多个<code>repository</code>仓库。<br>但这种做法的缺点是每个项目中都需要配置，此时可以直接修改Maven的配置文件，即conf/setting.xml，添加下列内容：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">profiles</span>&gt;</span>                                                                    </div><div class="line">    <span class="tag">&lt;<span class="title">profile</span>&gt;</span>                                                                 </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>NexusRepo<span class="tag">&lt;/<span class="title">id</span>&gt;</span>                                                    </div><div class="line">        <span class="tag">&lt;<span class="title">repositories</span>&gt;</span>                                                        </div><div class="line">            <span class="tag">&lt;<span class="title">repository</span>&gt;</span>                                                      </div><div class="line">                <span class="tag">&lt;<span class="title">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="title">id</span>&gt;</span>                                                </div><div class="line">                <span class="tag">&lt;<span class="title">name</span>&gt;</span>Repository for nexus<span class="tag">&lt;/<span class="title">name</span>&gt;</span>                             </div><div class="line">                <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/groups/public/<span class="tag">&lt;/<span class="title">url</span>&gt;</span> </div><div class="line">                <span class="tag">&lt;<span class="title">releases</span>&gt;</span>                                                    </div><div class="line">                    <span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span>                                   </div><div class="line">                <span class="tag">&lt;/<span class="title">releases</span>&gt;</span>                                                   </div><div class="line">                <span class="tag">&lt;<span class="title">snapshots</span>&gt;</span>                                                   </div><div class="line">                    <span class="tag">&lt;<span class="title">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="title">enabled</span>&gt;</span>                                   </div><div class="line">                <span class="tag">&lt;/<span class="title">snapshots</span>&gt;</span>                                                  </div><div class="line">            <span class="tag">&lt;/<span class="title">repository</span>&gt;</span>                                                     </div><div class="line">        <span class="tag">&lt;/<span class="title">repositories</span>&gt;</span>                                                       </div><div class="line">    <span class="tag">&lt;/<span class="title">profile</span>&gt;</span>                                                                </div><div class="line"><span class="tag">&lt;/<span class="title">profiles</span>&gt;</span>                                                                   </div><div class="line"><span class="comment">&lt;!-- 激活指定仓库 --&gt;</span>                                                               </div><div class="line"><span class="tag">&lt;<span class="title">activeProfiles</span>&gt;</span>                                                              </div><div class="line">    <span class="tag">&lt;<span class="title">activeProfile</span>&gt;</span>NexusRepo<span class="tag">&lt;/<span class="title">activeProfile</span>&gt;</span>                                  </div><div class="line">    <span class="tag">&lt;<span class="title">activeProfile</span>&gt;</span>anotherAlwaysActiveProfile<span class="tag">&lt;/<span class="title">activeProfile</span>&gt;</span>                 </div><div class="line"><span class="tag">&lt;/<span class="title">activeProfiles</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这样，当前电脑上使用Maven的所有项目都会从指定的仓库中下载依赖。<br><strong>注意，<code>profies</code>也可也配置在Maven项目的pom.xml文件中。</strong></p>
+<blockquote>
+<p>配置mirror<br>参考地址：<a href="http://m.oschina.net/blog/100634" target="_blank" rel="external">Maven：mirror和repository 区别</a><br>mirror相当于一个代理，它会拦截去指定的远程repository下载构件的请求，然后从自己这里找出构件回送给客户端。配置mirror的目的一般是出于网速考虑。<br>可以看出，internal repository和mirror是两码事。前者本身是一个repository，可以和其它repository一起提供服务，比如它可以用来提供公司内部的maven构件；而后者本身并不是repository，它只是远程repository的网络加速器。<br>不过，很多internal repository搭建工具往往也提供mirror服务，比如Nexus就可以让同一个URL,既用作internal repository，又使它成为所有repository的mirror。<br>如果仓库X可以提供仓库Y存储的所有内容，那么就可以认为X是Y的一个镜像。换句话说，任何一个可以从仓库Y获得的构件，都胡够从它的镜像中获取。举个例子，<a href="http://maven.net.cn/content/groups/public/" target="_blank" rel="external">http://maven.net.cn/content/groups/public/</a> 是中央仓库<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> 在中国的镜像，由于地理位置的因素，该镜像往往能够提供比中央仓库更快的务。因此，可以配置Maven使用该镜像来替代中央仓库。编辑settings.xml，代码如下：</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;settings&gt;</div><div class="line">  <span class="keyword">...</span></div><div class="line">  &lt;mirrors&gt;</div><div class="line">    &lt;mirror&gt;</div><div class="line">      &lt;id&gt;maven.net.cn&lt;/id&gt;</div><div class="line">      &lt;name&gt;one of the central mirrors <span class="keyword">in</span> china&lt;/name&gt;</div><div class="line">      &lt;url&gt;http://maven.net.cn/content/groups/public/&lt;/url&gt;</div><div class="line">      &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;</div><div class="line">    &lt;/mirror&gt;</div><div class="line">  &lt;/mirrors&gt;</div><div class="line">  <span class="keyword">...</span></div><div class="line">&lt;/settings&gt;</div></pre></td></tr></table></figure>
+
+<p>该例中，<code>&lt;mirrorOf&gt;</code>的值为central，表示该配置为中央仓库的镜像，任何对于中央仓库的请求都会转至该镜像，可以使用同样的方法配置其他仓库的镜像。</p>
+<h3 id="发布项目到私有服务器">发布项目到私有服务器</h3>
+<p>首需要在Maven项目的pom.xml文件中添加<code>&lt;  distributionManagement&gt;</code>，指定发布的项目和私有服务器URL。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--发布项目--&gt;</span>                                                                      </div><div class="line"><span class="tag">&lt;<span class="title">distributionManagement</span>&gt;</span>                                                         </div><div class="line">    <span class="tag">&lt;<span class="title">repository</span>&gt;</span>                                                                 </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>maven-guide-release<span class="tag">&lt;/<span class="title">id</span>&gt;</span>                                             </div><div class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>maven guide test release<span class="tag">&lt;/<span class="title">name</span>&gt;</span>                                    </div><div class="line">        <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/repositories/releases/<span class="tag">&lt;/<span class="title">url</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">repository</span>&gt;</span>                                                                </div><div class="line">    <span class="tag">&lt;<span class="title">snapshotRepository</span>&gt;</span>                                                         </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>maven-guide-snapshot<span class="tag">&lt;/<span class="title">id</span>&gt;</span>                                            </div><div class="line">        <span class="tag">&lt;<span class="title">name</span>&gt;</span>maven guide test snapshot<span class="tag">&lt;/<span class="title">name</span>&gt;</span>                                   </div><div class="line">        <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost:8081/nexus/content/repositories/snapshots/<span class="tag">&lt;/<span class="title">url</span>&gt;</span>   </div><div class="line">    <span class="tag">&lt;/<span class="title">snapshotRepository</span>&gt;</span>                                                        </div><div class="line"><span class="tag">&lt;/<span class="title">distributionManagement</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+<p>其中<code>&lt;repository&gt;</code>表示发布的是Release版本的项目，<code>&lt;snapshotRepository&gt;</code>表示发布的是Snapshot版本的项目，<strong>也就是要和pom.xml文件中配置的<code>&lt;version&gt;1.0-RELEASE&lt;/version&gt;</code>对应！</strong></p>
+<p>然后再次配置Maven的/conf/setting.xml文件，添加下列内容：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">servers</span>&gt;</span>                                  </div><div class="line">    <span class="tag">&lt;<span class="title">server</span>&gt;</span>                               </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>maven-guide-release<span class="tag">&lt;/<span class="title">id</span>&gt;</span>       </div><div class="line">        <span class="tag">&lt;<span class="title">username</span>&gt;</span>deployment<span class="tag">&lt;/<span class="title">username</span>&gt;</span>    </div><div class="line">        <span class="tag">&lt;<span class="title">password</span>&gt;</span>deployment123<span class="tag">&lt;/<span class="title">password</span>&gt;</span> </div><div class="line">    <span class="tag">&lt;/<span class="title">server</span>&gt;</span>                              </div><div class="line">    <span class="tag">&lt;<span class="title">server</span>&gt;</span>                               </div><div class="line">        <span class="tag">&lt;<span class="title">id</span>&gt;</span>maven-guide-snapshot<span class="tag">&lt;/<span class="title">id</span>&gt;</span>      </div><div class="line">        <span class="tag">&lt;<span class="title">username</span>&gt;</span>deployment<span class="tag">&lt;/<span class="title">username</span>&gt;</span>    </div><div class="line">        <span class="tag">&lt;<span class="title">password</span>&gt;</span>deployment123<span class="tag">&lt;/<span class="title">password</span>&gt;</span> </div><div class="line">    <span class="tag">&lt;/<span class="title">server</span>&gt;</span>                              </div><div class="line"><span class="tag">&lt;/<span class="title">servers</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这里的<code>&lt;id&gt;</code>要和上面<code>&lt;repository&gt;</code>中的id对应，下面是私有服务器的用户名和密码。对于每个发布的 <code>&lt;repository&gt;</code>都要配置。</p>
+<p><strong>最后，执行<code>mvn  deploy</code>命令就可以发布项目了！</strong></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Maven/">Maven</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Maven/Maven（四）：仓库管理和发布项目/" data-title="Maven（四）：仓库管理和发布项目 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/MyBatis/MyBatis教程（一）/" title="MyBatis教程（一）">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  MyBatis教程（一）</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Maven/Maven（二）：依赖管理/"  title="Maven（二）：依赖管理">
+ <strong>NEXT:</strong><br/> 
+ <span>Maven（二）：依赖管理
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Nexus"><span class="toc-number">1.</span> <span class="toc-text">Nexus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Nexus安装使用"><span class="toc-number">1.1.</span> <span class="toc-text">Nexus安装使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nexus仓库介绍"><span class="toc-number">1.2.</span> <span class="toc-text">Nexus仓库介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Maven使用私有Nexus服务"><span class="toc-number">1.3.</span> <span class="toc-text">Maven使用私有Nexus服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#发布项目到私有服务器"><span class="toc-number">1.4.</span> <span class="toc-text">发布项目到私有服务器</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

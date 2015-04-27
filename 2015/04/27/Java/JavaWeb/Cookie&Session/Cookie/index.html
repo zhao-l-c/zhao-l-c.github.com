@@ -1,0 +1,392 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Cookie | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="概述
+1）什么是会话：用户开启一个浏览器，访问本网站上的很多页面后，关闭浏览器，这个过程称之为一次会话。2）会话主要解决的问题：会话过程中数据的保存问题。3）解决会话数据保存的技术：Cookie：客户端技术，把会话数据保存在客户端的缓存中。HttpSession：服务器端技术，服务器会为每一个客户端">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/JavaWeb/Cookie&Session/Cookie/" title="Cookie" itemprop="url">Cookie</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端技术"><span class="toc-number">2.</span> <span class="toc-text">客户端技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#强烈建议查看javax-servlet-http-Cookie的手册说明。"><span class="toc-number">3.</span> <span class="toc-text">强烈建议查看javax.servlet.http.Cookie的手册说明。</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Cookie的属性"><span class="toc-number">3.1.</span> <span class="toc-text">1. Cookie的属性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#name:名称"><span class="toc-number">3.1.1.</span> <span class="toc-text">name:名称</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#value:单一的值"><span class="toc-number">3.1.2.</span> <span class="toc-text">value:单一的值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。"><span class="toc-number">3.1.3.</span> <span class="toc-text">path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#age：存活时间（单位是秒）"><span class="toc-number">3.1.4.</span> <span class="toc-text">age：存活时间（单位是秒）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#domain：域。如一个Servlet的访问路径是：_http://localhost:8080/day06/servlet/CookieDemo1_，则domain为localhost。"><span class="toc-number">3.1.5.</span> <span class="toc-text">domain：域。如一个Servlet的访问路径是： http://localhost:8080/day06/servlet/CookieDemo1 ，则domain为localhost。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#comment：注释"><span class="toc-number">3.1.6.</span> <span class="toc-text">comment：注释</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#version：版本号。"><span class="toc-number">3.1.7.</span> <span class="toc-text">version：版本号。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_向客户端写Cookie"><span class="toc-number">3.2.</span> <span class="toc-text">2. 向客户端写Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_删除指定的Cookie"><span class="toc-number">3.3.</span> <span class="toc-text">3. 删除指定的Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_服务器获取Cookie"><span class="toc-number">3.4.</span> <span class="toc-text">4. 服务器获取Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_案例"><span class="toc-number">3.5.</span> <span class="toc-text">5. 案例</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="概述">概述</h2>
+<p>1）什么是会话：用户开启一个浏览器，访问本网站上的很多页面后，关闭浏览器，这个过程称之为一次会话。<br>2）会话主要解决的问题：会话过程中数据的保存问题。<br>3）解决会话数据保存的技术：<br>Cookie：客户端技术，把会话数据保存在客户端的缓存中。<br>HttpSession：服务器端技术，服务器会为每一个客户端创建独享的HttpSession对象。</p>
+<h2 id="客户端技术">客户端技术</h2>
+<p>Cookie的值可以唯一标识一个客户端，因此常用于会话服务。</p>
+<h2 id="强烈建议查看javax-servlet-http-Cookie的手册说明。">强烈建议查看javax.servlet.http.Cookie的手册说明。</h2>
+<h3 id="1-_Cookie的属性">1. Cookie的属性</h3>
+<h4 id="name:名称">name:名称</h4>
+<h4 id="value:单一的值">value:单一的值</h4>
+<p>上面的2个属性在创建Cookie对象时必须为构造器指定。</p>
+<p>下面的属性是可以通过setXXX的方法设置：</p>
+<h4 id="path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。">path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。</h4>
+<p>如一个Servlet 的访问路径是： <code>http://localhost:8080/day06/servlet/CookieDemo1</code><br>则path默认为<strong>/day06/servlet/</strong>，此时只有访问地址为<code>http://localhost:8080/day06/servlet /XXX</code>的资源时浏览器才会发送该Cookie。<br>若把它设置为<strong>/day06</strong>，这时访问这个应用的所有资源时都会带上这个Cookie，可以通过<code>setPath</code>方法来设置path属性，<br>一般这样设置：<code>cookie.setPath(request.getContextPath());</code></p>
+<p>注意：<br>因此name和path唯一识别一个Cookie，如果有两个Cookie它们的这个两个值都相等，则后来的会替换前面存在的Cookie。</p>
+<blockquote>
+<p>补充：<br>根据Cookie的path值和请求资源的地址，浏览器是否会携带Cookie？例如cookie的path是<code>/day06/servlet/</code>，<br>请求的资源是<code>/day06/ServletDemo1</code>，此时浏览器不会带该cookie过来；<br>请求的资源是<code>/day06/servlet/ServletDemo1</code>，此时浏览器会带该cookie过来</p>
+</blockquote>
+<h4 id="age：存活时间（单位是秒）">age：存活时间（单位是秒）</h4>
+<p>默认为浏览器的进程，即关闭浏览器后就消失。若如果把时间设置为0，则视为删除cookie。<br>通过<code>setMaxAge</code>方法可以设置这个值，设置了存活时间的Cookie需要添加到response对象，这样浏览器才知道要接收并保存这个Cookie到磁盘。</p>
+<h4 id="domain：域。如一个Servlet的访问路径是：_http://localhost:8080/day06/servlet/CookieDemo1_，则domain为localhost。">domain：域。如一个Servlet的访问路径是： <a href="http://localhost:8080/day06/servlet/CookieDemo1" target="_blank" rel="external">http://localhost:8080/day06/servlet/CookieDemo1</a> ，则domain为localhost。</h4>
+<h4 id="comment：注释">comment：注释</h4>
+<h4 id="version：版本号。">version：版本号。</h4>
+<blockquote>
+<p>注意：<br>浏览器针对每一网站最多支持20个Cookie。<br>浏览器本身最多能支持300个Cookie。<br>每个Cookie的大小不能超过4KB。</p>
+</blockquote>
+<h3 id="2-_向客户端写Cookie">2. 向客户端写Cookie</h3>
+<p>调用<code>HttpServletResponse</code>的<code>addCooke</code>，这时相当于往响应头中设置<code>Set-Cookie</code>响应头字段。<br>如果创建了一个Cookie，并将他发送到浏览器，默认情况下它是一个会话级别的Cookie（即存储在浏览器的内存中），用户退出浏览器之后即被删除。<br>若希望浏览器将该Cookie 存储在磁盘上，则需要调用<code>Cookie</code>的<code>setMaxAge</code>，设置一个以秒为单位的时间。<br>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request,</div><div class="line">        HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">    <span class="comment">// 设置字符集</span></div><div class="line">    response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line"> </div><div class="line">    <span class="comment">// 获取浏览器发送的Cookies</span></div><div class="line">    Cookie[] cookieArray = request.getCookies();</div><div class="line">    String accessTime = <span class="string">"第一次访问"</span>;</div><div class="line">    <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">        <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">            System.out.println(<span class="string">"cookie name: "</span> + c.getName() + <span class="string">", value "</span> + c.getValue() + <span class="string">", path="</span> + c.getPath());</div><div class="line">            <span class="keyword">if</span>(MyConstants.COOKIE_ACCESS_NAME.equals(c.getName())) {</div><div class="line">                accessTime = c.getValue();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">    PrintWriter out = response.getWriter();</div><div class="line">    out.println(<span class="string">"您上次访问时间是："</span> + accessTime);</div><div class="line"> </div><div class="line">    out.println(<span class="string">"&lt;br&gt;&lt;br&gt;"</span>);</div><div class="line">    out.println(<span class="string">"&lt;a href=' "</span> + request.getContextPath() + <span class="string">"/CookieClear'&gt;clear cookie&lt;/a&gt; "</span>);</div><div class="line"> </div><div class="line">    <span class="comment">// 发送Cookie到浏览器</span></div><div class="line">    Timestamp tt = <span class="keyword">new</span> Timestamp(System.currentTimeMillis());</div><div class="line">    accessTime = tt.toString().substring(<span class="number">0</span>, <span class="number">19</span>);</div><div class="line">    Cookie cookie = <span class="keyword">new</span> Cookie(MyConstants.COOKIE_ACCESS_NAME, accessTime);</div><div class="line">    <span class="comment">// path一定要设置，否则不会接收到</span></div><div class="line">    cookie.setPath(request.getContextPath());</div><div class="line">    cookie.setMaxAge(MyConstants.COOKIE_ACCESS_MAX_AGE);</div><div class="line">    response.addCookie(cookie);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="3-_删除指定的Cookie">3. 删除指定的Cookie</h3>
+<p>将最大时效设为0则是命令浏览器删除该Cookie，<strong>同时删除cookie时，path必须正确，否则不会删除</strong>。<br>注意：<br>删除Cookie是靠浏览器操作的，而服务端的Servlet通过request对象获取某个Cookie后，它的path值为null。<br>所以这时候要重新设置path值为要删除Cookie的path值，然后发回给客户端后才能被识别最后删除。<br>看示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request,</div><div class="line">        HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">    Cookie[] cookieArray = request.getCookies();</div><div class="line">    <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">        <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">            <span class="keyword">if</span>(MyConstants.COOKIE_ACCESS_NAME.equals(c.getName())) {</div><div class="line">                <span class="comment">// 一定要设置path，并添加到response，告诉 客户端删除该Cookie</span></div><div class="line">                c.setMaxAge(<span class="number">0</span>);</div><div class="line">                c.setPath(request.getContextPath());</div><div class="line">                response.addCookie(c);</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="4-_服务器获取Cookie">4. 服务器获取Cookie</h3>
+<p>调用<code>HttpServletRequest</code>类的<code>getCookies</code>方法，注意返回的是一个数组。</p>
+<h3 id="5-_案例">5. 案例</h3>
+<p>登录时记住用户名<br>大致流程：<br>用户访问<code>http://localhost:8080/cookie01/ServletLogin</code>，此时获取Cookie数组并判断是否有保存用户登录名的Cookie，若有则取出Cookie的值，<br>并在登录界面回显这个登录名。<br>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/login"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServletLogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        String username = <span class="string">""</span>;</div><div class="line">        String checked = <span class="string">""</span>;</div><div class="line">        Cookie[] cookieArray = request.getCookies();</div><div class="line">        <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">                <span class="keyword">if</span>(MyConstants.COOKIE_LOGIN_NAME.equals(c.getName())) {</div><div class="line">                    username = c.getValue();</div><div class="line">                    checked = <span class="string">"checked='checked'"</span>;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">        request.setAttribute(<span class="string">"username"</span>, username);</div><div class="line">        request.setAttribute(<span class="string">"checked"</span>, checked);</div><div class="line">        request.getRequestDispatcher(<span class="string">"/login.jsp"</span>).forward(request, response);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>然后重定向到登录界面，登录界面的jsp内容大致如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;form action=<span class="string">"/cookie01/success"</span> method=<span class="string">"post"</span>&gt;</div><div class="line">       用户名：&lt;<span class="built_in">input</span> <span class="built_in">type</span>=<span class="string">"text"</span> name=<span class="string">"username"</span> value=&lt;%=request.getAttribute(<span class="string">"username"</span>) %&gt; &gt;&lt;<span class="keyword">br</span>/&gt;</div><div class="line">       密码：&lt;<span class="built_in">input</span> <span class="built_in">type</span>=<span class="string">"password"</span> name=<span class="string">"password"</span>&gt;&lt;<span class="keyword">br</span>/&gt;</div><div class="line">       保存：&lt;<span class="built_in">input</span> <span class="built_in">type</span>=<span class="string">"checkbox"</span> name=<span class="string">"save"</span> &lt;%=request.getAttribute(<span class="string">"checked"</span>) %&gt; value=<span class="string">"isSave"</span>&gt;&lt;<span class="keyword">br</span>/&gt;</div><div class="line">       &lt;<span class="built_in">input</span> <span class="built_in">type</span>=<span class="string">"submit"</span> value=<span class="string">"登录"</span>&gt;&lt;<span class="keyword">br</span>/&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+
+<p>在登录输入信息界面点击“登录”提交按钮进入保存登录信息的Servlet，该Servlet根据是否勾选了“保存”用户名做相关处理，<br>若勾选了则把这些的登录名作为Cookie的值，然后设置时效和path，最后保存。<br>若没有勾选，而且前面曾经保存过这样的Cookie，则应该把它删除。<br>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/success"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SaveLogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        String isSave = request.getParameter(<span class="string">"save"</span>);</div><div class="line">        String username = request.getParameter(<span class="string">"username"</span>);</div><div class="line">        <span class="keyword">if</span>(<span class="string">"isSave"</span>.equals(isSave)) {</div><div class="line">            <span class="comment">// 若勾选的话，保存Cookie</span></div><div class="line">            Cookie cookie = <span class="keyword">new</span> Cookie(MyConstants.COOKIE_LOGIN_NAME, username);</div><div class="line">            cookie.setPath(request.getContextPath());</div><div class="line">            cookie.setMaxAge(MyConstants.COOKIE_LOGIN_MAX_AGE);</div><div class="line">            response.addCookie(cookie);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            <span class="comment">// 若没有勾选的话，把相应的Cookie删除</span></div><div class="line">            Cookie[] cookieArray = request.getCookies();</div><div class="line">            <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">                <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">                    <span class="keyword">if</span>(MyConstants.COOKIE_LOGIN_NAME.equals(c.getName())) {</div><div class="line">                        c.setMaxAge(<span class="number">0</span>);</div><div class="line">                        c.setPath(request.getContextPath());</div><div class="line">                        response.addCookie(c);</div><div class="line">                    }</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line">        out.println(<span class="string">"登录成功！"</span>);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Cookie-Session/">Cookie&Session</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/JavaWeb/Cookie&Session/Cookie/" data-title="Cookie | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/JavaWeb/Cookie&Session/Session/" title="Session">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Session</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Android/Android完全教程（二）：持久化-保存数据到文件/"  title="Android完全教程（二）：持久化-保存数据到文件">
+ <strong>NEXT:</strong><br/> 
+ <span>Android完全教程（二）：持久化-保存数据到文件
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端技术"><span class="toc-number">2.</span> <span class="toc-text">客户端技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#强烈建议查看javax-servlet-http-Cookie的手册说明。"><span class="toc-number">3.</span> <span class="toc-text">强烈建议查看javax.servlet.http.Cookie的手册说明。</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Cookie的属性"><span class="toc-number">3.1.</span> <span class="toc-text">1. Cookie的属性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#name:名称"><span class="toc-number">3.1.1.</span> <span class="toc-text">name:名称</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#value:单一的值"><span class="toc-number">3.1.2.</span> <span class="toc-text">value:单一的值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。"><span class="toc-number">3.1.3.</span> <span class="toc-text">path：路径，十分重要，可以理解为访问某个应用时是否发送该Cookie。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#age：存活时间（单位是秒）"><span class="toc-number">3.1.4.</span> <span class="toc-text">age：存活时间（单位是秒）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#domain：域。如一个Servlet的访问路径是：_http://localhost:8080/day06/servlet/CookieDemo1_，则domain为localhost。"><span class="toc-number">3.1.5.</span> <span class="toc-text">domain：域。如一个Servlet的访问路径是： http://localhost:8080/day06/servlet/CookieDemo1 ，则domain为localhost。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#comment：注释"><span class="toc-number">3.1.6.</span> <span class="toc-text">comment：注释</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#version：版本号。"><span class="toc-number">3.1.7.</span> <span class="toc-text">version：版本号。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_向客户端写Cookie"><span class="toc-number">3.2.</span> <span class="toc-text">2. 向客户端写Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_删除指定的Cookie"><span class="toc-number">3.3.</span> <span class="toc-text">3. 删除指定的Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_服务器获取Cookie"><span class="toc-number">3.4.</span> <span class="toc-text">4. 服务器获取Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_案例"><span class="toc-number">3.5.</span> <span class="toc-text">5. 案例</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,369 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="AtomicInteger
+java.util.concurrent.atomic有几个以Atomic打头的类，它们的语义基本上和volatile一样，只是封装在API里，为操作提供适当的原子方法。这是非常简单的避免race condition的办法。
+下面的示例代码输出结果中，没有重复输出的数字，">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Concurrent/ConcurrentAPI/Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍/" title="Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md" itemprop="url">Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicInteger"><span class="toc-number">1.</span> <span class="toc-text">AtomicInteger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CountDownLatch"><span class="toc-number">2.</span> <span class="toc-text">CountDownLatch</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#局限性"><span class="toc-number">2.1.</span> <span class="toc-text">局限性</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="AtomicInteger">AtomicInteger</h2>
+<p><code>java.util.concurrent.atomic</code>有几个以<code>Atomic</code>打头的类，它们的语义基本上和<code>volatile</code>一样，只是封装在API里，为操作提供适当的原子方法。<br>这是非常简单的避免<code>race condition</code>的办法。</p>
+<p>下面的示例代码输出结果中，没有重复输出的数字，且不出出现小于等于0的结果:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap4.atomic;</div><div class="line"> </div><div class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</div><div class="line"> </div><div class="line"><span class="comment">/*</span></div><div class="line">* Atomic开头的类的使用介绍</div><div class="line">*/</div><div class="line"> </div><div class="line"><span class="comment">// 下面多个线程对变量atomicInteger的操作是线程安全的</span></div><div class="line">class Resource {</div><div class="line">    <span class="keyword">private</span> AtomicInteger atomicInteger = <span class="keyword">new</span> AtomicInteger(<span class="number">100</span>);</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">handle</span>() {</div><div class="line">        <span class="keyword">return</span> atomicInteger.decrementAndGet();</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class Client extends Thread {</div><div class="line">    <span class="keyword">final</span> <span class="keyword">private</span> Resource rs;</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">Client</span>(Resource rs) {</div><div class="line">        <span class="keyword">this</span>.rs = rs;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">int</span> value = rs.handle();</div><div class="line">            <span class="keyword">if</span>(value &gt; <span class="number">0</span>) {</div><div class="line">                System.out.println(getName() + <span class="string">" value="</span> + value);</div><div class="line">            }<span class="keyword">else</span></div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicDemo</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Resource rs = <span class="keyword">new</span> Resource();</div><div class="line">        <span class="keyword">new</span> Client(rs).start();</div><div class="line">        <span class="keyword">new</span> Client(rs).start();</div><div class="line">        <span class="keyword">new</span> Client(rs).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="CountDownLatch">CountDownLatch</h2>
+<p>在创建<code>CountDownLatch</code>实例时需要提供一个<code>int</code>值（计数器），然后还有两个控制方法：<code>countDown</code>和<code>await</code>，前者对计数器减一， 而后者 一直处于等待状态， 直到计数器为0时。</p>
+<p>使用场景：<br>一个主控制线程和多个子线程，主线程需要等待子线程都执行完成（例如做收尾工作），也就是主线程需要<code>await</code>。</p>
+<blockquote>
+<p>注意下面代码在Thread_TWGJD工程下面。</p>
+</blockquote>
+<p>示例1：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap4.countdownlatch;</div><div class="line"> </div><div class="line"><span class="keyword">import</span> java.util.Random;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</div><div class="line"> </div><div class="line"><span class="comment">/*</span></div><div class="line">* CountDownLatch示例代码，功能描述：</div><div class="line">* 当模块线程10个ModuleThread都执行完后，主控制线程SystemThread输出项目完成结果（仅仅用于模拟业务处理过程）</div><div class="line">*/</div><div class="line"> </div><div class="line">class ModuleThread implements Runnable {</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> moduleID;</div><div class="line">    <span class="keyword">private</span> CountDownLatch latch;</div><div class="line">    <span class="keyword">private</span> Random random = <span class="keyword">new</span> Random();</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">ModuleThread</span>(<span class="keyword">int</span> id, CountDownLatch latch) {</div><div class="line">        <span class="keyword">this</span>.moduleID = id;</div><div class="line">        <span class="keyword">this</span>.latch = latch;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            <span class="comment">// 模拟模块线程完成工作</span></div><div class="line">            Thread.sleep(random.nextInt(<span class="number">1000</span>));</div><div class="line">            System.out.println(<span class="string">"系统模块:"</span> + moduleID + <span class="string">" 开发完成"</span>);</div><div class="line">            latch.countDown();</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class SystemThread implements Runnable {</div><div class="line">    <span class="keyword">private</span> CountDownLatch latch;</div><div class="line">    <span class="keyword">public</span> <span class="title">SystemThread</span>(CountDownLatch latch) {</div><div class="line">        <span class="keyword">this</span>.latch = latch;</div><div class="line">    }</div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            <span class="comment">// 首先需要等待子模块线程完成，主控制线程才执行</span></div><div class="line">            latch.await();</div><div class="line">            <span class="comment">// 模拟主控制线程完成工作</span></div><div class="line">            System.out.println(<span class="string">"项目开发完成"</span>);</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountDownLatchDemo</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> MODULE_SIZE = <span class="number">10</span>;</div><div class="line">        CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(MODULE_SIZE);</div><div class="line">        <span class="comment">// 一个主控制线程，10个子模块线程</span></div><div class="line">        ExecutorService service = Executors.newFixedThreadPool(MODULE_SIZE + <span class="number">1</span>);</div><div class="line">        <span class="comment">// 开启主控制线程</span></div><div class="line">        service.execute(<span class="keyword">new</span> SystemThread(latch));</div><div class="line">        <span class="comment">// 开启子模块线程</span></div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MODULE_SIZE; i++) {</div><div class="line">            service.execute(<span class="keyword">new</span> ModuleThread(i + <span class="number">1</span>, latch));</div><div class="line">        }</div><div class="line">        service.shutdown();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>示例2：</p>
+<blockquote>
+<p>类似示例1，只不过示例1中的主控制线程换成这里的读线程，子模块线程换成写线程而已。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap4.countdownlatch;</div><div class="line"> </div><div class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</div><div class="line"> </div><div class="line"><span class="comment">/*</span></div><div class="line">* CountDownLatch示例代码2，功能描述：</div><div class="line">* 有5个读进程和1个写进程，当写进程完成后读进程开始，且读进程都完成后退出程序</div><div class="line">*/</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountDownLatchDemo2</span> </span>{</div><div class="line">    class ReadThread implements Runnable {</div><div class="line">        <span class="keyword">private</span> CountDownLatch readLatch;</div><div class="line">        <span class="keyword">private</span> CountDownLatch writeLatch;</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="title">ReadThread</span>(CountDownLatch readLatch, CountDownLatch writeLatch) {</div><div class="line">            <span class="keyword">this</span>.readLatch = readLatch;</div><div class="line">            <span class="keyword">this</span>.writeLatch = writeLatch;</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                <span class="comment">// 等待写进程的完成</span></div><div class="line">                writeLatch.await();</div><div class="line">                <span class="comment">// 开始读操作，用sleep模拟</span></div><div class="line">                Thread.sleep(<span class="number">100</span>);</div><div class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">" read finish"</span>);</div><div class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                e.printStackTrace();</div><div class="line">            } <span class="keyword">finally</span> {</div><div class="line">                <span class="comment">// 在finally中对计数器减1</span></div><div class="line">                <span class="comment">// 因为没有线程在等待read操作的Latch，所以这一步在这里有点多余</span></div><div class="line">                readLatch.countDown();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class WriteThread implements Runnable {</div><div class="line">        <span class="keyword">private</span> CountDownLatch writeLatch;</div><div class="line">        <span class="keyword">public</span> <span class="title">WriteThread</span>(CountDownLatch writeLatch) {</div><div class="line">            <span class="keyword">this</span>.writeLatch = writeLatch;</div><div class="line">        }</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                <span class="comment">// 模拟写操作</span></div><div class="line">                Thread.sleep(<span class="number">200</span>);</div><div class="line">                System.out.println(<span class="string">"write finish!"</span>);</div><div class="line">            } <span class="keyword">catch</span>(InterruptedException e) {</div><div class="line">            } <span class="keyword">finally</span> {</div><div class="line">                writeLatch.countDown();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        CountDownLatchDemo2 cd = <span class="keyword">new</span> CountDownLatchDemo2();</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> READ_THREAD_COUNT = <span class="number">5</span>;</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> WRITE_THREAD_COUNT = <span class="number">1</span>;</div><div class="line"> </div><div class="line">        CountDownLatch readLatch = <span class="keyword">new</span> CountDownLatch(READ_THREAD_COUNT);</div><div class="line">        CountDownLatch writeLatch = <span class="keyword">new</span> CountDownLatch(WRITE_THREAD_COUNT);</div><div class="line"> </div><div class="line">        ExecutorService service = Executors.newFixedThreadPool(READ_THREAD_COUNT);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; READ_THREAD_COUNT; i ++) {</div><div class="line">            service.execute(cd.<span class="keyword">new</span> ReadThread(readLatch, writeLatch));</div><div class="line">        }</div><div class="line">        <span class="keyword">new</span> Thread(cd.<span class="keyword">new</span> WriteThread(writeLatch)).start();</div><div class="line">        service.shutdown();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>示例代码3：</p>
+<blockquote>
+<p>通过上面的示例知道，CountDownLatch的作用就是限制线程之间的执行顺序，而且可以先让A线程先执行一点，然后B线程继续执行，接着A线程又开始执行，这样不改变线程的执行顺序。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap4.countdownlatch;</div><div class="line"> </div><div class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</div><div class="line"> </div><div class="line"><span class="comment">/*</span></div><div class="line">* CountDownLatch示例代码3，功能描述：</div><div class="line">* 这里的示例代码用锁存器（CountDownLatch）严格限制了2个线程之间操作（用operate函数代替）的执行顺序。</div><div class="line">* 这里要求操作的顺序是1、2、3、4，但1和3是在线程A中完成的，2和4是在线程B中完成的。</div><div class="line">* 通过CountDownLatch的作用就可以限制这些操作按照1、2、3、4的步骤执行。</div><div class="line">*/</div><div class="line"> </div><div class="line"><span class="comment">// 描述事件的步骤类</span></div><div class="line">class Step {</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">public</span> <span class="title">Step</span>(String name) {</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operate</span>() {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            Thread.sleep(<span class="number">1000</span>);</div><div class="line">        }<span class="keyword">catch</span>(InterruptedException e){</div><div class="line">        }</div><div class="line">        System.out.println(name + <span class="string">"finish"</span>);</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountDownLatchDemo3</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        <span class="keyword">final</span> Step s1 = <span class="keyword">new</span> Step(<span class="string">"步骤1"</span>);</div><div class="line">        <span class="keyword">final</span> Step s2 = <span class="keyword">new</span> Step(<span class="string">"步骤2"</span>);</div><div class="line">        <span class="keyword">final</span> Step s3 = <span class="keyword">new</span> Step(<span class="string">"步骤3"</span>);</div><div class="line">        <span class="keyword">final</span> Step s4 = <span class="keyword">new</span> Step(<span class="string">"步骤4"</span>);</div><div class="line"> </div><div class="line">        <span class="keyword">final</span> CountDownLatch firstLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">        <span class="keyword">final</span> CountDownLatch secondLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">        <span class="keyword">final</span> CountDownLatch thirdLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"> </div><div class="line">        Thread A = <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="comment">// 执行操作1</span></div><div class="line">                s1.operate();</div><div class="line">                firstLatch.countDown();</div><div class="line">                <span class="keyword">try</span> {</div><div class="line">                    <span class="comment">// 需要等待操作2完成，才能执行操作3</span></div><div class="line">                    secondLatch.await();</div><div class="line">                } <span class="keyword">catch</span> (InterruptedException e) {}</div><div class="line">                <span class="comment">// 可以执行操作3了</span></div><div class="line">                s3.operate();</div><div class="line">                thirdLatch.countDown();</div><div class="line">            }</div><div class="line">        };</div><div class="line"> </div><div class="line">        Thread B = <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="comment">// 等到操作1完成，操作2才可以执行</span></div><div class="line">                <span class="keyword">try</span> {</div><div class="line">                    firstLatch.await();</div><div class="line">                } <span class="keyword">catch</span> (InterruptedException e) {}</div><div class="line">                s2.operate();</div><div class="line">                secondLatch.countDown();</div><div class="line">                <span class="comment">// 等待操作3完成，操作4才可以执行</span></div><div class="line">                <span class="keyword">try</span> {</div><div class="line">                    thirdLatch.await();</div><div class="line">                } <span class="keyword">catch</span> (InterruptedException e) {}</div><div class="line">                s4.operate();</div><div class="line">            }</div><div class="line">        };</div><div class="line"> </div><div class="line">        <span class="comment">// 故意让执行后面操作的线程B先启动</span></div><div class="line">        B.start();</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            Thread.sleep(<span class="number">100</span>);</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException e) {}</div><div class="line">        A.start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="局限性">局限性</h3>
+<p>参考： <a href="http://blog.csdn.net/easyyoung/article/details/6906714" target="_blank" rel="external">http://blog.csdn.net/easyyoung/article/details/6906714</a><br>局限性和<code>CompletionService</code>类似，在于无法处理子任务数量不确定的情况，例如统计某个文件夹中的文件数量。另外，如果某个子任务在调用<code>countDown</code>之前就挂掉了，倒计数就永远不会归零。对于这种情况，要么用<code>finally</code>之类的手段保证<code>countDown</code>一定会被调用，要么用带参数的<code>await</code>方法指定超时时间。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ConcurrentAPI/">ConcurrentAPI</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Concurrent/ConcurrentAPI/Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍/" data-title="Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Hibernate/Hibernate4完全教程（三）：映射关系/" title="Hibernate4完全教程（三）：映射关系">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Hibernate4完全教程（三）：映射关系</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Concurrent/多线程基础（四）/"  title="多线程基础（四）">
+ <strong>NEXT:</strong><br/> 
+ <span>多线程基础（四）
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AtomicInteger"><span class="toc-number">1.</span> <span class="toc-text">AtomicInteger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CountDownLatch"><span class="toc-number">2.</span> <span class="toc-text">CountDownLatch</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#局限性"><span class="toc-number">2.1.</span> <span class="toc-text">局限性</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,610 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spring MVC完全教程（二）：REST、类型转换和校验 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="REST
+
+什么是RESTREST： 即 Representational State Transfer。 （资源）表现层状态转化。 是目前最流行的一种互联网软件架构。它结构清晰、符合标准、易于理解、 扩展方便，所以正得到越来越多网站的采用。
+
+资源（Resources） ： 网络上的一个实体，或者">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（二）：REST、类型转换和校验/" title="Spring MVC完全教程（二）：REST、类型转换和校验" itemprop="url">Spring MVC完全教程（二）：REST、类型转换和校验</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#REST"><span class="toc-number">1.</span> <span class="toc-text">REST</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HiddenHttpMethodFilter"><span class="toc-number">1.1.</span> <span class="toc-text">HiddenHttpMethodFilter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#REST风格URL示例"><span class="toc-number">1.2.</span> <span class="toc-text">REST风格URL示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RESTful_SpringMVC_CRUD（参考SpringMVC中的section07部分）"><span class="toc-number">2.</span> <span class="toc-text">RESTful SpringMVC CRUD（参考SpringMVC中的section07部分）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据类型转换、格式化和校验"><span class="toc-number">3.</span> <span class="toc-text">数据类型转换、格式化和校验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据绑定流程分析"><span class="toc-number">3.1.</span> <span class="toc-text">数据绑定流程分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mvc:annotation-driven配置项的作用"><span class="toc-number">3.2.</span> <span class="toc-text">mvc:annotation-driven配置项的作用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#mvc:default-servlet-handler和_mvc:annotation-driven的一些说明"><span class="toc-number">3.2.1.</span> <span class="toc-text">mvc:default-servlet-handler和 mvc:annotation-driven的一些说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自定义类型转换器"><span class="toc-number">3.3.</span> <span class="toc-text">自定义类型转换器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#源码简析"><span class="toc-number">3.3.1.</span> <span class="toc-text">源码简析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据格式化"><span class="toc-number">3.4.</span> <span class="toc-text">数据格式化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#@DateTimeFormat"><span class="toc-number">3.4.1.</span> <span class="toc-text">@DateTimeFormat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#@NumberFormat"><span class="toc-number">3.4.2.</span> <span class="toc-text">@NumberFormat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#同时使用_自定义转换器和格式化注解"><span class="toc-number">3.4.3.</span> <span class="toc-text">同时使用 自定义转换器和格式化注解</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取类型转换错误对象"><span class="toc-number">3.5.</span> <span class="toc-text">获取类型转换错误对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSR_303校验标准"><span class="toc-number">3.6.</span> <span class="toc-text">JSR 303校验标准</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#使用方法"><span class="toc-number">3.6.1.</span> <span class="toc-text">使用方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP中显示错误消息"><span class="toc-number">3.7.</span> <span class="toc-text">JSP中显示错误消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#国际化错误消息"><span class="toc-number">3.8.</span> <span class="toc-text">国际化错误消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@InitBinder注解"><span class="toc-number">3.9.</span> <span class="toc-text">@InitBinder注解</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="REST">REST</h2>
+<blockquote>
+<p>什么是REST<br>REST： 即 Representational State Transfer。 （资源）表现层状态转化。 是目前最流行的一种互联网软件架构。它结构清晰、符合标准、易于理解、 扩展方便，所以正得到越来越多网站的采用。</p>
+<ul>
+<li>资源（Resources） ： 网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务， 总之就是一个具体的存在。可以用一个URI（统一资源定位符）指向它， 每种资源对应一个特定的 URI 。 要获取这个资源， 访问它的URI就可以， 因此 URI 即为每一个资源的独一无二的识别符。</li>
+<li>表现层（Representation） ： 把资源具体呈现出来的形式，叫做它的表现层（Representation） 。比如，文本可以用 txt 格式表现，也可以用 HTML 格式、 XML 格式、 JSON 格式表现，甚至可以采用二进制格式。</li>
+<li>状态转化（State Transfer） ： 每发出一个请求， 就代表了客户 端和服务器的一次交互过程。 HTTP协议，是一个无状态协议，即所有的状态都保存在服务器端。因此， 如果客户端想要操作服务器，必须通过某种手段， 让服务器端发生“状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是 “表现层状态转化”。 具体说， 就是 HTTP 协议里面，四个表示操作方式的动词： <strong>GET、 POST、 PUT、 DELETE</strong>。它们分别对应四种基本操作：<strong> GET 用来获取资源， POST 用来新建资源， PUT 用来更新资源， DELETE 用来删除资源</strong>。</li>
+</ul>
+</blockquote>
+<p>使用REST格式的URL示例：</p>
+<ul>
+<li>/order/1 GET，得到id=1的order，<strong>一般用于修改操作</strong>；</li>
+<li>/order GET，得到全部的order，一般用于查询列表操作；</li>
+<li>/order/1 DELETE，删除id=1的order；</li>
+<li>/order PUT，更新order，一般用于提交修改操作；</li>
+<li>/order POST，新增order。<br><strong>所以这里会用到前面介绍的带占位符URL和获取占位符参数的方法。</strong></li>
+</ul>
+<h3 id="HiddenHttpMethodFilter">HiddenHttpMethodFilter</h3>
+<p><strong>浏览器 form 表单只支持 GET与 POST 请求，而DELETE、 PUT 等 method 并不支持， Spring3.0 添加了一个过滤器<code>HiddenHttpMethodFilter</code>，可以将这些请求转换为标准的HTTP方法，使得支持 GET、 POST、 PUT 与DELETE 请求。</strong></p>
+<h3 id="REST风格URL示例">REST风格URL示例</h3>
+<p>这里提供了使用REST风格的URL进行CRUD操作的示例。<br><strong>前面已经说明了form表单不支持DELETE和PUT等方法</strong>，所以为了支持这2个方法，需要：</p>
+<ul>
+<li>在应用wen.xml文件中配置<code>HiddenHttpMethodFilter</code>过滤器：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="variable">&lt;filter&gt;</span>                                                                              </div><div class="line">    <span class="variable">&lt;filter-name&gt;</span>hiddenHttpMethodFilter<span class="variable">&lt;/filter-name&gt;</span>                                 </div><div class="line">    <span class="variable">&lt;filter-class&gt;</span>org.springframework.web.filter.HiddenHttpMethodFilter<span class="variable">&lt;/filter-class&gt;</span></div><div class="line"><span class="variable">&lt;/filter&gt;</span>                                                                             </div><div class="line"><span class="variable">&lt;filter-mapping&gt;</span>                                                                      </div><div class="line">    <span class="variable">&lt;filter-name&gt;</span>hiddenHttpMethodFilter<span class="variable">&lt;/filter-name&gt;</span>                                 </div><div class="line">    <span class="variable">&lt;url-pattern&gt;</span>/<span class="keyword">*</span><span class="variable">&lt;/url-pattern&gt;</span>                                                     </div><div class="line"><span class="variable">&lt;/filter-mapping&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这里配置为对所以的请求进行过滤。</p>
+<ul>
+<li>当发送DELETE和PUT方法时，需要借助form表单<strong>先发送method为POST的请求，然后在form表单中提供一个name=”_method”的隐藏域，value值为DELETE或PUT</strong>。<br>对于发送POST请求，则不需要带隐藏域；对应GET请求，使用method为GET的请求就可以。<br>下面是JSP页面中4个方法的请求表单示例代码：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="type">GET</span>:                                                    </div><div class="line">&lt;form action=<span class="string">"REST/testREST/100"</span> <span class="keyword">method</span>=<span class="string">"get"</span>&gt;          </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"submit"</span> value=<span class="string">"TEST GET"</span>&gt;              </div><div class="line">&lt;/form&gt;                                                 </div><div class="line">&lt;br/&gt;                                                   </div><div class="line"><span class="type">POST</span>:                                                   </div><div class="line">&lt;form action=<span class="string">"REST/testREST"</span> <span class="keyword">method</span>=<span class="string">"post"</span>&gt;             </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"submit"</span> value=<span class="string">"TEST POST"</span>&gt;             </div><div class="line">&lt;/form&gt;                                                 </div><div class="line">&lt;br/&gt;                                                   </div><div class="line"><span class="type">PUT</span>:                                                    </div><div class="line">&lt;form action=<span class="string">"REST/testREST/101"</span> <span class="keyword">method</span>=<span class="string">"post"</span>&gt;         </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"hidden"</span> name=<span class="string">"_method"</span> value=<span class="string">"PUT"</span>&gt;    </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"submit"</span> value=<span class="string">"TEST PUT"</span>&gt;              </div><div class="line">&lt;/form&gt;                                                 </div><div class="line">&lt;br/&gt;                                                   </div><div class="line"><span class="type">DELETE</span>:                                                 </div><div class="line">&lt;form action=<span class="string">"REST/testREST/202"</span> <span class="keyword">method</span>=<span class="string">"post"</span>&gt;         </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"hidden"</span> name=<span class="string">"_method"</span> value=<span class="string">"DELETE"</span>&gt; </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"submit"</span> value=<span class="string">"TEST DELETE"</span>&gt;           </div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>对带占位符的GET、PUT和DELETE请求URL，目标方法使用<code>@PathVariable</code>接收，而POST方法的参数一般写在URL地址中。<br>下面是4个请求对应的目标方法示例代码：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">@<span class="type">RequestMapping</span>(<span class="string">"/REST"</span>)</div><div class="line">@<span class="type">Controller</span></div><div class="line">public class <span class="type">TestREST</span> {</div><div class="line">    private <span class="keyword">static</span> final <span class="type">String</span> <span class="type">SUCCESS</span> = <span class="string">"success"</span>;</div><div class="line"> </div><div class="line">    @<span class="type">RequestMapping</span>(value=<span class="string">"/testREST/{id}"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">GET</span>)</div><div class="line">    public <span class="type">String</span> testRestGET(@<span class="type">PathVariable</span>(<span class="string">"id"</span>) <span class="type">Integer</span> id) {</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"test REST GET:id="</span> + id);</div><div class="line">        <span class="keyword">return</span> <span class="type">SUCCESS</span>;</div><div class="line">    }</div><div class="line">    @<span class="type">RequestMapping</span>(value=<span class="string">"/testREST"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">POST</span>)</div><div class="line">    public <span class="type">String</span> testRestPOST() {</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"test REST POST"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="type">SUCCESS</span>;</div><div class="line">    }</div><div class="line">    @<span class="type">RequestMapping</span>(value=<span class="string">"/testREST/{id}"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">PUT</span>)</div><div class="line">    public <span class="type">String</span> testRestPUT(@<span class="type">PathVariable</span>(<span class="string">"id"</span>) <span class="type">Integer</span> id) {</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"test REST PUT:id="</span> + id);</div><div class="line">        <span class="keyword">return</span> <span class="type">SUCCESS</span>;</div><div class="line">    }</div><div class="line">    @<span class="type">RequestMapping</span>(value=<span class="string">"/testREST/{id}"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">DELETE</span>)</div><div class="line">    public <span class="type">String</span> testRestDELETE(@<span class="type">PathVariable</span>(<span class="string">"id"</span>) <span class="type">Integer</span> id) {</div><div class="line">        <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"test REST DELETE:id="</span> + id);</div><div class="line">        <span class="keyword">return</span> <span class="type">SUCCESS</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>一定要注意类型转换的问题，否则会出现400 bad request的错误（后面介绍类型转换）！</strong></p>
+<hr>
+<h2 id="RESTful_SpringMVC_CRUD（参考SpringMVC中的section07部分）">RESTful SpringMVC CRUD（参考SpringMVC中的section07部分）</h2>
+<p>下面使用REST风格的GET、POST、PUT和DELETE完成CRUD操作。（前面说过，web.xml中需要配置<code>HiddenHttpMethodFilter</code>拦截器 ）</p>
+<p>需求：根据下列的URL完成对Employee和Department数据的CRUD操作</p>
+<ul>
+<li>显示列表：emps，method=GET</li>
+</ul>
+<ul>
+<li>进入添加页面：emp，method=GET</li>
+</ul>
+<ul>
+<li>保存新员工：emp，method=POST</li>
+</ul>
+<ul>
+<li>删除：emp/{id}，method=DELETE<br>显示列表、进入添加页面都比较简单，保存的时候注意类型转换；<br>删除操作的时候，一般点击一个a标签的超链接后删除，但此时需要method=DELETE，所以一般会用JS绑定a标签的点击事件，然后把href设置到一个空的action中，相关JS代码可以这样（做成插件的样子）：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="list">(<span class="title">function</span><span class="list">($)</span> {</span></div><div class="line"></div><div class="line">    $.fn.delete = function<span class="list">(<span class="title">options</span>)</span> {</div><div class="line">        var settings = $.extend<span class="list">({</span></div><div class="line">            actionId: <span class="string">"delete_form"</span></div><div class="line">        }, options || {})<span class="comment">;</span></div><div class="line">        $<span class="list">(<span class="title">this</span>)</span>.click<span class="list">(<span class="title">function</span><span class="list">()</span> {</span></div><div class="line">            var href = this.href<span class="comment">;</span></div><div class="line">            $<span class="list">(<span class="string">"#"</span> + settings.actionId)</span>.attr<span class="list">(<span class="string">"action"</span>, href)</span>.submit<span class="list">()</span><span class="comment">;</span></div><div class="line">            return false<span class="comment">;</span></div><div class="line">        })<span class="comment">;</span></div><div class="line">    }</div><div class="line">})<span class="list">(<span class="title">jQuery</span>)</span><span class="comment">;</span></div></pre></td></tr></table></figure>
+
+<p>这个空的action需要有一个隐藏域，name=”_method”，value=”DELETE”：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;form action=<span class="string">""</span> id=<span class="string">"delete_form"</span> <span class="keyword">method</span>=<span class="string">"POST"</span>&gt;</div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"hidden"</span> name=<span class="string">"_method"</span> value=<span class="string">"DELETE"</span>/&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>进入修改页面：emp/{id}，method=GET</li>
+</ul>
+<ul>
+<li>保存修改内容：emp，method=PUT<br>保存操作的method=PUT，所以同样要有一个隐藏域<code>&lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;DELETE&quot;/&gt;</code>，但保存修改内容同样和新建用户是同一个表单，所以可以根据ID是否存在的方式提供这个隐藏域，类似这样：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;c:<span class="keyword">if</span> <span class="variable">test=</span><span class="string">"<span class="subst">${employee.id != <span class="constant">null</span> }</span>"</span>&gt;</div><div class="line">    &lt;form:hidden <span class="variable">path=</span><span class="string">"id"</span>/&gt;</div><div class="line">    &lt;input <span class="variable">type=</span><span class="string">"hidden"</span> <span class="variable">name=</span><span class="string">"_method"</span> <span class="variable">value=</span><span class="string">"PUT"</span>&gt;</div><div class="line">&lt;/c:<span class="keyword">if</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>然后在目标方法中，因为修改的JavaBean对象已经存在数据库中而且有时候有些属性不能被修改，所以需要在修改前提供JavaBean对象，可以这样：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@ModelAttribute</div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeUpdate</span>(@<span class="title">RequestParam</span>(<span class="keyword">value</span>=<span class="string">"id"</span>, required=<span class="keyword">false</span>) Integer id, Map&lt;String, Object&gt; map) {</div><div class="line">    <span class="keyword">if</span>(id != <span class="keyword">null</span>) {</div><div class="line">        map.put(<span class="string">"employee"</span>, empDao.<span class="keyword">get</span>(id));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>再次提醒，类型转换失败会出现400 bad request的错误。</strong></p>
+<h2 id="数据类型转换、格式化和校验">数据类型转换、格式化和校验</h2>
+<p><strong>在执行请求的处理方法时，一般需要把表单中的字段映射到处理方法的参数JavaBean属性中，这是由 <code>WebDataBinder</code>  完成的。由于表单字段为String类型，所以这里一般会涉及到数据类型转换、格式化问题，当然还可以进行数据校验。</strong></p>
+<h3 id="数据绑定流程分析">数据绑定流程分析</h3>
+<p><code>WebDataBinder</code>  执行把请求参数绑定为处理方法入参 的基本流程为：</p>
+<ul>
+<li>Spring MVC主框架将 <code>ServletRequest</code> 对象及<strong>目标方 法的入参实例</strong>传递给 <code>WebDataBinderFactory</code>实例，以创 建 <code>WebDataBinder</code>实例对象 ；</li>
+</ul>
+<ul>
+<li><code>WebDataBinder</code> 调用装配在 Spring MVC 上下文中的<code>C onversionService</code>属性组件进行<strong>数据类型转换、数据格式 化工作</strong>，将 Servlet 中的请求信息填充到入参对象中；</li>
+</ul>
+<ul>
+<li>调用<code>Validator</code>组件对已经绑定了请求消息的入参对象 进行数据合法性校验，并最终生成数据绑定结果<code>BindingResult</code>对象 ；</li>
+</ul>
+<ul>
+<li>Spring MVC 抽取 <code>WebDataBinder</code>中的 <code>BindingResult</code>中的入参对象和校验 错误对象，将它们赋给处理方法的入参。</li>
+</ul>
+<p>上述过程参考源码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//  ModelAttributeMethodProcessor 106</span></div><div class="line">    <span class="comment">// ......</span></div><div class="line">        WebDataBinder binder = binderFactory.createBinder(request, attribute, name);</div><div class="line">        <span class="keyword">if</span> (binder.getTarget() != <span class="literal">null</span>) {</div><div class="line">            bindRequestParameters(binder, request);</div><div class="line">            validateIfApplicable(binder, parameter);</div><div class="line">            <span class="keyword">if</span> (binder.getBindingResult().hasErrors()) {</div><div class="line">                <span class="keyword">if</span> (isBindExceptionRequired(binder, parameter)) {</div><div class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> BindException(binder.getBindingResult());</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">    <span class="comment">// ......</span></div></pre></td></tr></table></figure>
+
+<p><strong>代码调试到108行的时候，可以查看this对象中的binder属性，里面有3个重要的字段，即bindingResult、conversionService和validators。</strong></p>
+<h3 id="mvc:annotation-driven配置项的作用">mvc:annotation-driven配置项的作用</h3>
+<p>在SpringMVC的配置文件中一般需要加上 mvc:annotation-driven配置项，这是因为 mvc:annotation-driven会自动注 册<code>RequestMappingHandlerMapping</code>、<code>RequestMappingHandlerAdapter</code>与<code>ExceptionHandlerExceptionResolver</code>三个bean。</p>
+<p>其中<strong>前2个bean的作用是处理由<code>@RequestMapping</code>注解的请求映射</strong>。</p>
+<p>同时该配置还将提供以下支持：</p>
+<ul>
+<li>支持使用<code>ConversionService</code>实例对表单参数进行类型转换；</li>
+<li>支持使用<code>@NumberFormat annotation</code>、 <code>@DateTimeFormat</code> 注解完成数据类型的格式化；</li>
+<li>支持使用<code>@Valid</code>注解对 JavaBean 实例进行 JSR 303 验证；</li>
+<li>支持使用<code>@RequestBody</code>和<code>@ResponseBody</code>。</li>
+</ul>
+<h4 id="mvc:default-servlet-handler和_mvc:annotation-driven的一些说明">mvc:default-servlet-handler和 mvc:annotation-driven的一些说明</h4>
+<p>前面说过，配置项 mvc:default-servlet-handler是用于处理静态资源的请求，下图显示了项目中使用或不使用 mvc:default-servlet-handler 和 mvc:annotation-driven配置情况下，SpringMVC中处理请求的组件的情况：</p>
+<p>其中<code>AnnotationMethodHandlerAdapter</code>在Spring4中是一个过期的类，可以处理 <code>@RequestMapping</code>请求 。<br>可以得到的结论是：</p>
+<ul>
+<li>2个都没有配置时可以处理 <code>@RequestMapping</code>请求，但不能处理静态资源请求；</li>
+<li>只配置 mvc:default-servlet-handler 而不配置 mvc:annotation-driven的情况下，可以处理静态资源请求，但不能处理<code>@RequestMapping</code>请求；</li>
+<li>只配置 mvc:annotation-driven而没有配置 mvc:default-servlet-handler的情况下，可以处理 处理<code>@RequestMapping</code>请求，但无法处理静态资源请求。因此一般项目中都要加上。</li>
+</ul>
+<h3 id="自定义类型转换器">自定义类型转换器</h3>
+<p>基本步骤：</p>
+<ul>
+<li>转换器需要 通过<code>ConversionServiceFactoryBean</code> 或者<code>FormattingConversionServiceFactoryBean</code>的<code>converters</code>属性进行注册，这样应用其中是才会自动加载该转换器，供后续转换使用。配置方法：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">mvc:annotation-driven</span> <span class="attribute">conversion-service</span>=<span class="value">"conversionServiceFactoryBean"</span>/&gt;</span> </div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"conversionServiceFactoryBean"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.context.support.ConversionServiceFactoryBean"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"converters"</span>&gt;</span>                                                                                 </div><div class="line">        <span class="tag">&lt;<span class="title">list</span>&gt;</span>                                                                                                    </div><div class="line">            <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"section08.MyConverter"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>                                                           </div><div class="line">        <span class="tag">&lt;/<span class="title">list</span>&gt;</span>                                                                                                   </div><div class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span>                                                                                                  </div><div class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>最好使用 <code>FormattingConversionServiceFactoryBean</code>，否则配置了自定义的类型转换器后，系统默认的转换器会不能正常工作（例如下面将要说明的格式化功功能）。</strong></p>
+<ul>
+<li>定义转换器， Spring 定义了 3 种类型的转换器接口， 实现任意一个转换 器接口都可以作为自定义转换器注册到<code>ConversionServiceFactroyBean</code>中：<ul>
+<li><code>Converter&lt;S,T&gt;</code>：将 S 类型对象转为 T 类型对象；</li>
+<li><code>ConverterFactory</code>：将相同系列多个“同质”Converter 封装在一 起。如希望将一种类型的对象转换为另一种类型及其子类的对 象（例如将 String 转换为 Number 及 Number 子类。 （Integer、 Long、 Double 等） 对象）可使用该转换器工厂类；</li>
+<li><code>GenericConverter</code>：会根据源类对象及目标类对象所在的宿主类 中的上下文信息进行类型转换。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>在需要进行类型转换的目标方法中会<strong>自动调用</strong>该转换器。</li>
+</ul>
+<p>示例：<br>例如下列代码中 ：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"> * 测试自定义类型转换器，把一个字符串转换为Employee对象。</div><div class="line"> * 注意，@RequestParam接收的是一个字符串，经过MyConverter后，转换为Employee对象。</div><div class="line"> */</div><div class="line">@RequestMapping(<span class="string">"/testConverter"</span>)</div><div class="line"><span class="keyword">public</span> String <span class="title">testConverter</span>(@<span class="title">RequestParam</span>("employee_string") Employee employee) {</div><div class="line">    System.<span class="keyword">out</span>.println(employee);</div><div class="line">    empDao.save(employee);</div><div class="line">    <span class="keyword">return</span> <span class="string">"redirect:/EmployeeHandler/emps"</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>请求方法需要获取一个名为 employee_string请求参数，但该参数从页面传过来是 <strong> 字符串类型</strong>的，此时方法中却要求是<strong>Employee类型</strong>，所以SpringMVC判断需要进行类型转换，并且找到自定义转换器：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyConverter</span> <span class="keyword">implements</span> <span class="title">Converter</span>&lt;<span class="title">String</span>, <span class="title">Employee</span>&gt;</span>{</div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> Employee <span class="title">convert</span>(String s) {</div><div class="line">        <span class="comment">// GG-gg@atguigu.com-0-105</span></div><div class="line">        <span class="keyword">if</span>(s != <span class="keyword">null</span>) {</div><div class="line">                <span class="comment">// ......</span></div><div class="line">                <span class="keyword">return</span> employee;</div><div class="line">            }</div><div class="line">        }</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h4 id="源码简析">源码简析</h4>
+<p>在调用目标方法前，如果有必要，则对参数类型进行转换。<strong>可以在自定义转换器中添加断点进行调试。</strong></p>
+<p>首先SpringMVC会执行<code>DataBinder</code>的<code>convertIfNecessary</code>方法，然后执行<code>GenericConversionService)</code>的<code>canConvert</code> 方法判断是否能转换，最后进入到 <code>GenericConversionService)</code> 下列的源码中：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> GenericConverter <span class="title">getConverter</span>(TypeDescriptor sourceType, TypeDescriptor targetType) {</div><div class="line">    ConverterCacheKey key = <span class="keyword">new</span> ConverterCacheKey(sourceType, targetType);</div><div class="line">    GenericConverter converter = <span class="keyword">this</span>.converterCache.<span class="keyword">get</span>(key);</div><div class="line">    <span class="keyword">if</span> (converter != <span class="keyword">null</span>) {</div><div class="line">        <span class="keyword">return</span> (converter != NO_MATCH ? converter : <span class="keyword">null</span>);</div><div class="line">    }</div><div class="line"> </div><div class="line">    converter = <span class="keyword">this</span>.converters.find(sourceType, targetType);</div><div class="line">    <span class="keyword">if</span> (converter == <span class="keyword">null</span>) {</div><div class="line">        converter = getDefaultConverter(sourceType, targetType);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">if</span> (converter != <span class="keyword">null</span>) {</div><div class="line">        <span class="keyword">this</span>.converterCache.put(key, converter);</div><div class="line">        <span class="keyword">return</span> converter;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">this</span>.converterCache.put(key, NO_MATCH);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>从<code>converterCache</code>或者<code>converters</code> 中获取相应转换器，其中 <code>converters</code>中包含的是应用其中后创建的大量转换器，包括这里配置的自定义转换器！</p>
+<h3 id="数据格式化">数据格式化</h3>
+<p>数据格式化还是数据类型转换的范畴， Spring 在格式化模块中定义了一个实现<code>ConversionService</code>接口的<code>FormattingConversionService</code>实现类， 该实现类扩展 了<code>GenericConversionService</code>，它既具有类型转换的 功能，又具有格式化的功能。</p>
+<p><code>FormattingConversionService</code>拥有一个<code>FormattingConversionServiceFactroyBean</code>工厂类， 后者用于在 Spring 上下文中构造前者。</p>
+<p><strong>只要在项目中配置  mvc:annotation-driven，Spring就会默认创建<code>FormattingConversionServiceFactroyBean</code>。</strong></p>
+<p><code>FormattingConversionServiceFactroyBean</code>内部已经注册了 :</p>
+<ul>
+<li><code>NumberFormatAnnotationFormatterFactroy</code>：支持对数字类型的属性， 使用<code>@NumberFormat</code>注解；</li>
+</ul>
+<ul>
+<li><code>JodaDateTimeFormatAnnotationFormatterFactroy</code>：支持对日期类型 的属性使用<code>@DateTimeFormat</code>注解。</li>
+</ul>
+<h4 id="@DateTimeFormat">@DateTimeFormat</h4>
+<p>@DateTimeFormat 注解可对<code>java.util.Date</code>、<code>java.util.Calendar</code>、<code>java.long.Long</code>时间 类型进行标注：</p>
+<ul>
+<li>pattern 属性： 类型为字符串。指定解析/格式化字段数据的模式， 如：<code>yyyy-MM-dd hh:mm:ss</code>；</li>
+<li>iso 属性： 类型为<code>DateTimeFormat.ISO</code>。指定解析/格式化字段数据 的ISO模式，包括四种：<ul>
+<li>ISO.NONE（不使用）， 默 认值；</li>
+<li>ISO.DATE(yyyy-MM-dd) ；</li>
+<li>ISO.TIME(hh:mm:ss.SSSZ)；</li>
+<li>ISO.DATE_TIME(yyyy-MM-dd hh:mm:ss.SSSZ)。</li>
+</ul>
+</li>
+<li>style 属性：字符串类型。通过样式指定日期时间的格式，由两位字 符组成，第一位表示日期的格式，第二位表示时间的格式： S：短日 期/时间格式、 M：中日期/时间 格式、 L： 长日期/时间 格式、 F：完整 日期/时间 格式、 -：忽略日期或时间格式。</li>
+</ul>
+<h4 id="@NumberFormat">@NumberFormat</h4>
+<p>@NumberFormat   可对类似数字类型的属性进行标 注，它拥有两个互斥的属性：</p>
+<ul>
+<li>style： 类型为 <code>NumberFormat.Style</code>。用于指定样式类 型，包括三种： <ul>
+<li>Style.NUMBER（正常数字类型）；</li>
+<li>Style.CURRENCY（货币类型）；</li>
+<li>Style.PERCENT（ 百分数类型）；</li>
+</ul>
+</li>
+<li>pattern： 类型为 String，自定义样式， 如<code>pattern=&quot;#,###,###.#&quot;</code>。</li>
+</ul>
+<p><strong>注意，这两个注解使用时都是注解加到JavaBean的属性上就行！</strong><br>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span>{</div><div class="line"></div><div class="line">    <span class="comment">// ......</span></div><div class="line">    <span class="annotation">@DateTimeFormat</span>(pattern=<span class="string">"yyyy-MM-dd"</span>)</div><div class="line">    <span class="keyword">private</span> Date birth;</div><div class="line">    <span class="annotation">@NumberFormat</span>(pattern=<span class="string">"#,###,###.#"</span>)</div><div class="line">    <span class="keyword">private</span> Float salary;</div></pre></td></tr></table></figure>
+
+<h4 id="同时使用_自定义转换器和格式化注解">同时使用 自定义转换器和格式化注解</h4>
+<p><strong>在使用上面两个注解的时候，如果系统中还有自定义的类型转换器，则在配置自定义类型转换器是一定要用<code>FormattingConversionServiceFactoryBean</code>，否则这2个注解无法正常工作，因为 <code>FormattingConversionServiceFactoryBean</code>即包含了类型转换功能，又包含了格式化功能！</strong><br>使用 <code>FormattingConversionServiceFactoryBean</code> 配置自定义转换器并保留Spring的格式化功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">mvc:annotation-driven</span> <span class="attribute">conversion-service</span>=<span class="value">"conversionServiceFactoryBean"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"conversionServiceFactoryBean"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.format.support.FormattingConversionServiceFactoryBean"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"converters"</span>&gt;</span>                                                                                </div><div class="line">        <span class="tag">&lt;<span class="title">list</span>&gt;</span>                                                                                                   </div><div class="line">            <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"section08.MyConverter"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>                                                          </div><div class="line">        <span class="tag">&lt;/<span class="title">list</span>&gt;</span>                                                                                                  </div><div class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span>                                                                                                 </div><div class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="获取类型转换错误对象">获取类型转换错误对象</h3>
+<p>目标方法可以接收类型转换异常对象或者转换结果作为参数，<strong>异常对象的接口为<code>Errors</code>，也可以使用它的实现类<code>AbstractErrors</code>或者<code>BindingResult</code>，但不能用<code>EscapedErrors</code>。</strong></p>
+<p>结果转换异常示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">@<span class="type">RequestMapping</span>(value=<span class="string">"/emp"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">POST</span>)                                   </div><div class="line">public <span class="type">String</span> newSave(@<span class="type">Valid</span> <span class="type">Employee</span> employee, <span class="type">Errors</span> e, <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt; map) {       </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(employee);                                                          </div><div class="line">    <span class="keyword">if</span>(e != null) {                                                                        </div><div class="line">        <span class="type">List</span>&lt;<span class="type">FieldError</span>&gt; errors = e.getFieldErrors();                                      </div><div class="line">        <span class="keyword">for</span>(<span class="type">FieldError</span> error : errors) {                                                   </div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(error.getField() + <span class="string">"-错误消息-"</span> + error.getDefaultMessage());   </div><div class="line">        }                                                                                  </div><div class="line">        // 发生错误后回到input.jsp页面                                                              </div><div class="line">        map.put(<span class="string">"departments"</span>, deptDao.getDepartments());                                  </div><div class="line">        <span class="keyword">return</span> <span class="string">"section07/input"</span>;                                                          </div><div class="line">    }                                                                                      </div><div class="line">    empDao.save(employee);                                                                 </div><div class="line">    <span class="keyword">return</span> <span class="string">"redirect:/EmployeeHandler/emps"</span>;                                               </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意： 需校验的JavaBean对象和其绑定结果对象（<code>BindingResult</code>）或错误对象（<code>Errors</code>）时成对出现的，它们 之间不允许声明其他的入参。</strong><br>例如下面方法的参数定义是正确的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="built_in">String</span> <span class="keyword">handle</span> <span class="number">91</span> (@Valid User user, BindingResult userBindingResult,  <span class="built_in">String</span> sessionId, ModelMap mm,  @Valid Dept dept, Errors deptErrors){</div><div class="line">    <span class="comment">// ......</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="JSR_303校验标准">JSR 303校验标准</h3>
+<p>JSR303：</p>
+<ul>
+<li>JSR 303 是 Java 为 Bean 数据合法性校验提供的标准框架， 它已经包含在 JavaEE 6.0 中。</li>
+<li>JSR 303 通过在 Bean 属性上标注类似于<code>@NotNull</code>、 <code>@Max</code> 等标准的注解指定校验规则，并通过标准的验证接口对Bean 进行验证。</li>
+<li>Hibernate Validator 是 JSR 303 的一个参考实现，除支持 所有标准的校验注解外，它还支持以下的扩展注解：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>注解</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@Email</td>
+<td>属性必须是电子邮箱格式</td>
+</tr>
+<tr>
+<td>@Length</td>
+<td>属性字符串必须在指定范围</td>
+</tr>
+<tr>
+<td>@NotEmpty</td>
+<td>属性字符串必须非空</td>
+</tr>
+<tr>
+<td>@Range</td>
+<td>属性必须在指定范围</td>
+</tr>
+</tbody>
+</table>
+<h4 id="使用方法">使用方法</h4>
+<p>要使用实现 JSR303的 Hibernate Validator基本步骤：<br>（1）加入下列jar包：<br>hibernate-validator-5.0.0.CR2.jar<br>hibernate-validator-annotation-processor-5.0.0.CR2.jar<br>validation-api-1.1.0.CR1.jar<br>classmate-0.8.0.jar<br>jboss-logging-3.1.1.GA.jar</p>
+<p>（2）Spring配置文件需要添加mvc:annotation-driven配置项。</p>
+<p>（3）对JavaBean对象需要校验的属性添加注解，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span>{</div><div class="line">    <span class="annotation">@NotEmpty</span></div><div class="line">    <span class="keyword">private</span> String lastName;</div><div class="line">    <span class="annotation">@Email</span></div><div class="line">    <span class="keyword">private</span> String email;</div><div class="line">    <span class="comment">// ......</span></div></pre></td></tr></table></figure>
+
+<p>（4）对使用JavaBean对象作为参数的目标方法添加<code>@Valid</code>注解，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">@<span class="type">RequestMapping</span>(value=<span class="string">"/emp"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">POST</span>)                           </div><div class="line">public <span class="type">String</span> newSave(@<span class="type">Valid</span> <span class="type">Employee</span> employee, <span class="type">BindingResult</span> br) {                </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(employee);                                                  </div><div class="line">    <span class="keyword">if</span>(br != null) {                                                               </div><div class="line">        <span class="type">List</span>&lt;<span class="type">FieldError</span>&gt; errors = br.getFieldErrors();                             </div><div class="line">        <span class="keyword">for</span>(<span class="type">FieldError</span> e : errors) {                                               </div><div class="line">            <span class="type">System</span>.<span class="keyword">out</span>.println(e.getField() + <span class="string">"-错误消息-"</span> + e.getDefaultMessage());   </div><div class="line">        }                                                                          </div><div class="line">    }                                                                              </div><div class="line">    empDao.save(employee);                                                         </div><div class="line">    <span class="keyword">return</span> <span class="string">"redirect:/EmployeeHandler/emps"</span>;                                       </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="JSP中显示错误消息">JSP中显示错误消息</h3>
+<p>Spring MVC 除了会将表单对象的校验结果保存到对 应的<code>BindingResult</code>或<code>Errors</code>对象中外， 还会将所有校验 结果保存到 “隐含数据模型”。 隐含数据模型中的所有数据最终将通过<code>HttpServletRequest</code>的 属性列表暴露给 JSP 视图对象，因此在 JSP 中可以获取 错误信息。</p>
+<p><strong>在 JSP 页面上可通过<code>form:errors path=&quot;propertyName&quot;</code> 显示错误消息，当propertyName为<code>*</code>的时候，取出所有的错误消息。</strong></p>
+<p>例如获取JSP页面中employee的lastName字段错误消息：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">form:errors</span> <span class="attribute">path</span>=<span class="value">"lastName"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="国际化错误消息">国际化错误消息</h3>
+<p>当一个属性校验失败后，校验框架会为该属性生成 4 个消 息代码， 这些代码<strong>以校验注解类名为前缀， 结合 modleAttribute、属性名及属性类型名</strong>生成多个对应的消息。<br>例如 User 类中的 password 属性标准了一个 @Pattern 注 解，当该属性值 不满足 @Pattern 所定义的规则时, 就会产生以下 4 个错误代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Pattern</span>.user.password</div><div class="line"><span class="keyword">Pattern</span>.password</div><div class="line"><span class="keyword">Pattern</span>.java.lang.<span class="keyword">String</span></div><div class="line"><span class="keyword">Pattern</span></div></pre></td></tr></table></figure>
+
+<p>这时候只要把其中一种错误代码配置在国际化资源文件中，就可以对错误消息显示进行国际化。</p>
+<p><strong>注意，上面这种命名方法不适合用@DateTimeFormat和@NumberFormat格式化的JavaBean属性，它们需要使用下面的命名方式。</strong></p>
+<p>若数据类型转换或数据格式转换时发生错误，或该有的参 数不存在，或调用处理方法时发生错误，都会在隐含模型 中创建错误消息。其错误代码前缀说明如下：</p>
+<ul>
+<li>required：必要的参数不存在。如 @RequiredParam(“param1”) 标注了一个入参，但是该参数不存在；</li>
+<li>typeMismatch：在数据绑定时， 发生数据类型不匹配的问题；</li>
+<li>methodInvocation： Spring MVC 在调用处理方法时发生了错误。</li>
+</ul>
+<p>示例：<br>例如Employee类中对以下4个属性进行了注解：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span>{</div><div class="line">    <span class="annotation">@NotEmpty</span></div><div class="line">    <span class="keyword">private</span> String lastName;</div><div class="line">    <span class="annotation">@Email</span></div><div class="line">    <span class="keyword">private</span> String email;</div><div class="line">    <span class="annotation">@DateTimeFormat</span>(pattern=<span class="string">"yyyy-MM-dd"</span>)</div><div class="line">    <span class="keyword">private</span> Date birth;</div><div class="line">    <span class="annotation">@NumberFormat</span>(pattern=<span class="string">"#,###,###.#"</span>)</div><div class="line">    <span class="keyword">private</span> Float salary;</div></pre></td></tr></table></figure>
+
+<p>这时候需要配置的国际化资源文件的核心文件为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">NotEmpty.employee.lastName=lastName may <span class="operator">not</span> be <span class="constant">null</span></div><div class="line">Email.employee.email=<span class="operator">not</span> <span class="operator">a</span> email address</div><div class="line"> </div><div class="line"><span class="comment">#for @DateTimeFormat and @NumberFormat</span></div><div class="line">typeMismatch.employee.birth=<span class="operator">not</span> <span class="operator">a</span> <span class="built_in">date</span> <span class="built_in">format</span></div><div class="line">typeMismatch.employee.salary=<span class="operator">not</span> <span class="operator">a</span> <span class="built_in">number</span> <span class="built_in">format</span></div></pre></td></tr></table></figure>
+
+<p>最后在JSP页面中使用form:errors就能获取国际化的错误消息：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">form:errors</span> <span class="attribute">path</span>=<span class="value">"lastName"</span>/&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="title">form:errors</span> <span class="attribute">path</span>=<span class="value">"email"</span>/&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="title">form:errors</span> <span class="attribute">path</span>=<span class="value">"birth"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">form:errors</span> <span class="attribute">path</span>=<span class="value">"salary"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="@InitBinder注解">@InitBinder注解</h3>
+<p>使用说明：</p>
+<ul>
+<li>由 <code>@InitBinder</code> 标识的方法， 可以对<code>WebDataBinder</code>对 象进行初始化（<code>WebDataBinder</code>是 <code>DataBinder</code> 的子类，用 于完成由表单字段到 JavaBean 属性的绑定）；</li>
+<li><code>@InitBinder</code>方法不能有返回值，它必须声明为 void；</li>
+<li><code>@InitBinder</code>方法的参数通常是是<code>WebDataBinder</code>；</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@InitBinder</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initBinder</span>(WebDataBinder binder){</div><div class="line">    binder.setDisallowedFields(<span class="string">"lastName"</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这个方法的效果是执行目标方法时，取消把表单中的lastName字段映射为JavaBean中的lastName属性。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/SpringMVC/">SpringMVC</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/SpringMVC/Spring MVC完全教程（二）：REST、类型转换和校验/" data-title="Spring MVC完全教程（二）：REST、类型转换和校验 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（四）：原理分析/" title="Spring MVC完全教程（四）：原理分析">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Spring MVC完全教程（四）：原理分析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理/"  title="Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理">
+ <strong>NEXT:</strong><br/> 
+ <span>Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#REST"><span class="toc-number">1.</span> <span class="toc-text">REST</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HiddenHttpMethodFilter"><span class="toc-number">1.1.</span> <span class="toc-text">HiddenHttpMethodFilter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#REST风格URL示例"><span class="toc-number">1.2.</span> <span class="toc-text">REST风格URL示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RESTful_SpringMVC_CRUD（参考SpringMVC中的section07部分）"><span class="toc-number">2.</span> <span class="toc-text">RESTful SpringMVC CRUD（参考SpringMVC中的section07部分）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据类型转换、格式化和校验"><span class="toc-number">3.</span> <span class="toc-text">数据类型转换、格式化和校验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据绑定流程分析"><span class="toc-number">3.1.</span> <span class="toc-text">数据绑定流程分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mvc:annotation-driven配置项的作用"><span class="toc-number">3.2.</span> <span class="toc-text">mvc:annotation-driven配置项的作用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#mvc:default-servlet-handler和_mvc:annotation-driven的一些说明"><span class="toc-number">3.2.1.</span> <span class="toc-text">mvc:default-servlet-handler和 mvc:annotation-driven的一些说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自定义类型转换器"><span class="toc-number">3.3.</span> <span class="toc-text">自定义类型转换器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#源码简析"><span class="toc-number">3.3.1.</span> <span class="toc-text">源码简析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据格式化"><span class="toc-number">3.4.</span> <span class="toc-text">数据格式化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#@DateTimeFormat"><span class="toc-number">3.4.1.</span> <span class="toc-text">@DateTimeFormat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#@NumberFormat"><span class="toc-number">3.4.2.</span> <span class="toc-text">@NumberFormat</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#同时使用_自定义转换器和格式化注解"><span class="toc-number">3.4.3.</span> <span class="toc-text">同时使用 自定义转换器和格式化注解</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取类型转换错误对象"><span class="toc-number">3.5.</span> <span class="toc-text">获取类型转换错误对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSR_303校验标准"><span class="toc-number">3.6.</span> <span class="toc-text">JSR 303校验标准</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#使用方法"><span class="toc-number">3.6.1.</span> <span class="toc-text">使用方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP中显示错误消息"><span class="toc-number">3.7.</span> <span class="toc-text">JSP中显示错误消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#国际化错误消息"><span class="toc-number">3.8.</span> <span class="toc-text">国际化错误消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@InitBinder注解"><span class="toc-number">3.9.</span> <span class="toc-text">@InitBinder注解</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,564 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Hibernate4完全教程（三）：映射关系 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="映射关系和方向说明
+所谓的映射关系是指某个表中的记录和另一个表中的记录的对应关系。例如多对一（一对多类似）的关系，就是一个表中有多条记录对应另一个表中的某一条记录，通过外键表示这种关系；多对多的关联，就是一个表A中，记录a对应另一个表B中的多条记录，记录b也对应表B中的多条记录，等等。多对多的关联关">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Hibernate/Hibernate4完全教程（三）：映射关系/" title="Hibernate4完全教程（三）：映射关系" itemprop="url">Hibernate4完全教程（三）：映射关系</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#映射关系和方向说明"><span class="toc-number">1.</span> <span class="toc-text">映射关系和方向说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一对一关联关系映射"><span class="toc-number">2.</span> <span class="toc-text">一对一关联关系映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于外键"><span class="toc-number">2.1.</span> <span class="toc-text">基于外键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#property-ref的作用"><span class="toc-number">2.2.</span> <span class="toc-text">property-ref的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于外键时的查询策略"><span class="toc-number">2.3.</span> <span class="toc-text">基于外键时的查询策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于主键"><span class="toc-number">2.4.</span> <span class="toc-text">基于主键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于主键方式的查询策略"><span class="toc-number">2.5.</span> <span class="toc-text">基于主键方式的查询策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单向多对一关联映射"><span class="toc-number">3.</span> <span class="toc-text">单向多对一关联映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单向一对多"><span class="toc-number">4.</span> <span class="toc-text">单向一对多</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#set元素的3个属性"><span class="toc-number">4.1.</span> <span class="toc-text">set元素的3个属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#双向一对多关联映射"><span class="toc-number">5.</span> <span class="toc-text">双向一对多关联映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结一对多的关联关系"><span class="toc-number">6.</span> <span class="toc-text">小结一对多的关联关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多对多关联映射"><span class="toc-number">7.</span> <span class="toc-text">多对多关联映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#单向多对多"><span class="toc-number">7.1.</span> <span class="toc-text">单向多对多</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双向多对多"><span class="toc-number">7.2.</span> <span class="toc-text">双向多对多</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结class元素的使用方法"><span class="toc-number">8.</span> <span class="toc-text">总结class元素的使用方法</span></a></li></ol>
+		</div>
+		
+		<h2 id="映射关系和方向说明">映射关系和方向说明</h2>
+<p><strong>所谓的映射关系是指某个表中的记录和另一个表中的记录的对应关系。</strong>例如多对一（一对多类似）的关系，就是一个表中有多条记录对应另一个表中的某一条记录，通过外键表示这种关系；多对多的关联，就是一个表A中，记录a对应另一个表B中的多条记录，记录b也对应表B中的多条记录，等等。多对多的关联关系中一般用中间关联表表示。</p>
+<p>多对一或者多对多表项在JavaBean中是一样的。对象A中包含了对象B的集合类型的属性，这时候A和B之间的关系可以是一对多或者多对多！如果是一对多，则最后生成的数据表是通过外键联系；如果是多对多，则需要提供中间表。<strong>所以确定多对一还是多对多其实是根据.hbm.xml文件中set元素的配置情况。</strong></p>
+<p><strong>所谓的方向针对JavaBean来说的，也就是一个对象是否包含了另一个对象的引用，通过对象的引用就能实现查询另一个对象的数据值。</strong>例如A对象包含了B对象的引用，但B对象没有包含A对象，则只能通过A对象查询到B对象的值，反过来则不行。</p>
+<p>这种引用关系体现在数据库中就是外键，定义外键可以是把当前表的主键引用另一表的主键，或者当前表额外的外键列引用另一个表的主键。外键应该是没有所谓的方向的，也就是A表的aa列引用了B表的bb主键列，此时只要用等值连接这aa和bb字段就能把2个表的数据都查询出来。</p>
+<h2 id="一对一关联关系映射">一对一关联关系映射</h2>
+<p>一对一的关联关系用JavaBean可以表示为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Department {</div><div class="line">    <span class="keyword">private</span> Integer deptId;</div><div class="line">    <span class="keyword">private</span> String deptName;</div><div class="line">    <span class="comment">// 引用对象</span></div><div class="line">    <span class="keyword">private</span> Manager manager;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Manager {</div><div class="line">    <span class="keyword">private</span> Integer managerId;</div><div class="line">    <span class="keyword">private</span> String managerName;</div><div class="line">    <span class="comment">// 引用对象</span></div><div class="line">    <span class="keyword">private</span> Department department;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Department对象中包含了Manager对象的引用，同样Manager对象中也包含Department对象的引用。</p>
+<p>一对一的关联关系可以使用数据库的<strong>主键</strong>或者<strong>外键</strong>的方式约束。</p>
+<h3 id="基于外键">基于外键</h3>
+<p><strong>基于外键的意思是，2个表的其中一个表需要提供一个额外的字段作为外键关联字段，保存的是关联数据表的主键，这个字段需要用DDL语言声明为外键并且是唯一的。这也是数据库设计中常用的方式。</strong></p>
+<p>对于基于外键的一对一关联，其外键可以存放在<strong>任意一边</strong>，在需要存放外键一端，<strong>使用many-to-one元素</strong>，<strong>而且增加unique=”true”属性来表示为一对一关联关系。</strong></p>
+<p>例如这里把many-to-one放在了Department对象中，所以它的映射文件为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.one2one.foreign"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Department"</span> <span class="attribute">table</span>=<span class="value">"DEPARTMENTS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"deptId"</span> <span class="attribute">column</span>=<span class="value">"DEPT_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"deptName"</span> <span class="attribute">column</span>=<span class="value">"DEPT_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            unique="true"把外键约束为唯一外键，这样多对一就变成了一对一。</div><div class="line">         --&gt;</div><div class="line">        <span class="tag">&lt;<span class="title">many-to-one</span> <span class="attribute">name</span>=<span class="value">"manager"</span> <span class="attribute">class</span>=<span class="value">"Manager"</span> <span class="attribute">column</span>=<span class="value">"MANAGER_ID"</span> <span class="attribute">unique</span>=<span class="value">"true"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>生成的数据表为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">| departments | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`departments`</span> (</span></div><div class="line">  <span class="string">`DEPT_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`DEPT_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`MANAGER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`DEPT_ID`</span>),</div><div class="line">  <span class="keyword">UNIQUE</span> <span class="keyword">KEY</span> <span class="string">`UK_hpi0ma0bedsi4fya3pk6ul6i6`</span> (<span class="string">`MANAGER_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`FK_hpi0ma0bedsi4fya3pk6ul6i6`</span> (<span class="string">`MANAGER_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`FK_hpi0ma0bedsi4fya3pk6ul6i6`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`MANAGER_ID`</span>) REFERENCE S <span class="string">`managers`</span> (<span class="string">`MANAGER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">3</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p><strong>可以看到，DEPARTMENTS表的数据列 MANAGER_ID被约束为UNIQUE，且它是一个外键，引用MANAGERS表的MANAGER_ID列。分别对应映射文件中many-to-one的column和unique属性设置的值。</strong></p>
+<p>另一JavaBean需要使用one-to-one元素，所以Manager的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;hibernate-mapping package=<span class="string">"section04.one2one.foreign"</span>&gt;</div><div class="line">    &lt;class name=<span class="string">"Manager"</span> table=<span class="string">"MANAGERS"</span>&gt;</div><div class="line">        &lt;id name=<span class="string">"managerId"</span> column=<span class="string">"MANAGER_ID"</span> <span class="keyword">type</span>=<span class="string">"java.lang.Integer"</span>&gt;</div><div class="line">            &lt;generator class=<span class="string">"native"</span>/&gt;</div><div class="line">        &lt;/id&gt;</div><div class="line">        &lt;property name=<span class="string">"managerName"</span> column=<span class="string">"MANAGER_NAME"</span> <span class="keyword">type</span>=<span class="string">"java.lang.String"</span>/&gt;</div><div class="line">        &lt;!--</div><div class="line">            property-<span class="keyword">ref</span>=<span class="string">"manager"</span>指定使用class=<span class="string">"Department"</span>中的manager属性</div><div class="line">         --&gt;</div><div class="line">        &lt;one-to-one name=<span class="string">"department"</span> class=<span class="string">"Department"</span>  property-<span class="keyword">ref</span>=<span class="string">"manager"</span>/&gt;</div><div class="line">    &lt;/class&gt;</div><div class="line">&lt;/hibernate-mapping&gt;</div></pre></td></tr></table></figure>
+
+<p><strong>一定要注意一下，这里使用</strong>property-ref<strong>属性指定关联 class=”Department”中的manager属性，因为manager属性在Department中被声明为了唯一外键，所以在执行查询的时候，才会正确的使用managers .MANAGER_ID=departments.MANAGER_ID的连接条件。</strong></p>
+<h3 id="property-ref的作用">property-ref的作用</h3>
+<p>前面已经说明了，外键管理的一对一关系中，使用one-to-one元素需要加上property-ref属性，它的值是使用many-to-one的JavaBean中被声明为外键的属性。</p>
+<p><strong>这是因为在使用many-to-one的JavaBean查询one-to-one的JavaBean对象时，需要使用左外连接关联2个数据表，property-ref的功能就是声明使用当前表主键关联另一个表的外键。</strong></p>
+<p>示例，测试查询功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public <span class="type">void</span> testPropertyRef() {                                                                </div><div class="line">    // 使用延迟加载策略，即关联的对象不会发送查询语句，只查询当前表对应的记录                                             </div><div class="line">    <span class="type">Department</span> dept = (<span class="type">Department</span>)session.get(<span class="type">Department</span>.class, <span class="number">1</span>);                    </div><div class="line">    // 注意查看生产的<span class="type">SQL</span>语句，如果没有添加property-<span class="keyword">ref</span>属性，则<span class="type">SQL</span>语句中等值连接条件是错误的                             </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(dept.getManager().getManagerName());                            </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这里如果没有使用property-ref属性，则得到的属性SQL为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Hibernate:</div><div class="line">    <span class="operator"><span class="keyword">select</span></span></div><div class="line">        manager0_.MANAGER_ID <span class="keyword">as</span> MANAGER_1_1_1_,</div><div class="line">        manager0_.MANAGER_NAME <span class="keyword">as</span> MANAGER_2_1_1_,</div><div class="line">        department1_.DEPT_ID <span class="keyword">as</span> DEPT_ID1_0_0_,</div><div class="line">        department1_.DEPT_NAME <span class="keyword">as</span> DEPT_NAM2_0_0_,</div><div class="line">        department1_.MANAGER_ID <span class="keyword">as</span> MANAGER_3_0_0_</div><div class="line">    <span class="keyword">from</span></div><div class="line">        MANAGERS manager0_</div><div class="line">    <span class="keyword">left</span> <span class="keyword">outer</span> <span class="keyword">join</span></div><div class="line">        DEPARTMENTS department1_</div><div class="line">            <span class="keyword">on</span> manager0_.MANAGER_ID=department1_.DEPT_ID</div><div class="line">    <span class="keyword">where</span></div><div class="line">        manager0_.MANAGER_ID=?</div></pre></td></tr></table></figure>
+
+<p>此时MANAGER表的MANAGER_ID关联的是DEPARTMENTS表的DEPT_ID字段，明显不对。<br>只有加上了property-ref属性后：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Hibernate:</div><div class="line">    <span class="operator"><span class="keyword">select</span></span></div><div class="line">        manager0_.MANAGER_ID <span class="keyword">as</span> MANAGER_1_1_1_,</div><div class="line">        manager0_.MANAGER_NAME <span class="keyword">as</span> MANAGER_2_1_1_,</div><div class="line">        department1_.DEPT_ID <span class="keyword">as</span> DEPT_ID1_0_0_,</div><div class="line">        department1_.DEPT_NAME <span class="keyword">as</span> DEPT_NAM2_0_0_,</div><div class="line">        department1_.MANAGER_ID <span class="keyword">as</span> MANAGER_3_0_0_</div><div class="line">    <span class="keyword">from</span></div><div class="line">        MANAGERS manager0_</div><div class="line">    <span class="keyword">left</span> <span class="keyword">outer</span> <span class="keyword">join</span></div><div class="line">        DEPARTMENTS department1_</div><div class="line">            <span class="keyword">on</span> manager0_.MANAGER_ID=department1_.MANAGER_ID</div><div class="line">    <span class="keyword">where</span></div><div class="line">        manager0_.MANAGER_ID=?</div></pre></td></tr></table></figure>
+
+<p>此时MANAGER表的MANAGER_ID关联的 才是DEPARTMENTS表的MANAGER_ID字段。</p>
+<h3 id="基于外键时的查询策略">基于外键时的查询策略</h3>
+<p>在使用基于外键方式的一对一关联关系中查询数据时，无论从哪一个对象进行查询，<strong>都是只直接查询当前对象，延迟查询引用对象。</strong></p>
+<p><strong>注意，这里所谓的延迟查询策略是指只查询当前对象的非引用类型属性的数据，而引用类型属性的数据当需要的时候才会查询。并不是说只查询某个数据表，因为有时候只查询非引用类型属性的数据时也需要用到多表查询。</strong></p>
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span>() {                                               </div><div class="line">    Department dept = (Department) session.<span class="keyword">get</span>(Department.class, <span class="number">1</span>);  </div><div class="line">    System.<span class="keyword">out</span>.println(dept.getDeptName());                           </div><div class="line"> </div><div class="line">    Manager manager = (Manager) session.<span class="keyword">get</span>(Manager.class, <span class="number">1</span>);        </div><div class="line">    System.<span class="keyword">out</span>.println(manager.getManagerName());                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>查看输出的SQL语句，可以发现查询Department对象时并没有把它的Manager属性也查询出来；对应Manager对象也是同样的。</strong></p>
+<h3 id="基于主键">基于主键</h3>
+<p><strong>基于主键的方式2个数据表中都没有额外的字段，而是直接把其中一个表的主键声明为外键，并且引用另一个表的外键。这不是一种好的数据库设计方式。</strong></p>
+<p>基于主键的映射策略：一端的主键生成器使用<strong>foreign</strong>策略，表明根据”对方“的主键来生成自己的主键，自己并不能独立生成主键。所以此时的Department类的映射文件为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.one2one.primary"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Department"</span> <span class="attribute">table</span>=<span class="value">"DEPARTMENTS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"deptId"</span> <span class="attribute">column</span>=<span class="value">"DEPT_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!--</span></div><div class="line">                使用外键生产策略，name="property"指定是引用Manager类的manager属性作为外键</div><div class="line">             --&gt;</div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"foreign"</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">param</span> <span class="attribute">name</span>=<span class="value">"property"</span>&gt;</span>manager<span class="tag">&lt;/<span class="title">param</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">generator</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"deptName"</span> <span class="attribute">column</span>=<span class="value">"DEPT_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            one-to-one 需要加上constrained="true"，声明</div><div class="line">         --&gt;</div><div class="line">        <span class="tag">&lt;<span class="title">one-to-one</span> <span class="attribute">name</span>=<span class="value">"manager"</span> <span class="attribute">class</span>=<span class="value">"Manager"</span> <span class="attribute">constrained</span>=<span class="value">"true"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>这里有2点需要注意：</strong></p>
+<ul>
+<li>外键生成策略为foreign，且引用的是Manager类的manager属性作为外键，所以要加上<code>&lt;param name=&quot;property&quot;&gt;manager&lt;/param&gt;</code>部分；</li>
+<li><code>&lt;one-to-one name=&quot;manager&quot; class=&quot;Manager&quot; constrained=&quot;true&quot;/&gt;</code>把当期类的manager属性声明为一个外键约束，所以对应的数据表中没有这个属性对应的字段。</li>
+</ul>
+<p>生成的数据表结构为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">| departments | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`departments`</span> (</span></div><div class="line">  <span class="string">`DEPT_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`DEPT_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`DEPT_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`FK_4hwk7fsamtev3p0xbjubrjian`</span> (<span class="string">`DEPT_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`FK_4hwk7fsamtev3p0xbjubrjian`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`DEPT_ID`</span>) <span class="keyword">REFERENCES</span> <span class="string">` managers`</span> (<span class="string">`MANAGER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p>可以看到只有2个字段，且把主键约束为外键，引用MANAGERS表的MANAGER_ID字段。</p>
+<p>Manager的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;hibernate-mapping <span class="variable">package=</span><span class="string">"section04.one2one.primary"</span>&gt;</div><div class="line">    &lt;class <span class="variable">name=</span><span class="string">"Manager"</span> <span class="variable">table=</span><span class="string">"MANAGERS"</span>&gt;</div><div class="line">        &lt;id <span class="variable">name=</span><span class="string">"managerId"</span> <span class="variable">column=</span><span class="string">"MANAGER_ID"</span> <span class="variable">type=</span><span class="string">"java.lang.Integer"</span>&gt;</div><div class="line">            &lt;generator <span class="variable">class=</span><span class="string">"native"</span>/&gt;</div><div class="line">        &lt;/id&gt;</div><div class="line">        &lt;property <span class="variable">name=</span><span class="string">"managerName"</span> <span class="variable">column=</span><span class="string">"MANAGER_NAME"</span> <span class="variable">type=</span><span class="string">"java.lang.String"</span>/&gt;</div><div class="line">        &lt;one-to-one <span class="variable">name=</span><span class="string">"department"</span> <span class="variable">class=</span><span class="string">"Department"</span>/&gt;</div><div class="line">    &lt;/class&gt;</div><div class="line">&lt;/hibernate-mapping&gt;</div></pre></td></tr></table></figure>
+
+<p>没有特别需要注意的地方。</p>
+<h3 id="基于主键方式的查询策略">基于主键方式的查询策略</h3>
+<p>这时候的查询策略是，包含外键的对象使用延迟查询非引用类型数据，而不包含外键的对象每次都会直接查询所有属性的数据，也就是没有延迟。</p>
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 引用类型数据使用延迟查询                                                     </span></div><div class="line">@Test                                                               </div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span>() {                                             </div><div class="line">    Department dept = (Department) session.<span class="keyword">get</span>(Department.class, <span class="number">1</span>);</div><div class="line">    System.<span class="keyword">out</span>.println(dept.getDeptName());              </div><div class="line">    <span class="comment">// System.out.println(dept.getManager().getManagerName());            </span></div><div class="line">}                                                                   </div><div class="line"> </div><div class="line"><span class="comment">// 每次都是直接关联2个数据表查询                                                  </span></div><div class="line">@Test                                                               </div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet2</span>() {                                            </div><div class="line">    Manager manager = (Manager)session.<span class="keyword">get</span>(Manager.class, <span class="number">1</span>);       </div><div class="line">    System.<span class="keyword">out</span>.println(manager.getManagerName());                   </div><div class="line">    System.<span class="keyword">out</span>.println(manager.getDepartment().getDeptName());      </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>查看testGet()方法的输出SQL，在需要查询引用类型属性时才会发送相关的SQL。查看testGet2()方法的输出SQL，则无论属性是否是引用类型，输出SQL都是一样的。</p>
+<hr>
+<h2 id="单向多对一关联映射">单向多对一关联映射</h2>
+<p>在交易系统中，通常一个客户可以提交多个订单，也就是多个订单对应一个客户，从订单到客户的角度就是多对一的关系。<br>把这种关系用JavaBean表示：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Order {</div><div class="line">    <span class="keyword">private</span> Integer orderId;</div><div class="line">    <span class="keyword">private</span> String orderName;</div><div class="line">    <span class="comment">// 多对一引用属性</span></div><div class="line">    <span class="keyword">private</span> Customer customer;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Customer {</div><div class="line">    <span class="keyword">private</span> Integer customerId;</div><div class="line">    <span class="keyword">private</span> String customerName;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Order对象包含了对Customer对象的引用。</p>
+<p>这时候的Order映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.single.many2one"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Order"</span> <span class="attribute">table</span>=<span class="value">"ORDERS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"orderId"</span> <span class="attribute">column</span>=<span class="value">"ORDER_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"orderName"</span> <span class="attribute">column</span>=<span class="value">"ORDER_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            多对一映射:</div><div class="line">            name:属性名</div><div class="line">            class:属性类型</div><div class="line">            column:数据表的外键列的列名</div><div class="line">            foreign-key:引用的列</div><div class="line">         --&gt;</div><div class="line">        <span class="tag">&lt;<span class="title">many-to-one</span> <span class="attribute">name</span>=<span class="value">"customer"</span> <span class="attribute">class</span>=<span class="value">"Customer"</span> <span class="attribute">column</span>=<span class="value">"FK_CUSTOMER_ID"</span> <span class="attribute">foreign-key</span>=<span class="value">"CUSTOMER_ID"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>使用<strong>many-to-one</strong>元素表示这种多对一的关系，<strong>这个属性的作用就是把这种关系表示为数据库的外键</strong>，也就是把customer声明为FK_CUSTOMER_ID外键列，引用的是 Customer对象中的 CUSTOMER_ID列。<br>所以many-to-one中的4个属性的作用为：</p>
+<ul>
+<li>name：属性名                   </li>
+<li>class：属性类型                 </li>
+<li>column：数据表的外键列的列名          </li>
+<li>foreign-key：引用的列       </li>
+</ul>
+<p>这时候Order生成的数据库为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">| orders | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`orders`</span> (</span></div><div class="line">  <span class="string">`ORDER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`ORDER_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`FK_CUSTOMER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`ORDER_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`CUSTOMER_ID`</span> (<span class="string">`FK_CUSTOMER_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`CUSTOMER_ID`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`FK_CUSTOMER_ID`</span>) <span class="keyword">REFERENCES</span> <span class="string">`customers`</span> (<span class="string">`CUSTOMER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+
+
+<p>FK_CUSTOMER_ID是ORDERS表的外键列，引用CUSTOMERS表的CUSTOMER_ID列。</p>
+<p>另外一个对象Customer因为没有包含引用类型对象，所以配置的内容比较简单：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;hibernate-mapping <span class="variable">package=</span><span class="string">"section04.single.many2one"</span>&gt;</div><div class="line">    &lt;class <span class="variable">name=</span><span class="string">"Customer"</span> <span class="variable">table=</span><span class="string">"CUSTOMERS"</span>&gt;</div><div class="line">        &lt;id <span class="variable">name=</span><span class="string">"customerId"</span> <span class="variable">column=</span><span class="string">"CUSTOMER_ID"</span> <span class="variable">type=</span><span class="string">"java.lang.Integer"</span>&gt;</div><div class="line">            &lt;generator <span class="variable">class=</span><span class="string">"native"</span>/&gt;</div><div class="line">        &lt;/id&gt;</div><div class="line">        &lt;property <span class="variable">name=</span><span class="string">"customerName"</span> <span class="variable">column=</span><span class="string">"CUSTOMER_NAME"</span> <span class="variable">type=</span><span class="string">"java.lang.String"</span>/&gt;</div><div class="line">    &lt;/class&gt;</div><div class="line">&lt;/hibernate-mapping&gt;</div></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="literal">void</span> testGet() {                                         </div><div class="line">    <span class="keyword">Order</span> <span class="keyword">order</span> <span class="subst">=</span> (<span class="keyword">Order</span>) session<span class="built_in">.</span>get(<span class="keyword">Order</span><span class="built_in">.</span>class, <span class="number">1</span>);          </div><div class="line">    <span class="comment">// 这时候不会查询Customer表                                         </span></div><div class="line">    System<span class="built_in">.</span>out<span class="built_in">.</span>println(<span class="keyword">order</span><span class="built_in">.</span>getOrderName());                   </div><div class="line"> </div><div class="line">    <span class="comment">// 只有需要Customer对象时才会查询                                      </span></div><div class="line">    System<span class="built_in">.</span>out<span class="built_in">.</span>println(<span class="keyword">order</span><span class="built_in">.</span>getCustomer()<span class="built_in">.</span>getCustomerName());  </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>从输出的SQL语句可以知道，Order获取非引用类型的数据时，只查询当前的数据表；只有在获取引用类型对象是才会查询Customer对应的表。</p>
+<hr>
+<h2 id="单向一对多">单向一对多</h2>
+<p>单向的一对多和多对一其实是类似的，只不过从不同的角度出发，从客户对订单的角度就是一对多，所以只要在Customer中添加Order的集合类型属性就是一对多关联关系。<br>此时的JavaBean为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Customer {</div><div class="line">    <span class="keyword">private</span> Integer customerId;</div><div class="line">    <span class="keyword">private</span> String customerName;</div><div class="line">    <span class="comment">// 一对多属性</span></div><div class="line">    <span class="keyword">private</span> Set&lt;Order&gt; orders = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Order {</div><div class="line">    <span class="keyword">private</span> Integer orderId;</div><div class="line">    <span class="keyword">private</span> String orderName;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在定义集合类型的属性时注意2点：</p>
+<ul>
+<li>集合类型的属性一定是接口类型而不是接口实现类类型，因为Hibernate是通过代理的方式返回集合类型的属性对象的，而所使用的代理是通过接口的形式实现；</li>
+<li>集合类型的属性最好要初始化，避免在使用过程中出现空指针异常</li>
+</ul>
+<p>Customer的映射文件内容：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.single.one2many"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Customer"</span> <span class="attribute">table</span>=<span class="value">"CUSTOMERS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"customerId"</span> <span class="attribute">column</span>=<span class="value">"CUSTOMER_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"customerName"</span> <span class="attribute">column</span>=<span class="value">"CUSTOMER_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!-- 一对多映射 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">set</span> <span class="attribute">name</span>=<span class="value">"orders"</span> <span class="attribute">table</span>=<span class="value">"CUSTOMERS"</span> <span class="attribute">inverse</span>=<span class="value">"true"</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!-- 引用Order对应的数据表的外键列 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">key</span> <span class="attribute">column</span>=<span class="value">"FK_CUSTOMER_ID"</span>/&gt;</span></div><div class="line">            <span class="comment">&lt;!-- orders属性的类型 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">one-to-many</span> <span class="attribute">class</span>=<span class="value">"Order"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">set</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>set元素是用来表示集合类型的属性，<strong>它不表示关联关系</strong>，而且它一定包含key和one-to-many子元素；</li>
+<li><p>set元素并没有在当前对象对应的数据表中声明任何列，也就是orders属性在CUSTOMERS表中不对应列，而是通过key的方式声明了外键列，并且这个外键列是在Order对象对应的表中！</p>
+</li>
+<li><p>set元素添加inverse=”true”表示由另一个维护关联关系，也就是由包含外键列的一方维护；</p>
+</li>
+<li>one-to-many子元素的作用是告诉外键列所在的数据表。</li>
+</ul>
+<p>对应Order对象的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;hibernate-mapping <span class="variable">package=</span><span class="string">"section04.single.one2many"</span>&gt;</div><div class="line">    &lt;class <span class="variable">name=</span><span class="string">"Order"</span> <span class="variable">table=</span><span class="string">"ORDERS"</span>&gt;</div><div class="line">        &lt;id <span class="variable">name=</span><span class="string">"orderId"</span> <span class="variable">column=</span><span class="string">"ORDER_ID"</span> <span class="variable">type=</span><span class="string">"java.lang.Integer"</span>&gt;</div><div class="line">            &lt;generator <span class="variable">class=</span><span class="string">"native"</span>/&gt;</div><div class="line">        &lt;/id&gt;</div><div class="line">        &lt;property <span class="variable">name=</span><span class="string">"orderName"</span> <span class="variable">column=</span><span class="string">"ORDER_NAME"</span> <span class="variable">type=</span><span class="string">"java.lang.String"</span>/&gt;</div><div class="line">    &lt;/class&gt;</div><div class="line">&lt;/hibernate-mapping&gt;</div></pre></td></tr></table></figure>
+
+<p>可以看到是简单的配置方式。</p>
+<p>此时查看数据库表的结构，首先是CUSTOMERS表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">| customers | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`customers`</span> (</span></div><div class="line">  <span class="string">`CUSTOMER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`CUSTOMER_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`CUSTOMER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p><strong>这个表中并没有orders属性对应的列！</strong><br>查看ORDERS表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">| orders | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`orders`</span> (</span></div><div class="line">  <span class="string">`ORDER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`ORDER_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`FK_CUSTOMER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`ORDER_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`FK_boyicyxou7xmot9a8s6ug42nj`</span> (<span class="string">`FK_CUSTOMER_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`FK_boyicyxou7xmot9a8s6ug42nj`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`FK_CUSTOMER_ID`</span>) REFER ENCES <span class="string">`customers`</span> (<span class="string">`CUSTOMER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">3</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p><strong>也就是在customer.hbm.xml中用set元素声明的外键是在ORDERS表中出现的！</strong></p>
+<h3 id="set元素的3个属性">set元素的3个属性</h3>
+<p>这里补充set元素中常用到的3个属性：</p>
+<ul>
+<li>inverse：指定由哪一方来维护关联关系，inverse=”false”的为主动方，inverse=”true”的为被动方，由主动方负责维护关联关系。一般主动方是包含外键列的那方；</li>
+<li>cascade：设定级联操作，在删除使用了外键的数据时有用。开发时不建议设定该属性，而是使用手工的方式来处理；它的常用取值为：<ul>
+<li>delete：删除“一方”对象时会删除通过外键关联的“多方”对象；</li>
+<li>save-update：保存或者更新对象“一方”对象时，会保存“多方”的临时对象和更新“多方”的游离对象（具体效果还没测试）；</li>
+<li>delete-orphan：删除“一方”对象时会删除关联的“多方”对象（具体效果还没测试）。</li>
+</ul>
+</li>
+<li>order-by：在查询时对集合中的元素进行排序，order-by 中使用的是表的字段名，而不是持久化类的属性名。</li>
+</ul>
+<hr>
+<h2 id="双向一对多关联映射">双向一对多关联映射</h2>
+<p>注意，因为是<strong>双向的</strong>，所以一对多和多对一是一样的，只是从不同对象的角度分析而已。这里从一对多的角度分析。</p>
+<p>前面已经介绍过单向的多对一和一对多，<strong>只要把这两种关联合并就是双向的了</strong>。</p>
+<p>对应JavaBean为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Customer {</div><div class="line">    <span class="keyword">private</span> Integer customerId;</div><div class="line">    <span class="keyword">private</span> String customerName;</div><div class="line">    <span class="comment">// 一对多属性</span></div><div class="line">    <span class="keyword">private</span> Set&lt;Order&gt; orders = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Order {</div><div class="line">    <span class="keyword">private</span> Integer orderId;</div><div class="line">    <span class="keyword">private</span> String orderName;</div><div class="line">    <span class="comment">// 多对一引用属性</span></div><div class="line">    <span class="keyword">private</span> Customer customer;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Customer包含了Order的集合类型属性，表示一对多的管理；Order包含了Customer的属性，表示多对一的关联。</p>
+<p>此时Customer的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.both"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Customer"</span> <span class="attribute">table</span>=<span class="value">"CUSTOMERS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"customerId"</span> <span class="attribute">column</span>=<span class="value">"CUSTOMER_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"customerName"</span> <span class="attribute">column</span>=<span class="value">"CUSTOMER_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            一对多映射：</div><div class="line">            inverse="true":表示放弃维护关联关系，也就是由包含外键列的数据表ORDERS进行维护</div><div class="line">         --&gt;</div><div class="line">        <span class="tag">&lt;<span class="title">set</span> <span class="attribute">name</span>=<span class="value">"orders"</span> <span class="attribute">table</span>=<span class="value">"CUSTOMERS"</span> <span class="attribute">inverse</span>=<span class="value">"true"</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!-- 引用Order对应的数据表的外键列 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">key</span> <span class="attribute">column</span>=<span class="value">"FK_CUSTOMER_ID"</span>/&gt;</span></div><div class="line">            <span class="comment">&lt;!-- orders属性的类型 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">one-to-many</span> <span class="attribute">class</span>=<span class="value">"Order"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">set</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>Order对象的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.both"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Order"</span> <span class="attribute">table</span>=<span class="value">"ORDERS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"orderId"</span> <span class="attribute">column</span>=<span class="value">"ORDER_ID"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"orderName"</span> <span class="attribute">column</span>=<span class="value">"ORDER_NAME"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!-- 多对一映射 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">many-to-one</span> <span class="attribute">name</span>=<span class="value">"customer"</span> <span class="attribute">class</span>=<span class="value">"Customer"</span> <span class="attribute">column</span>=<span class="value">"FK_CUSTOMER_ID"</span> <span class="attribute">foreign-key</span>=<span class="value">"CUSTOMER_ID"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>生成的数据库表CUSTOMER结构为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">| customers | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`customers`</span> (</span></div><div class="line">  <span class="string">`CUSTOMER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`CUSTOMER_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`CUSTOMER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">3</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p>可以看到CUSTOMERS表中并没有orders对应的列。再看看ORDERS表的结构：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">| orders | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`orders`</span> (</span></div><div class="line">  <span class="string">`ORDER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line">  <span class="string">`ORDER_NAME`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`FK_CUSTOMER_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`ORDER_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`CUSTOMER_ID`</span> (<span class="string">`FK_CUSTOMER_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`CUSTOMER_ID`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`FK_CUSTOMER_ID`</span>) <span class="keyword">REFERENCES</span> <span class="string">`customers`</span> (<span class="string">`CUSTOMER_ID`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p>外键列还是在ORDERS表中，这都和前面介绍的多对一和一对多中数据表的结构是一样的！</p>
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public <span class="type">void</span> testGet() {                                               </div><div class="line">    <span class="type">Customer</span> c = (<span class="type">Customer</span>) session.get(<span class="type">Customer</span>.class, <span class="number">1</span>);           </div><div class="line">    // 只查询<span class="type">CUSTOMERS</span>表，延迟查询<span class="type">CUSTOMERS</span>表                                   </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(c.getCustomerName());                          </div><div class="line">    // 这时候才查询<span class="type">CUSTOMERS</span>表的数据                                            </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(c.getOrders().<span class="keyword">iterator</span>().next().getOrderName());</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以发现查询时的策略也是延迟查询不需要的引用类型属性。 </p>
+<h2 id="小结一对多的关联关系">小结一对多的关联关系</h2>
+<p>从上面的示例可以看到，一对多或者多对一的关系中，无论是单向还是双向的，<strong>最后都是的数据库表都是在“多方”中添加了外键列，这个外键列会引用“一方”的主键。</strong>这也是完全符合数据库的设计规范。因为不可能由“一方”维护这种关联的关系。举例来说，要想让一名总统记住全国人民的姓名是不可能的，但让全国的人民记住总统的名字则是可能的。所以要在“多方”中维护！</p>
+<hr>
+<h2 id="多对多关联映射">多对多关联映射</h2>
+<p>多对多关联包括单向和双向的，两者都必须使用中间关联表。</p>
+<h3 id="单向多对多">单向多对多</h3>
+<p>例如有这样的JavaBean：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Category {</div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="comment">// 一对多</span></div><div class="line">    <span class="keyword">private</span> Set&lt;Item&gt; items = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line"></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Item {</div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Category的映射文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.n2n.single"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Category"</span> <span class="attribute">table</span>=<span class="value">"CATEGORIES"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"id"</span> <span class="attribute">column</span>=<span class="value">"id"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"name"</span> <span class="attribute">column</span>=<span class="value">"name"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            set指定中间表的结构</div><div class="line">         --&gt;</div><div class="line">         <span class="tag">&lt;<span class="title">set</span> <span class="attribute">name</span>=<span class="value">"items"</span> <span class="attribute">table</span>=<span class="value">"CATEGORIES_ITEMS"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">key</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">column</span> <span class="attribute">name</span>=<span class="value">"CATEGORY_ID"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">key</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">many-to-many</span> <span class="attribute">class</span>=<span class="value">"Item"</span> <span class="attribute">column</span>=<span class="value">"ITEM_ID"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">set</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意这里：</p>
+<ul>
+<li>set元素的table指定了中间表的名称；</li>
+</ul>
+<ul>
+<li><strong>必须为set元素添加key 元素</strong>，并用column指定中间表CATEGORIES_ITEMS中参照CATEGORIES表的外键为 CATEGORIY_ID 。</li>
+</ul>
+<ul>
+<li><strong>必须为set元素添加many-to-many子元素</strong>，many-to-many子元素的 class 属性指定 items 属性集合中存放的是 Item 对象，column 属性指定中间表CATEGORIES_ITEMS中参照ITEMS表的外键为 ITEM_ID。</li>
+</ul>
+<p><strong>由于是单向的关联，所以Item对象的映射文件中并不需要使用set元素</strong>，它的内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;hibernate-mapping <span class="variable">package=</span><span class="string">"section04.n2n.single"</span>&gt;</div><div class="line">    &lt;class <span class="variable">name=</span><span class="string">"Item"</span> <span class="variable">table=</span><span class="string">"ITEMS"</span>&gt;</div><div class="line">        &lt;id <span class="variable">name=</span><span class="string">"id"</span> <span class="variable">column=</span><span class="string">"id"</span> <span class="variable">type=</span><span class="string">"java.lang.Integer"</span>&gt;</div><div class="line">            &lt;generator <span class="variable">class=</span><span class="string">"native"</span>/&gt;</div><div class="line">        &lt;/id&gt;</div><div class="line">        &lt;property <span class="variable">name=</span><span class="string">"name"</span> <span class="variable">column=</span><span class="string">"name"</span> <span class="variable">type=</span><span class="string">"java.lang.String"</span>/&gt;</div><div class="line">    &lt;/class&gt;</div><div class="line">&lt;/hibernate-mapping&gt;</div></pre></td></tr></table></figure>
+
+<p>此时Hibernate生成的数据表有3个，其中CATEGORIES和ITEMS都是普通表，没有外键；而中间表CATEGORIES_ITEMS的结构为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">| categories_items | <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`categories_items`</span> (</span></div><div class="line">  <span class="string">`CATEGORY_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`ITEM_ID`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="keyword">PRIMARY</span> <span class="keyword">KEY</span>  (<span class="string">`CATEGORIY_ID`</span>,<span class="string">`ITEM_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`FK_d3txsd2nsghuduy3ybn2bmeko`</span> (<span class="string">`ITEM_ID`</span>),</div><div class="line">  <span class="keyword">KEY</span> <span class="string">`FK_n25oygiu9q21mo18kvulla5wl`</span> (<span class="string">`CATEGORIY_ID`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`FK_n25oygiu9q21mo18kvulla5wl`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`CATEGORIY_ID`</span>) REFEREN CES <span class="string">`categories`</span> (<span class="string">`id`</span>),</div><div class="line">  <span class="keyword">CONSTRAINT</span> <span class="string">`FK_d3txsd2nsghuduy3ybn2bmeko`</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (<span class="string">`ITEM_ID`</span>) <span class="keyword">REFERENCES</span> <span class="string">` items`</span> (<span class="string">`id`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</div></pre></td></tr></table></figure>
+
+<p>可以看到，<strong>中间表只有2个字段，这2个字段都是外键，分别引用2个表中的主键。</strong></p>
+<p>测试保存功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSave</span>() {                         </div><div class="line">    Category c1 = <span class="keyword">new</span> Category();                </div><div class="line">    c1.setName(<span class="string">"c-aa"</span>);                          </div><div class="line">    Category c2 = <span class="keyword">new</span> Category();                </div><div class="line">    c2.setName(<span class="string">"c-bb"</span>);                          </div><div class="line"> </div><div class="line">    Item item1 = <span class="keyword">new</span> Item();                     </div><div class="line">    item1.setName(<span class="string">"i-aa"</span>);                       </div><div class="line"> </div><div class="line">    Item item2 = <span class="keyword">new</span> Item();                     </div><div class="line">    item2.setName(<span class="string">"i-bb"</span>);                       </div><div class="line">    <span class="comment">// 建立关联关系，而且是单向的</span></div><div class="line">    c1.getItems().add(item1);                    </div><div class="line">    c1.getItems().add(item2);                    </div><div class="line"> </div><div class="line">    c2.getItems().add(item1);                    </div><div class="line">    c2.getItems().add(item2);                    </div><div class="line">    <span class="comment">// 所有对象都要保存</span></div><div class="line">    session.save(c1);                            </div><div class="line">    session.save(c2);                            </div><div class="line"> </div><div class="line">    session.save(item1);                         </div><div class="line">    session.save(item2);                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="双向多对多">双向多对多</h3>
+<p>前面说过方向指的就是包含对象的引用，所以这里双向多对多对应的JavaBean为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Category {</div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="comment">// 一对多</span></div><div class="line">    <span class="keyword">private</span> Set&lt;Item&gt; items = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Item {</div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="comment">// 一对多</span></div><div class="line">    <span class="keyword">private</span> Set&lt;Category&gt; categories = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="comment">// getter setter</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>即主要在Item中加入对Category的集合类型属性就行。</strong></p>
+<p>Category的映射文件和前面的不变，而Item同样要加上set元素配置集合属性，内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">hibernate-mapping</span> <span class="attribute">package</span>=<span class="value">"section04.n2n.both"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">class</span> <span class="attribute">name</span>=<span class="value">"Item"</span> <span class="attribute">table</span>=<span class="value">"ITEMS"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">id</span> <span class="attribute">name</span>=<span class="value">"id"</span> <span class="attribute">column</span>=<span class="value">"id"</span> <span class="attribute">type</span>=<span class="value">"java.lang.Integer"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">generator</span> <span class="attribute">class</span>=<span class="value">"native"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">id</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"name"</span> <span class="attribute">column</span>=<span class="value">"name"</span> <span class="attribute">type</span>=<span class="value">"java.lang.String"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!--</span></div><div class="line">            同样用set声明中间表的结构</div><div class="line">         --&gt;</div><div class="line">        <span class="tag">&lt;<span class="title">set</span> <span class="attribute">name</span>=<span class="value">"categories"</span> <span class="attribute">table</span>=<span class="value">"CATEGORIES_ITEMS"</span> <span class="attribute">inverse</span>=<span class="value">"true"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">key</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">column</span> <span class="attribute">name</span>=<span class="value">"ITEM_ID"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">key</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">many-to-many</span> <span class="attribute">class</span>=<span class="value">"Category"</span> <span class="attribute">column</span>=<span class="value">"CATEGORY_ID"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">set</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">hibernate-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以看到，和Category的内容基本一致，比较这2个文件的内容得出：<br>key和 many-to-many分别指定当前持久化类和关联类在中间表中的外键列名，因此两边的key与many-to-many的<strong>column属性交叉相同</strong>。也就是说，一边的set元素的key的 cloumn值为a，many-to-many的column值为b；则另一边的 set 元素的 key 的 column 值为b，many-to-many的column 值为a。如下图所示：</p>
+<p><strong>而且必须在其中一端的添加inverse=”true”的属性，表示放弃维护关联关系。否则两端都维护关联关系会造成主键冲突，出现<code>org.hibernate.exception.ConstraintViolationException</code> 异常。</strong></p>
+<p>最后查看生成的数据库表和单向时是一样的，这样验证了前面提到的内容，方向只是体现在对象包含另一个对象的引用，而在数据库中不能表示这种方向性。</p>
+<p>测试保存功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public void testSave() {                         </div><div class="line">    Category c1 = <span class="built_in">new</span> Category();                </div><div class="line">    c1.setName(<span class="string">"c-aa"</span>);                          </div><div class="line">    Category c2 = <span class="built_in">new</span> Category();                </div><div class="line">    c2.setName(<span class="string">"c-bb"</span>);                          </div><div class="line"> </div><div class="line">    Item item1 = <span class="built_in">new</span> Item();                     </div><div class="line">    item1.setName(<span class="string">"i-aa"</span>);                       </div><div class="line"> </div><div class="line">    Item item2 = <span class="built_in">new</span> Item();                     </div><div class="line">    item2.setName(<span class="string">"i-bb"</span>);                       </div><div class="line"> </div><div class="line">   <span class="comment"> // 建立关联关系，由于是双向的，所以2边都要设置                    </span></div><div class="line">    c1.getItems().<span class="built_in">add</span>(item1);                    </div><div class="line">    c1.getItems().<span class="built_in">add</span>(item2);                    </div><div class="line"> </div><div class="line">    c2.getItems().<span class="built_in">add</span>(item1);                    </div><div class="line">    c2.getItems().<span class="built_in">add</span>(item2);                    </div><div class="line"> </div><div class="line">    item1.getCategories().<span class="built_in">add</span>(c1);               </div><div class="line">    item1.getCategories().<span class="built_in">add</span>(c2);               </div><div class="line"> </div><div class="line">    item2.getCategories().<span class="built_in">add</span>(c1);               </div><div class="line">    item2.getCategories().<span class="built_in">add</span>(c2);               </div><div class="line"> </div><div class="line">   <span class="comment"> // 所有对象都要保存                                  </span></div><div class="line">    session.save(c1);                            </div><div class="line">    session.save(c2);                            </div><div class="line"> </div><div class="line">    session.save(item1);                         </div><div class="line">    session.save(item2);                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结class元素的使用方法">总结class元素的使用方法</h2>
+<p>上述介绍的内容中，无论是一对一还是一对多，单向还是双向，关键是根据引用类型属性进行配置。</p>
+<p>首先在hibernate-mapping中，class元素中可以使用：</p>
+<ul>
+<li>many-to-one：多对一关联或者基于外键一对一都可以使用，外键列在当前对象对应的表中；</li>
+<li>one-to-one：基于主键的一对一关联，使用较少；</li>
+<li>set：配置集合类型的属性，但 并不能表示关联关系，但可以使用子元素来表示：<ul>
+<li>one-to-many：表示一对多，此时外键列不在当前对象对应的表中；</li>
+<li>many-to-many：表示多对多，最后会生成中间表。</li>
+</ul>
+</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Hibernate/">Hibernate</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Hibernate/Hibernate4完全教程（三）：映射关系/" data-title="Hibernate4完全教程（三）：映射关系 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Hibernate/Hibernate4完全教程（二）：常用API和方法介绍/" title="Hibernate4完全教程（二）：常用API和方法介绍">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Hibernate4完全教程（二）：常用API和方法介绍</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Concurrent/ConcurrentAPI/Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍/"  title="Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md">
+ <strong>NEXT:</strong><br/> 
+ <span>Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#映射关系和方向说明"><span class="toc-number">1.</span> <span class="toc-text">映射关系和方向说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一对一关联关系映射"><span class="toc-number">2.</span> <span class="toc-text">一对一关联关系映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于外键"><span class="toc-number">2.1.</span> <span class="toc-text">基于外键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#property-ref的作用"><span class="toc-number">2.2.</span> <span class="toc-text">property-ref的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于外键时的查询策略"><span class="toc-number">2.3.</span> <span class="toc-text">基于外键时的查询策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于主键"><span class="toc-number">2.4.</span> <span class="toc-text">基于主键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于主键方式的查询策略"><span class="toc-number">2.5.</span> <span class="toc-text">基于主键方式的查询策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单向多对一关联映射"><span class="toc-number">3.</span> <span class="toc-text">单向多对一关联映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#单向一对多"><span class="toc-number">4.</span> <span class="toc-text">单向一对多</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#set元素的3个属性"><span class="toc-number">4.1.</span> <span class="toc-text">set元素的3个属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#双向一对多关联映射"><span class="toc-number">5.</span> <span class="toc-text">双向一对多关联映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结一对多的关联关系"><span class="toc-number">6.</span> <span class="toc-text">小结一对多的关联关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多对多关联映射"><span class="toc-number">7.</span> <span class="toc-text">多对多关联映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#单向多对多"><span class="toc-number">7.1.</span> <span class="toc-text">单向多对多</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双向多对多"><span class="toc-number">7.2.</span> <span class="toc-text">双向多对多</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结class元素的使用方法"><span class="toc-number">8.</span> <span class="toc-text">总结class元素的使用方法</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,390 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>FileChannel | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="来源： http://ifeve.com/file-channel/
+概述
+Java NIO中的FileChannel是一个连接到文件的通道。可以通过文件通道读写文件。FileChannel无法设置为非阻塞模式，它总是运行在阻塞模式下。
+打开FileChannel
+在使用FileChannel之前，">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/NIO/FileChannel/" title="FileChannel" itemprop="url">FileChannel</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打开FileChannel"><span class="toc-number">2.</span> <span class="toc-text">打开FileChannel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从FileChannel读取数据"><span class="toc-number">3.</span> <span class="toc-text">从FileChannel读取数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#向FileChannel写数据"><span class="toc-number">4.</span> <span class="toc-text">向FileChannel写数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关闭FileChannel"><span class="toc-number">5.</span> <span class="toc-text">关闭FileChannel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的position方法"><span class="toc-number">6.</span> <span class="toc-text">FileChannel的position方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的size方法"><span class="toc-number">7.</span> <span class="toc-text">FileChannel的size方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的truncate方法"><span class="toc-number">8.</span> <span class="toc-text">FileChannel的truncate方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的force方法"><span class="toc-number">9.</span> <span class="toc-text">FileChannel的force方法</span></a></li></ol>
+		</div>
+		
+		<p>来源： <a href="http://ifeve.com/file-channel/" target="_blank" rel="external">http://ifeve.com/file-channel/</a></p>
+<h2 id="概述">概述</h2>
+<p>Java NIO中的FileChannel是一个连接到文件的通道。可以通过文件通道读写文件。<br><strong>FileChannel无法设置为非阻塞模式，它总是运行在阻塞模式下。</strong></p>
+<h2 id="打开FileChannel">打开FileChannel</h2>
+<p>在使用FileChannel之前，必须先打开它。但是，我们无法直接打开一个FileChannel，需要通过使用一个InputStream、OutputStream或RandomAccessFile来获取一个FileChannel实例。<br>下面是通过RandomAccessFile打开FileChannel的示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> (RandomAccessFile file = <span class="keyword">new</span> RandomAccessFile(<span class="string">"test03.txt"</span>, <span class="string">"rw"</span>)) {</div><div class="line">    <span class="keyword">try</span> (FileChannel channel = file.getChannel()) {                     </div><div class="line">        <span class="comment">//...                                       </span></div><div class="line">    }                                                                   </div><div class="line">} <span class="keyword">catch</span> (IOException e) {                                               </div><div class="line">    e.printStackTrace();                                                </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="从FileChannel读取数据">从FileChannel读取数据</h2>
+<p>调用多个read()方法之一从FileChannel中读取数据。如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> (RandomAccessFile file = <span class="keyword">new</span> RandomAccessFile(<span class="string">"test03.txt"</span>, <span class="string">"rw"</span>)) {</div><div class="line">    <span class="keyword">try</span> (FileChannel channel = file.getChannel()) {                    </div><div class="line">        ByteBuffer buffer = ByteBuffer.allocate(<span class="number">48</span>);                   </div><div class="line">        <span class="keyword">int</span> bytesRead = channel.read(buffer);                          </div><div class="line">        <span class="keyword">int</span> totalRead = <span class="number">0</span>;                                             </div><div class="line">        <span class="keyword">while</span> (bytesRead != -<span class="number">1</span>) {                                      </div><div class="line">            totalRead += bytesRead;                                    </div><div class="line">            buffer.flip(); <span class="comment">// 切换到读模式                                   </span></div><div class="line">            <span class="keyword">while</span>(buffer.hasRemaining()) {                             </div><div class="line">                System.out.print((<span class="keyword">char</span>) buffer.get());                 </div><div class="line">            }                                                          </div><div class="line">            buffer.clear();                                            </div><div class="line">            bytesRead = channel.read(buffer);                          </div><div class="line">        }                                                              </div><div class="line">        System.out.println(<span class="string">"\ntotal read:"</span> + totalRead);               </div><div class="line">        <span class="keyword">long</span> position = channel.position();                            </div><div class="line">        System.out.println(<span class="string">"end position:"</span> + position);                </div><div class="line">    }                                                                  </div><div class="line">} <span class="keyword">catch</span> (IOException e) {                                              </div><div class="line">    e.printStackTrace();                                               </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>首先，分配一个Buffer。从FileChannel中读取的数据将被读到Buffer中。</p>
+<p>然后，调用FileChannel.read()方法。该方法将数据从FileChannel读取到Buffer中。read()方法返回的int值表示了有多少字节被读到了Buffer中。<br>如果返回-1，表示到了文件末尾。</p>
+<h2 id="向FileChannel写数据">向FileChannel写数据</h2>
+<p>使用FileChannel.write()方法向FileChannel写数据，该方法的参数是一个Buffer。如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> (FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(<span class="string">"test04.txt"</span>), <span class="keyword">true</span>)) {   </div><div class="line">    <span class="keyword">try</span> (FileChannel channel = fos.getChannel()) {                                  </div><div class="line">        String src = <span class="string">"write some thing to file."</span> + System.currentTimeMillis() + <span class="string">"\n"</span>;</div><div class="line">        ByteBuffer buffer = ByteBuffer.allocate(<span class="number">48</span>);                                </div><div class="line">        buffer.clear();                                                             </div><div class="line">        buffer.put(src.getBytes());                                                 </div><div class="line">        buffer.flip();                                                              </div><div class="line">        <span class="keyword">int</span> eachWrite = <span class="number">0</span>;                                                          </div><div class="line">        <span class="keyword">while</span>(buffer.hasRemaining()) {                                              </div><div class="line">            eachWrite = channel.write(buffer);                                      </div><div class="line">        }                                                                           </div><div class="line">        System.out.println(<span class="string">"write:"</span> + eachWrite);                                   </div><div class="line">        <span class="keyword">long</span> position = channel.position();                                         </div><div class="line">        System.out.println(<span class="string">"end position:"</span> + position);                             </div><div class="line">    }                                                                               </div><div class="line">} <span class="keyword">catch</span> (FileNotFoundException e) {                                                 </div><div class="line">    e.printStackTrace();                                                            </div><div class="line">} <span class="keyword">catch</span> (IOException e) {                                                           </div><div class="line">    e.printStackTrace();                                                            </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>注意FileChannel.write()是在while循环中调用的。因为无法保证write()方法一次能向FileChannel写入多少字节，因此需要重复调用write()方法，直到Buffer中已经没有尚未写入通道的字节。</p>
+<h2 id="关闭FileChannel">关闭FileChannel</h2>
+<p>用完FileChannel后必须将其关闭。如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">channel.close();</div></pre></td></tr></table></figure>
+
+
+<h2 id="FileChannel的position方法">FileChannel的position方法</h2>
+<p>有时可能需要在FileChannel的某个特定位置进行数据的读/写操作。可以通过调用position()方法获取FileChannel的当前位置。</p>
+<p>也可以通过调用position(long pos)方法设置FileChannel的当前位置。</p>
+<p>这里有两个例子:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">long</span> pos = channel.position();</div><div class="line">channel.position(pos +<span class="number">123</span>);</div></pre></td></tr></table></figure>
+
+<p>如果将位置设置在文件结束符之后，然后试图从文件通道中读取数据，读方法将返回-1 —— 文件结束标志。</p>
+<p>如果将位置设置在文件结束符之后，然后向通道中写数据，文件将撑大到当前位置并写入数据。这可能导致“文件空洞”，磁盘上物理文件中写入的数据间有空隙。</p>
+<h2 id="FileChannel的size方法">FileChannel的size方法</h2>
+<p>FileChannel实例的size()方法将返回该实例所关联文件的大小。如:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">long</span> fileSize = channel.size();</div></pre></td></tr></table></figure>
+
+
+<h2 id="FileChannel的truncate方法">FileChannel的truncate方法</h2>
+<p>可以使用FileChannel.truncate()方法截取一个文件。截取文件时，文件将中指定长度后面的部分将被删除。如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">channel.truncate(<span class="number">1024</span>);</div></pre></td></tr></table></figure>
+
+<p>这个例子截取文件的前1024个字节。</p>
+<h2 id="FileChannel的force方法">FileChannel的force方法</h2>
+<p>FileChannel.force()方法将通道里尚未写入磁盘的数据强制写到磁盘上。出于性能方面的考虑，操作系统会将数据缓存在内存中，所以无法保证写入到FileChannel里的数据一定会即时写到磁盘上。要保证这一点，需要调用force()方法。</p>
+<p>force()方法有一个boolean类型的参数，指明是否同时将文件元数据（权限信息等）写到磁盘上。</p>
+<p>下面的例子同时将文件数据和元数据强制写到磁盘上：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">channel.force(<span class="keyword">true</span>);</div></pre></td></tr></table></figure>
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/NIO/">NIO</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/NIO/FileChannel/" data-title="FileChannel | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/NIO/Scatter-Gather/" title="Scatter-Gather">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Scatter-Gather</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/NIO/Channel to Channel/"  title="Channel to Channel">
+ <strong>NEXT:</strong><br/> 
+ <span>Channel to Channel
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打开FileChannel"><span class="toc-number">2.</span> <span class="toc-text">打开FileChannel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从FileChannel读取数据"><span class="toc-number">3.</span> <span class="toc-text">从FileChannel读取数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#向FileChannel写数据"><span class="toc-number">4.</span> <span class="toc-text">向FileChannel写数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关闭FileChannel"><span class="toc-number">5.</span> <span class="toc-text">关闭FileChannel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的position方法"><span class="toc-number">6.</span> <span class="toc-text">FileChannel的position方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的size方法"><span class="toc-number">7.</span> <span class="toc-text">FileChannel的size方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的truncate方法"><span class="toc-number">8.</span> <span class="toc-text">FileChannel的truncate方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FileChannel的force方法"><span class="toc-number">9.</span> <span class="toc-text">FileChannel的force方法</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

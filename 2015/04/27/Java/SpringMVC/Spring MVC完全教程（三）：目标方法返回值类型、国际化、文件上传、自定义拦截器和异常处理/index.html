@@ -1,0 +1,558 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="HttpMessageConverter
+HTTP 请求和响应是基于文本的，意味着浏览器和服务器通过交换原始文本进行通信。但是，使用 Spring，controller 类中的方法返回纯 ‘String’ 类型和域模型（或其他 Java 内建对象）。如何将对象序列化/反序列化为原始文本？这由Http">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理/" title="Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理" itemprop="url">Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpMessageConverter"><span class="toc-number">1.</span> <span class="toc-text">HttpMessageConverter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#处理JSON数据"><span class="toc-number">2.</span> <span class="toc-text">处理JSON数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#源码简析"><span class="toc-number">2.1.</span> <span class="toc-text">源码简析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其它示例"><span class="toc-number">2.2.</span> <span class="toc-text">其它示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#国际化"><span class="toc-number">3.</span> <span class="toc-text">国际化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用超链接切换Locale"><span class="toc-number">3.1.</span> <span class="toc-text">使用超链接切换Locale</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#源码简析-1"><span class="toc-number">3.2.</span> <span class="toc-text">源码简析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用JSP和目标方法中获取本地化资源"><span class="toc-number">3.3.</span> <span class="toc-text">使用JSP和目标方法中获取本地化资源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件上传"><span class="toc-number">4.</span> <span class="toc-text">文件上传</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义拦截器"><span class="toc-number">5.</span> <span class="toc-text">自定义拦截器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异常处理"><span class="toc-number">6.</span> <span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring_MVC异常处理简介"><span class="toc-number">6.1.</span> <span class="toc-text">Spring MVC异常处理简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@ExceptionHandler和_@ControllerAdvice"><span class="toc-number">6.2.</span> <span class="toc-text">@ExceptionHandler和 @ControllerAdvice</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResponseStatusExceptionResolver和@ResponseStatus"><span class="toc-number">6.3.</span> <span class="toc-text">ResponseStatusExceptionResolver和@ResponseStatus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DefaultHandlerExceptionResolver"><span class="toc-number">6.4.</span> <span class="toc-text">DefaultHandlerExceptionResolver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleMappingExceptionResolver"><span class="toc-number">6.5.</span> <span class="toc-text">SimpleMappingExceptionResolver</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="HttpMessageConverter">HttpMessageConverter<t></t></h2>
+<p>HTTP 请求和响应是基于文本的，意味着浏览器和服务器通过交换原始文本进行通信。但是，使用 Spring，controller 类中的方法返回纯 ‘String’ 类型和域模型（或其他 Java 内建对象）。如何将对象序列化/反序列化为原始文本？这由<code>HttpMessageConverter</code>处理。<br><code>HttpMessageConverter&lt;T&gt;</code>是Spring3.0 新添加的一个接 口， 负责将请求信息转换为一个对象， 将对象 输出为响应信息， 它有下列的实现类：</p>
+<table>
+<thead>
+<tr>
+<th>使用……</th>
+<th>您可以……</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>StringHttpMessageConverter</td>
+<td>从请求和响应读取/编写字符串。默认情况下，它支持媒体类型 text/* 并使用文本/无格式内容类型编写。</td>
+</tr>
+<tr>
+<td>FormHttpMessageConverter</td>
+<td>从请求和响应读取/编写表单数据。默认情况下，它读取媒体类型 application/x-www-form-urlencoded 并将数据写入 MultiValueMap<string,string>。</string,string></td>
+</tr>
+<tr>
+<td>MarshallingHttpMessageConverter</td>
+<td>使用 Spring 的 marshaller/un-marshaller 读取/编写 XML 数据。它转换媒体类型为 application/xml 的数据。</td>
+</tr>
+<tr>
+<td>MappingJacksonHttpMessageConverter</td>
+<td>使用 Jackson 的 ObjectMapper 读取/编写 JSON 数据。它转换媒体类型为 application/json 的数据。</td>
+</tr>
+<tr>
+<td>AtomFeedHttpMessageConverter</td>
+<td>使用 ROME 的 Feed API 读取/编写 ATOM 源。它转换媒体类型为 application/atom+xml 的数据。</td>
+</tr>
+<tr>
+<td>RssChannelHttpMessageConverter</td>
+<td>使用 ROME 的 feed API 读取/编写 RSS 源。它转换媒体类型为 application/rss+xml 的数据。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>简而言之，它可以处理请求消息和响应消息，进而可以完成识别请求、返回特定类型数据等功能。注意和前面介绍的类型转换区分。</strong>下面是一个简单示意图：</p>
+<p><code>HttpMessageConverter&lt;T&gt;</code>接口定义的方法：</p>
+<ul>
+<li><code>Boolean canRead(Class&lt;?&gt; clazz,MediaType mediaType)</code>： 指定转换器 可以读取的对象类型，即转换器是否可将请求信息转换为 clazz 类型的对 象，同时指定支持 MIME 类型(text/html,applaiction/json等)；</li>
+<li><code>Boolean canWrite(Class&lt;?&gt; clazz,MediaType mediaType)</code>：指定转换器 是否可将 clazz 类型的对象写到响应流中， 响应流支持的媒体类型 在MediaType 中定义 ；</li>
+<li><code>LIst&lt;MediaType&gt; getSupportMediaTypes()</code>： 该转换器支持的媒体类 型 ；</li>
+<li><code>T read(Class&lt;? extends T&gt; clazz,HttpInputMessage inputMessage)</code>： 将请求信息流转换为 T 类型的对象 ；</li>
+<li><code>void write(T t,MediaType contnetType,HttpOutputMessgae outputMessage)</code>：将T类型的对象写到响应流中，同时指定相应的媒体类 型为 contentType。</li>
+</ul>
+<p>默认情况下，Spring启动后会装配6个 <code>HttpMessageConverter</code>，如果要获取JSON格式数据，项目中加入相应的jar包后，就自定变成7个，如下图所示：</p>
+<p>上图中用红框标注的就是处理JSON数据的转换器，其它是默认加载的转换器。</p>
+<blockquote>
+<p>（上面的内容可以在调试时查看<code>DispatcherServlet</code>的成员， <code>DispatcherServlet</code>默认会装<br>载 <code>RequestMappingHandlerAdapter</code>， <code>RequestMappingHandlerAdapter</code> 的messageConverters属性就是这些转换器。）</p>
+</blockquote>
+<p>使用 HttpMessageConverter<t> 将<strong>请求信息转化并绑定到处理方法的入 参中</strong>或<strong>将响应结果转为对应类型的响应信息</strong>， Spring 提供了两种途径：</t></p>
+<ul>
+<li>使用<code>@RequestBody</code>或者<code>@ResponseBody</code>对处理方法进行标注，不需要成对出现；</li>
+<li>使用<code>HttpEntity&lt;T&gt;</code>或者<code>ResponseEntity&lt;T&gt;</code>作为处理方法的入参或返回值，也不需要成对出现。</li>
+</ul>
+<h2 id="处理JSON数据">处理JSON数据</h2>
+<p>按照下列步骤完成：<br>（1）首先项目加入处理JSON数据的jar包：<br>jackson-core-2.1.5.jar<br>jackson-databind-2.1.5.jar<br>jackson-annotations-2.1.5.jar</p>
+<p>（2）然后使用<code>@ResponseBody</code>对目标方法注解，表示需要根据目标方法的返回值类型处理响应数据的结构。目标方法为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@RequestMapping</span>(<span class="string">"/HttpMessageConverter"</span>)    </div><div class="line"><span class="annotation">@Controller</span>                                 </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestHttpMessageConverter</span> </span>{     </div><div class="line">    <span class="annotation">@Autowired</span>                              </div><div class="line">    <span class="keyword">private</span> EmployeeDao empDao;             </div><div class="line">    <span class="comment">/*                                      </span></div><div class="line">     * 返回JSON格式数据。                          </div><div class="line">     */                                     </div><div class="line">    <span class="annotation">@ResponseBody</span>                           </div><div class="line">    <span class="annotation">@RequestMapping</span>(<span class="string">"/testJson"</span>)            </div><div class="line">    <span class="keyword">public</span> Collection&lt;Employee&gt; <span class="title">testJson</span>() {</div><div class="line">        <span class="keyword">return</span> empDao.getAll();             </div><div class="line">    }                                       </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>（3）页面的通过Ajax发送POST请求获取JSON数据：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript"></span></div><div class="line">    $(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">        $(<span class="string">"#testJson"</span>).click(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">            <span class="keyword">var</span> url = <span class="string">"HttpMessageConverter/testJson"</span>;</div><div class="line">            $.post(url, {}, <span class="function"><span class="keyword">function</span><span class="params">(data)</span> </span>{</div><div class="line">                <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; data.length; i++) {</div><div class="line">                    <span class="keyword">var</span> id = data[i].id;</div><div class="line">                    <span class="keyword">var</span> lastName = data[i].lastName;</div><div class="line">                    alert(id + <span class="string">"-"</span> + lastName);</div><div class="line">                }</div><div class="line">            });</div><div class="line">        });</div><div class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    });</div><div class="line"><span class="tag">&lt;/<span class="title">script</span>&gt;</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"button"</span> <span class="attribute">value</span>=<span class="value">"Test Json"</span> <span class="attribute">id</span>=<span class="value">"testJson"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="源码简析">源码简析</h3>
+<p>对于上述请求JSON数据的处理流程大致是这样的：</p>
+<p>Spring在处理目标方法时，首先会判断目标方法是否使用了<code>@ResponseBody</code>注解，若是则最后会交给<code>RequestResponseBodyMethodProcessor</code>处理，它是<code>HandlerMethodReturnValueHandler</code>的一个实现类。<br>这个实现类最后会调用<code>AbstractMessageConverterMethodProcessor</code>的核心方法<code>writeWithMessageConverters</code>处理返回结果：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//  AbstractMessageConverterMethodProcessor </span></div><div class="line"><span class="keyword">protected</span> &lt;T&gt; <span class="keyword">void</span> <span class="title">writeWithMessageConverters</span>(T returnValue,</div><div class="line">    MethodParameter returnType,</div><div class="line">    ServletServerHttpRequest inputMessage,</div><div class="line">    ServletServerHttpResponse outputMessage) <span class="keyword">throws</span> IOException, HttpMediaTypeNotAcceptableException {</div><div class="line"> </div><div class="line">    Class&lt;?&gt; returnValueClass = returnValue.getClass();</div><div class="line"> </div><div class="line">    HttpServletRequest servletRequest = inputMessage.getServletRequest();</div><div class="line">    <span class="comment">// 调试值为：[*/*]，从根据请求头得到对应的MediaType   </span></div><div class="line">    List&lt;MediaType&gt; requestedMediaTypes = getAcceptableMediaTypes(servletRequest);</div><div class="line">    <span class="comment">// 调试值为：[application/json;charset=UTF-8, application/*+json;charset=UTF-8]                         </span></div><div class="line">    <span class="comment">// 根据返回的结果类型returnValueClass判断哪种MediaType可以处理，这里的returnValueClass是HashMap</span></div><div class="line">    List&lt;MediaType&gt; producibleMediaTypes = getProducibleMediaTypes(servletRequest, returnValueClass);</div><div class="line"> </div><div class="line">    Set&lt;MediaType&gt; compatibleMediaTypes = <span class="keyword">new</span> LinkedHashSet&lt;MediaType&gt;();</div><div class="line">    <span class="keyword">for</span> (MediaType r : requestedMediaTypes) {</div><div class="line">        <span class="keyword">for</span> (MediaType p : producibleMediaTypes) {</div><div class="line">            <span class="keyword">if</span> (r.isCompatibleWith(p)) {</div><div class="line">                compatibleMediaTypes.add(getMostSpecificMediaType(r, p));</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">if</span> (compatibleMediaTypes.isEmpty()) {</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> HttpMediaTypeNotAcceptableException(producibleMediaTypes);</div><div class="line">    }</div><div class="line"> </div><div class="line">    List&lt;MediaType&gt; mediaTypes = <span class="keyword">new</span> ArrayList&lt;MediaType&gt;(compatibleMediaTypes);</div><div class="line">    MediaType.sortBySpecificityAndQuality(mediaTypes);</div><div class="line"> </div><div class="line">    MediaType selectedMediaType = <span class="keyword">null</span>;</div><div class="line">    <span class="keyword">for</span> (MediaType mediaType : mediaTypes) {</div><div class="line">        <span class="keyword">if</span> (mediaType.isConcrete()) {</div><div class="line">            selectedMediaType = mediaType;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (mediaType.equals(MediaType.ALL) || mediaType.equals(MEDIA_TYPE_APPLICATION)) {</div><div class="line">            selectedMediaType = MediaType.APPLICATION_OCTET_STREAM;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 调试值为：application/json;charset=UTF-8                                                                                                                       </span></div><div class="line">    <span class="comment">// 经过一些处理得到需要返回的数据类型</span></div><div class="line">    <span class="keyword">if</span> (selectedMediaType != <span class="keyword">null</span>) {</div><div class="line">        selectedMediaType = selectedMediaType.removeQualityValue();</div><div class="line">        <span class="comment">// 然后从7个messageConverters中选择匹配的类型进行转换   </span></div><div class="line">        <span class="keyword">for</span> (HttpMessageConverter&lt;?&gt; messageConverter : messageConverters) {</div><div class="line">            <span class="comment">// 根据该messageConverter是否把结果值处理为对应的selectedMediaType</span></div><div class="line">            <span class="keyword">if</span> (messageConverter.canWrite(returnValueClass, selectedMediaType)) {</div><div class="line">                <span class="comment">/*</span></div><div class="line">                 *  显然这里要把HashMap结果处理为JSON，就要用到MappingJackson2HttpMessageConverter，</div><div class="line">                 *  转换后的内容写入到outputMessage中                                           </div><div class="line">                 */</div><div class="line">                ((HttpMessageConverter&lt;T&gt;) messageConverter).write(returnValue, selectedMediaType, outputMessage);</div><div class="line">                <span class="keyword">if</span> (logger.isDebugEnabled()) {</div><div class="line">                    logger.debug(<span class="string">"Written ["</span> + returnValue + <span class="string">"] as \""</span> + selectedMediaType + <span class="string">"\" using ["</span> +</div><div class="line">                            messageConverter + <span class="string">"]"</span>);</div><div class="line">                }</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> HttpMediaTypeNotAcceptableException(allSupportedMediaTypes);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>从上述的调试过程可以知道，如果使用了<code>@ResponseBody</code>注解，SpringMVC会根据请求方法的<strong>返回值类型</strong>判断需要调用哪个<code>HttpMessageConverter</code>处理返回的数据，然后设置到<code>HttpOutputMessage</code>中，由于<code>MappingJackson2HttpMessageConverter</code>可以处理HashMap类型的返回值，所以示例代码中最终就会返回JSON格式的数据。</p>
+<h3 id="其它示例">其它示例</h3>
+<p>下面提供2个示例，分别测试<code>ResponseEntity</code>和<code>HttpEntity</code>的使用方法。</p>
+<p>使用<code>ResponseEntity</code>实现文件下载功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">@RequestMapping</span>(<span class="string">"/testResponseEntity"</span>)                                                                   </div><div class="line"><span class="keyword">public</span> ResponseEntity&lt;<span class="keyword">byte</span>[]&gt; testResponseEntity(HttpServletRequest request) throws IOException {        </div><div class="line">    InputStream <span class="keyword">is</span> = request.getServletContext().getResourceAsStream(<span class="string">"/scripts/jquery-1.9.1.min.js"</span>);    </div><div class="line">    <span class="keyword">byte</span>[] <span class="keyword">body</span> = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="keyword">is</span>.available()];                                                              </div><div class="line">    <span class="keyword">is</span>.read(<span class="keyword">body</span>);                                                                                       </div><div class="line">    HttpHeaders headers = <span class="keyword">new</span> HttpHeaders();                                                             </div><div class="line">    headers.add(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename=jquery-1.9.1.min.js"</span>);                       </div><div class="line">    ResponseEntity&lt;<span class="keyword">byte</span>[]&gt; resp = <span class="keyword">new</span> ResponseEntity&lt;<span class="keyword">byte</span>[]&gt;(<span class="keyword">body</span>, headers, HttpStatus.OK);              </div><div class="line">    <span class="keyword">return</span> resp;                                                                                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>使用 <code>HttpEntity</code>输出请求头信息：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(<span class="string">"/testHttpEntity"</span>)                             </div><div class="line"><span class="keyword">public</span> String <span class="title">testHttpEntity</span>(HttpEntity&lt;String&gt; entity) {      </div><div class="line">    System.<span class="keyword">out</span>.println(entity.getHeaders().toString());        </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;                                          </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="国际化">国际化</h2>
+<p>默认情况下， SpringMVC 根据请求头中的<code>Accept-Language</code>参数 判断客户端的本地化类型。 当接受到请求时， SpringMVC 会在上下文中查找一个本 地化解析器（接口为<code>LocalResolver</code>），默认情况下使用的是<code>AcceptHeaderLocaleResolver</code>解析器。</p>
+<p>可以通过<strong>配置拦截器和解析器，动态的修改本地化解析器</strong>。有下面2中本地化解析器可以选择：</p>
+<ul>
+<li><code>CookieLocaleResolver</code>：根据指定的 Cookie 值确定本地化类 型；</li>
+<li><code>SessionLocaleResolver</code>：根据 Session 中特定的属性确定本 地化类型。</li>
+</ul>
+<p>拦截器可以使用<code>LocaleChangeInterceptor</code>，它会根据请求参数<code>locale</code>获取对应的<code>LocaleResolver</code>。</p>
+<h3 id="使用超链接切换Locale">使用超链接切换Locale</h3>
+<p>下面通过实例说明使用超链接切换Locale的方法：<br>（1）在JSP中配置2个URL，注意需要传递一个locale参数，参数值为Locale值：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"I18n/testLocale?locale=zh_CN"</span>&gt;</span>Test Locale 中文<span class="tag">&lt;/<span class="title">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                    </div><div class="line"><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"I18n/testLocale?locale=en_US"</span>&gt;</span>Test Locale 英文<span class="tag">&lt;/<span class="title">a</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>（2）提供 目标方法为，因为对locale参数的接收必须过拦截器，所以也就必须经过目标方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@RequestMapping</span>(<span class="string">"/testLocale"</span>)                                       </div><div class="line"><span class="keyword">public</span> String <span class="title">testLocale</span>() {                                              </div><div class="line">    <span class="keyword">return</span> <span class="string">"section09/i18n"</span>;                                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>（3）最后，最重要的是拦截器和本地化解析器的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"localeResolver"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.i18n.SessionLocaleResolver"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span> </div><div class="line"> </div><div class="line"><span class="tag">&lt;<span class="title">mvc:interceptors</span>&gt;</span>                                                                                   </div><div class="line">    <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.i18n.LocaleChangeInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>               </div><div class="line"><span class="tag">&lt;/<span class="title">mvc:interceptors</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="源码简析-1">源码简析</h3>
+<p>配置了拦截器<code>LocaleChangeInterceptor</code>后，<code>DispatcherServlet</code>在执行目标方法前会去先调用<code>LocaleChangeInterceptor</code>的<code>preHandle</code>方法获取<code>Locale</code>对象，如果此时配置了本地化解析器<code>SessionLocaleResolver</code>，并且请求URL带参数<code>locale</code>，则会创建<code>SessionLocaleResolver</code>对象用于解析本地化工作。<br>相关代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span>                                                                                                    </div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span>(HttpServletRequest request, HttpServletResponse response, Object handler)           </div><div class="line">        <span class="keyword">throws</span> ServletException {                                                                            </div><div class="line"></div><div class="line"></div><div class="line">    String newLocale = request.getParameter(<span class="keyword">this</span>.paramName);                                                 </div><div class="line">    <span class="keyword">if</span> (newLocale != <span class="keyword">null</span>) {                                                                                 </div><div class="line">        <span class="comment">// 如果配置了SessionLocaleResolver，则这里返回的将是 SessionLocaleResolver对象</span></div><div class="line">        LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);                      </div><div class="line">        <span class="keyword">if</span> (localeResolver == <span class="keyword">null</span>) {                                                                        </div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"No LocaleResolver found: not in a DispatcherServlet request?"</span>); </div><div class="line">        }                                                                                                    </div><div class="line">        localeResolver.setLocale(request, response, StringUtils.parseLocaleString(newLocale));               </div><div class="line">    }                                                                                                        </div><div class="line">    <span class="comment">// Proceed in any case.                                                                                  </span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;                                                                                             </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下图是 <code>LocaleChangeInterceptor</code>和 <code>SessionLocaleResolver</code>的基本工作过程：</p>
+<h3 id="使用JSP和目标方法中获取本地化资源">使用JSP和目标方法中获取本地化资源</h3>
+<p>首先需要提供资源文件，例如名为i18n.properties的国家化资源文件。<br>然后配置绑定资源文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;bean <span class="property">id</span>=<span class="string">"messageSource"</span> <span class="type">class</span>=<span class="string">"org.springframework.context.support.ResourceBundleMessageSource"</span>&gt; </div><div class="line">    &lt;<span class="keyword">property</span> <span class="property">name</span>=<span class="string">"basename"</span> value=<span class="string">"i18n"</span>&gt;&lt;/<span class="keyword">property</span>&gt;                                            </div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+
+<p>很多生产系统都需要长时间持续运行，系统重启会给运行带来很大的负面影响，这时使用<code>ReloadableResourceBundleMessageSource</code>就可以解决国际化信息更新的问题：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--国际化--&gt;</span>                                                                                                          </div><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"messageSource"</span> <span class="attribute">class</span>=<span class="value">"org.springframework.context.support.ReloadableResourceBundleMessageSource"</span>&gt;</span>         </div><div class="line">    <span class="comment">&lt;!--资源文件基础名--&gt;</span>                                                                                                  </div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"basename"</span> <span class="attribute">value</span>=<span class="value">"i18n"</span>/&gt;</span>                                                                       </div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"defaultEncoding"</span> <span class="attribute">value</span>=<span class="value">"UTF-8"</span>/&gt;</span>                                                                </div><div class="line">    <span class="comment">&lt;!--刷新时间，单位秒--&gt;</span>                                                                                                 </div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"cacheSeconds"</span> <span class="attribute">value</span>=<span class="value">"30"</span>/&gt;</span>                                                                      </div><div class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，这是在SpringMVC的配置文件中配置的，当和Spring整合的时候不要在Spring的IOC容器配置文件中配置！！</strong><br><strong>还要注意，在Intellij IDEA中要写成下列的形式：<code>&lt;property name=&quot;basename&quot; value=&quot;/WEB-INF/classes/i18n&quot;/&gt;</code>。</strong></p>
+<p>之后就能在JSP或者目标方法中获取本地化资源。</p>
+<ul>
+<li>在JSP中使用标签fmt:message获取，该标签的key属性对应资源名。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;fm<span class="variable">t:message</span> key=<span class="string">"login.user.username"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<p>如果资源文件带占位符，则可以这样：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;fm<span class="variable">t:message</span> key=<span class="string">"login.user.age"</span>&gt;</div><div class="line">    &lt;fm<span class="variable">t:param</span> value=<span class="string">"20"</span>/&gt;</div><div class="line">&lt;/fm<span class="variable">t:message</span>&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>在目标方法中可以先注入<code>ResourceBundleMessageSource</code>对象，然后调用<code>getMessage</code>方法获取。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Controller</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestI18n</span> </span>{</div><div class="line">    <span class="annotation">@Autowired</span></div><div class="line">    ResourceBundleMessageSource bundleMS;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="annotation">@RequestMapping</span>(<span class="string">"/testLocale"</span>)</div><div class="line">    <span class="keyword">public</span> String <span class="title">testLocale</span>(Locale locale) {</div><div class="line">        String message = bundleMS.getMessage(<span class="string">"username"</span>, <span class="keyword">null</span>, locale);</div><div class="line">        System.out.println(message);</div><div class="line">        <span class="keyword">return</span> <span class="string">"section09/i18n"</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="文件上传">文件上传</h2>
+<p>Spring MVC 为文件上传提供了直接的支持， 这种支持是通 过即插即用的<code>MultipartResolver</code>接口实现的。Spring 用 Jakarta Commons FileUpload 技术实现了一个 MultipartResolver 实现类：<code>CommonsMultipartResovler</code>。<br>Sring MVC默认没有装配<code>MultipartResovler</code>， 如果想使用 文件上传功能，需要在上下文中配置相关的<code>MultipartResolver</code>，例如这里配置 <code>CommonsMultipartResovler</code> ：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;bean <span class="variable">id=</span><span class="string">"multipartResolver"</span> <span class="variable">class=</span><span class="string">"org.springframework.web.multipart.commons.CommonsMultipartResolver"</span>&gt;</div><div class="line">    &lt;property <span class="variable">name=</span><span class="string">"defaultEncoding"</span> <span class="variable">value=</span><span class="string">"UTF-8"</span>/&gt;                                                    </div><div class="line">    &lt;property <span class="variable">name=</span><span class="string">"maxUploadSize"</span> <span class="variable">value=</span><span class="string">"1024000"</span>/&gt;                                                    </div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+
+<p>并且加入commons-fileupload相关jar包：<br>commons-fileupload-1.2.1.jar<br>commons-io-2.0.jar</p>
+<p>然后提供一个请求JSP页面：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;form action=<span class="string">"MultipartResolver/testFileUpload"</span> <span class="keyword">method</span>=<span class="string">"POST"</span> enctype=<span class="string">"multipart/form-data"</span>&gt;  </div><div class="line">    <span class="type">File</span>: &lt;input <span class="keyword">type</span>=<span class="string">"file"</span> name=<span class="string">"file"</span>/&gt;                                                    </div><div class="line">    &lt;br/&gt;                                                                                     </div><div class="line">    <span class="type">Desc</span>: &lt;input <span class="keyword">type</span>=<span class="string">"text"</span> name=<span class="string">"desc"</span>/&gt;                                                    </div><div class="line">    &lt;br/&gt;                                                                                     </div><div class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"submit"</span> value=<span class="string">"Submit"</span>/&gt;                                                     </div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+<p>最后提供目标方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(<span class="string">"/MultipartResolver"</span>)                                     </div><div class="line">@Controller                                                               </div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> TestCommonsMultipartResolver {                               </div><div class="line">                                                                </div><div class="line"></div><div class="line">    @RequestMapping(<span class="string">"/testFileUpload"</span>)                                    </div><div class="line">    <span class="keyword">public</span> String <span class="title">testFileUpload</span>(@<span class="title">RequestParam</span>("desc") String desc,       </div><div class="line">            @<span class="title">RequestParam</span>("file") MultipartFile file) throws IOException {</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"desc:"</span> + desc);                               </div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"filename:"</span> + file.getOriginalFilename());     </div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"inputStream:"</span> + file.getInputStream());       </div><div class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;                                                 </div><div class="line">    }                                                                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="自定义拦截器">自定义拦截器</h2>
+<p>Spring MVC也可以使用拦截器对请求进行拦截处理，用户 可以自定义拦截器来实现特定的功能， 自定义的拦截器必 须实现<code>HandlerInterceptor</code>接口并重写3个方法：</p>
+<ul>
+<li><code>preHandle</code>： 这个方法 <code>DispatcherServlet</code>调用 目标方法前执行 。该方法返回true表示继续 调用其他的拦截器或者目标方法，返回false表示 不需要再调用其他的组件 去处理请求；</li>
+<li><code>postHandle</code>： 这个方法在目标方法执行完后调用，但在 <code>DispatcherServlet</code>向客户端返回响应前被调用 ；</li>
+<li><code>afterCompletion</code>： 这个方法在<code>DispatcherServlet</code>完全处理完请 求后被调用，可以在该方法中进行一些资源清理的操作。</li>
+</ul>
+<p>配置自定义拦截器：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">mvc:interceptors</span>&gt;</span>                                                                   </div><div class="line">    <span class="comment">&lt;!-- 配置自定义拦截器 --&gt;</span>                                                                </div><div class="line">    <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"section11.FirstInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>                                 </div><div class="line">    <span class="tag">&lt;<span class="title">mvc:interceptor</span>&gt;</span>                                                                </div><div class="line">        <span class="comment">&lt;!-- 配置拦截器(不)作用的路径 --&gt;</span>                                                       </div><div class="line">        <span class="tag">&lt;<span class="title">mvc:mapping</span> <span class="attribute">path</span>=<span class="value">"/emp"</span>/&gt;</span>                                                   </div><div class="line">        <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"section11.SecondInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>                            </div><div class="line">    <span class="tag">&lt;/<span class="title">mvc:interceptor</span>&gt;</span>                                                               </div><div class="line">    <span class="comment">&lt;!-- 配置国际化专用拦截器 --&gt;</span>                                                              </div><div class="line">    <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.i18n.LocaleChangeInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">mvc:interceptors</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在上述配置项中，配置了2个自定义拦截器和一个用于处理locale请求的国际化拦截器。<strong>在配置项中还可以声明拦截和不拦截的路径</strong>。</p>
+<p>假如项目中配置了一个名为<code>FirstInterceptor</code>的自定义拦截器，则下图是它和目标方法的执行流程：</p>
+<p>对应的源码为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// DispatcherServlet</span></div><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doDispatch</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> Exception {       </div><div class="line">            <span class="comment">// .... </span></div><div class="line"></div><div class="line"></div><div class="line">              <span class="comment">// 执行拦截器的 preHandle方法，并且如果 preHandle返回false，则直接从这里返回</span></div><div class="line"></div><div class="line">            <span class="keyword">if</span> (!mappedHandler.applyPreHandle(processedRequest, response)) {                                 </div><div class="line">                <span class="keyword">return</span>;                                                                                      </div><div class="line">            }                                                                                                </div><div class="line">            <span class="keyword">try</span> {                                                                                            </div><div class="line">                <span class="comment">// 执行目标方法                                                            </span></div><div class="line">                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());                      </div><div class="line">            }                                                                                                </div><div class="line">            <span class="comment">// 对目标方法视图进行渲染，返回响应内容</span></div><div class="line">            applyDefaultViewName(request, mv);     </div><div class="line">            <span class="comment">// 执行拦截器的postHandle方法                                                           </span></div><div class="line">            mappedHandler.applyPostHandle(processedRequest, response, mv);                                   </div><div class="line">        }                                                                                                    </div><div class="line">        <span class="keyword">catch</span> (Exception ex) {                                                                               </div><div class="line">            dispatchException = ex;                                                                          </div><div class="line">        }                                                                                                    </div><div class="line">        processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);             </div><div class="line">    }                                                                                                        </div><div class="line">    <span class="keyword">catch</span> (Exception ex) {   </div><div class="line">         <span class="comment">// 执行拦截器的 afterCompletion方法                                                                                 </span></div><div class="line">        triggerAfterCompletion(processedRequest, response, mappedHandler, ex);                               </div><div class="line">    }                                                                                                        </div><div class="line">    <span class="keyword">catch</span> (Error err) {             </div><div class="line">         <span class="comment">// 或者是在这里 执行拦截器的afterCompletion方法                                                                                </span></div><div class="line">        triggerAfterCompletionWithError(processedRequest, response, mappedHandler, err);                     </div><div class="line">    }                                                                                                        </div><div class="line">    <span class="comment">// ......                                                                                                     </span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+<p>假设项目中配置了2个拦截器，分别是<code>FirstInterceptor</code>和<code>SecondInterceptor</code>，而且<code>SecondInterceptor</code>的<code>preHandle</code>方法返回false，则拦截器和目标方法的执行流程如下：</p>
+<p>从图中可以看到，先执行<code>preHandle</code>方法的 拦截器，它的<code>afterCompletion</code>方法会后执行，而且由于第二个拦截器返回false，所以不会执行<code>postHandle</code>方法，这可以从上面的源码分析中得知 。</p>
+<h2 id="异常处理">异常处理</h2>
+<h3 id="Spring_MVC异常处理简介">Spring MVC异常处理简介</h3>
+<p>Spring MVC 通过<code>HandlerExceptionResolver</code>解析器处理程序 的异常，包括 Handler 映射、数据绑定以及目标方法执行 时发生的异常。</p>
+<p>异常处理是在<code>DispatchserServlet</code>的<code>processDispatchResult</code>中执行的，当捕获到异常对象时，<code>DispatcherServlet</code>变量属性<code>handlerExceptionResolvers</code>，而且按照该属性中异常解析器的存放顺序处理异常，相关源码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// DispatcherServlet 1158</span></div><div class="line"><span class="keyword">protected</span> ModelAndView <span class="title">processHandlerException</span>(HttpServletRequest request, HttpServletResponse response,  Object handler, Exception ex) <span class="keyword">throws</span> Exception {</div><div class="line">     ModelAndView exMv = <span class="keyword">null</span>;                        </div><div class="line">    <span class="comment">// 循环从handlerExceptionResolvers找到一个解析器处理当前异常</span></div><div class="line">     <span class="keyword">for</span> (HandlerExceptionResolver handlerExceptionResolver : <span class="keyword">this</span>.handlerExceptionResolvers) { </div><div class="line">        <span class="comment">// 如果有返回结果就跳出循环                      </span></div><div class="line">        exMv = handlerExceptionResolver.resolveException(request, response, handler, ex); </div><div class="line">          <span class="keyword">if</span> (exMv != <span class="keyword">null</span>) {</div><div class="line">               <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="comment">// ……省略</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>那Spring MVC有自动装载解析器呢？<br>可以调试代码查看 <code>handlerExceptionResolvers</code>的内容，这时候会发现，当项目使用了<code>mvc:annotation-driven</code>配置项是 ，自动装载的解析器为：</p>
+<p>如果没有使用该配置项，则 <code>handlerExceptionResolvers</code>属性的第一个元素将被<code>AnnotationMethodHandlerExcpetionResolver</code>代替。<br>如果项目中还配置了下面将会说明的<code>SimpleMappingExceptionResolver</code>解析器，这个解析器将会作为 <code>handlerExceptionResolvers</code>属性第4个元素。</p>
+<p><strong>注意，Spring MVC在处理异常的时候就是按照 <code>handlerExceptionResolvers</code>属性中元素的顺序循环进行，当处理完并返回结果不为null时就会跳出循环。</strong></p>
+<h3 id="@ExceptionHandler和_@ControllerAdvice">@ExceptionHandler和 @ControllerAdvice</h3>
+<p><strong><code>@ExceptionHandler</code>对 当前Controller中的方法有效，<code>@ControllerAdvice</code>可以把异常处理方法集中到一个类中。</strong></p>
+<p><code>@ExceptionHandler</code>注解的作用是在handler中提供异常处理方法，它提供了value属性声明可以处理哪些异常。<br>声明了异常处理方法后，如果当前这个handler中的目标方法发生异常时，且该处理方法可以捕获，则转由异常处理方法处理异常。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*                                                                                 </span></div><div class="line"> * 使用@ExceptionHandler注解的方法表示异常处理方法。                                               </div><div class="line"> * 当前方法表示既处理 ArithmeticException异常，又处理IllegalAccessException异常。                    </div><div class="line"> */                                                                                </div><div class="line">@ExceptionHandler(<span class="keyword">value</span>={ArithmeticException.class, IllegalAccessException.class}) </div><div class="line"><span class="keyword">public</span> ModelAndView <span class="title">exceptionHanle</span>(Exception ex) {                                 </div><div class="line">    System.<span class="keyword">out</span>.println(<span class="string">"[异常处理方法] 发生了："</span> + ex.getMessage());                         </div><div class="line">    ModelAndView mv = <span class="keyword">new</span> ModelAndView(<span class="string">"section12/error"</span>);                         </div><div class="line">    mv.addObject(<span class="string">"my_exception"</span>, ex);                                              </div><div class="line">    <span class="keyword">return</span> mv;                                                                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>声明</p>
+<p>下面有几个值得注意的问题：</p>
+<ul>
+<li><p>若希望在JSP页面获取异常信息，@ExceptionHandler方法可以接收异常对象作为参数，并且把该异常对象设置到<code>ModelAndView</code>中，最后返回<code>ModelAndView</code>；     </p>
+</li>
+<li><p>handler如果定义了多个@ExceptionHandler方法，则它们是有优先级的问题，当发生异常时，根据异常的最近继承关系找到可以处理该异常的方法；</p>
+</li>
+</ul>
+<ul>
+<li>如果在当前 handler 中找不到@ExceptionHandler方法来出来当前方法出现的异常，则将去 @ControllerAdvice 标记的类中查找 @ExceptionHandler 标记的方法来处理异常。这样做的好处是可以把异常处理方法都集中在某个类中，例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@ControllerAdvice</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> TestControllerAdvice {</div><div class="line">    <span class="comment">/*</span></div><div class="line">     * 处理数组下标越界异常的方法。</div><div class="line">     */</div><div class="line">    @ExceptionHandler(<span class="keyword">value</span>={ArrayIndexOutOfBoundsException.class})</div><div class="line">    <span class="keyword">public</span> ModelAndView <span class="title">exceptionHandler</span>(Exception ex) {</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"发生下标越界异常..."</span>);</div><div class="line">        ModelAndView mv = <span class="keyword">new</span> ModelAndView(<span class="string">"section12/error"</span>);</div><div class="line">        mv.addObject(<span class="string">"my_exception"</span>, ex);</div><div class="line">        <span class="keyword">return</span> mv;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="ResponseStatusExceptionResolver和@ResponseStatus">ResponseStatusExceptionResolver和@ResponseStatus</h3>
+<p>某些情况下，如果希望对特定的异常返回特定的HTTP状态异常信息，可以先使用<code>@ResponseStatus</code>自定义一个异常类，然后当这个异常类出现的时候，<code>ResponseStatusExceptionResolver</code>就会捕获该异常并进行处理。</p>
+<p>下面是 <code>ResponseStatusExceptionResolver</code>处理异常的核心方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//  ResponseStatusExceptionResolver 79</span></div><div class="line"><span class="keyword">protected</span> ModelAndView <span class="title">resolveResponseStatus</span>(ResponseStatus responseStatus, HttpServletRequest request,</div><div class="line">        HttpServletResponse response, Object handler, Exception ex) throws Exception {                </div><div class="line">    <span class="comment">// 获取状态码和错误原因</span></div><div class="line">    <span class="keyword">int</span> statusCode = responseStatus.<span class="keyword">value</span>().<span class="keyword">value</span>();                                                  </div><div class="line">    String reason = responseStatus.reason();                                                          </div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.messageSource != <span class="keyword">null</span>) {           </div><div class="line">        <span class="comment">// 错误原因国际化                                                       </span></div><div class="line">        reason = <span class="keyword">this</span>.messageSource.getMessage(reason, <span class="keyword">null</span>, reason, LocaleContextHolder.getLocale());</div><div class="line">    }                                                                                                 </div><div class="line">    <span class="keyword">if</span> (!StringUtils.hasLength(reason)) {                                                             </div><div class="line">        response.sendError(statusCode);                                                               </div><div class="line">    }                                                                                                 </div><div class="line">    <span class="keyword">else</span> {                                                                                            </div><div class="line">        response.sendError(statusCode, reason);                                                       </div><div class="line">    }                                                                                                 </div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ModelAndView();                                                                        </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>从这个<code>resolveResponseStatus</code>方法可以知道，解析器会获取状态码和国际化的错误消息，然后作为响应的错误消息，最后返回一个新的视图显示这些错误消息。</p>
+<p>示例：<br>定义一个异常处理类型，并用注解<code>@ResponseStatus</code>声明：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason=<span class="string">"错误的请求"</span>)</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BadRequestExcpetion</span> <span class="inheritance"><span class="keyword">extends</span></span> <span class="title">RuntimeException</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">833581199090720707</span>L;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>提供目标方法，测试对于某种情况下会抛出这个自定义异常：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@RequestMapping</span>(<span class="string">"/testResponseStatusExceptionResolver"</span>)                                     </div><div class="line"><span class="keyword">public</span> String <span class="title">testResponseStatusExceptionResolver</span>(@<span class="title">RequestParam</span>("number") Integer number) { </div><div class="line">    <span class="keyword">if</span>(number == <span class="number">10</span>) {                                                                      </div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BadRequestExcpetion();                                                    </div><div class="line">    }                                                                                       </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;                                                                       </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>因为 <code>ResponseStatusExceptionResolver</code>解析器在处理该异常是会自动返回<code>ModelAndView</code>对象，所以进入目标方法的if判断流程后，最后还是能够转发到视图中显示错误信息。</strong></p>
+<h3 id="DefaultHandlerExceptionResolver">DefaultHandlerExceptionResolver</h3>
+<p><code>DefaultHandlerExceptionResolver</code>是SpringMVC的默认 异常解析器，可以查看<code>doResolveException</code>方法了解它可以处理哪些异常：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">protected</span> ModelAndView <span class="title">doResolveException</span>(HttpServletRequest request, HttpServletResponse response,  Object handler, Exception ex) {</div><div class="line">     <span class="keyword">try</span> {</div><div class="line">          <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> NoSuchRequestHandlingMethodException) {</div><div class="line">               <span class="keyword">return</span> handleNoSuchRequestHandlingMethod((NoSuchRequestHandlingMethodException) ex, </div><div class="line">                              request, response,  handler);</div><div class="line">        }</div><div class="line">          <span class="comment">// ……省略中间部分</span></div><div class="line">          <span class="keyword">else</span> <span class="keyword">if</span> (ex <span class="keyword">instanceof</span> NoHandlerFoundException) {</div><div class="line">               <span class="keyword">return</span> handleNoHandlerFoundException((NoHandlerFoundException) ex, request, response, handler);</div><div class="line">          }</div><div class="line">     }</div><div class="line">     <span class="keyword">catch</span> (Exception handlerException) {</div><div class="line">          logger.warn(<span class="string">"Handling of ["</span> + ex.getClass().getName() + <span class="string">"] resulted in Exception"</span>, handlerException); </div><div class="line">     }</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>测试示例：<br>从上面源码中可以知道，<code>DefaultHandlerExceptionResolver</code>可以处理<code>`异常，所以定义一个映射且只能接受POST请求，这时候用GET请访问该映射就会报错，此时是通过</code>DefaultHandlerExceptionResolver`异常解析器来处理的。<br>目标方法映射：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@<span class="type">RequestMapping</span>(value=<span class="string">"/testDefaultHandlerExceptionResolver"</span>, <span class="keyword">method</span>=<span class="type">RequestMethod</span>.<span class="type">POST</span>)</div><div class="line">public <span class="type">String</span> testDefaultHandlerExceptionResolver() {                                   </div><div class="line">    <span class="type">System</span>.<span class="keyword">out</span>.println(<span class="string">"testDefaultHandlerExceptionResolver"</span>);                          </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;                                                                   </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在JSP页面中发送GET请求：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"Exception/testDefaultHandlerExceptionResolver"</span>&gt;</span>Test DefaultHandlerExceptionResolver<span class="tag">&lt;/<span class="title">a</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="SimpleMappingExceptionResolver">SimpleMappingExceptionResolver</h3>
+<p>如果希望对所有异常进行统一处理，可以使用<code>SimpleMappingExceptionResolver</code>，它将异常类名映射为 视图名，即发生异常时使用对应的视图报告异常。</p>
+<p>示例：<br>下面把目标方法发生的<code>FileNotFoundException</code>异常都由同一个视图进行处理，首先需要配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"</span>&gt;</span>  </div><div class="line">    <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"exceptionMappings"</span>&gt;</span>                                                </div><div class="line">        <span class="tag">&lt;<span class="title">props</span>&gt;</span>                                                                        </div><div class="line">            <span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"java.io.FileNotFoundException"</span>&gt;</span>section12/no_such_file_error<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">props</span>&gt;</span>                                                                       </div><div class="line">    <span class="tag">&lt;/<span class="title">property</span>&gt;</span>                                                                        </div><div class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>然后提供一个测试的目标方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@RequestMapping</span>(<span class="string">"/testSimpleMappingExceptionResolver"</span>)                                   </div><div class="line"><span class="keyword">public</span> String <span class="title">testSimpleMappingExceptionResolver</span>(@<span class="title">RequestParam</span>("number") Integer number) </div><div class="line">        <span class="keyword">throws</span> FileNotFoundException {                                                   </div><div class="line">    System.out.println(<span class="string">"testSimpleMappingExceptionResolver"</span>);                            </div><div class="line">    <span class="keyword">if</span>(number == <span class="number">12</span>) {                                                                   </div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> FileNotFoundException();                                               </div><div class="line">    }                                                                                    </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;</div></pre></td></tr></table></figure>
+
+<p>最后可以在视图JSP中获取异常信息：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// ......</div><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">h3</span>&gt;</span>FileNotFound Page<span class="tag">&lt;/<span class="title">h3</span>&gt;</span></div><div class="line">    异常信息：</div><div class="line">    ${requestScope.exception }</div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div><div class="line">// ......</div></pre></td></tr></table></figure>
+
+<p>还需要注意：</p>
+<ul>
+<li>当前的Handler中必须没有使用<code>@ExceptionHandler</code>且可以捕获<code>FileNotFoundException</code>异常的异常处理方法，但可以有捕获其它异常的处理方法；</li>
+</ul>
+<ul>
+<li><code>SimpleMappingExceptionResolver</code>默认会把异常信息放入到<code>ModelAndView</code>对象中返回给视图页面，而且默认的属性名为<code>exception</code>，且不能修改（可以查看 <code>SimpleMappingExceptionResolver</code>的源码验证 ）！</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/SpringMVC/">SpringMVC</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/SpringMVC/Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理/" data-title="Spring MVC完全教程（三）：目标方法返回值类型、国际化、文件上传、自定义拦截器和异常处理 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（二）：REST、类型转换和校验/" title="Spring MVC完全教程（二）：REST、类型转换和校验">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Spring MVC完全教程（二）：REST、类型转换和校验</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（一）：入门示例、目标方法和视图解析/"  title="Spring MVC完全教程（一）：入门示例、目标方法和视图解析">
+ <strong>NEXT:</strong><br/> 
+ <span>Spring MVC完全教程（一）：入门示例、目标方法和视图解析
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpMessageConverter"><span class="toc-number">1.</span> <span class="toc-text">HttpMessageConverter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#处理JSON数据"><span class="toc-number">2.</span> <span class="toc-text">处理JSON数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#源码简析"><span class="toc-number">2.1.</span> <span class="toc-text">源码简析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其它示例"><span class="toc-number">2.2.</span> <span class="toc-text">其它示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#国际化"><span class="toc-number">3.</span> <span class="toc-text">国际化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用超链接切换Locale"><span class="toc-number">3.1.</span> <span class="toc-text">使用超链接切换Locale</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#源码简析-1"><span class="toc-number">3.2.</span> <span class="toc-text">源码简析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用JSP和目标方法中获取本地化资源"><span class="toc-number">3.3.</span> <span class="toc-text">使用JSP和目标方法中获取本地化资源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件上传"><span class="toc-number">4.</span> <span class="toc-text">文件上传</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义拦截器"><span class="toc-number">5.</span> <span class="toc-text">自定义拦截器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异常处理"><span class="toc-number">6.</span> <span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring_MVC异常处理简介"><span class="toc-number">6.1.</span> <span class="toc-text">Spring MVC异常处理简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@ExceptionHandler和_@ControllerAdvice"><span class="toc-number">6.2.</span> <span class="toc-text">@ExceptionHandler和 @ControllerAdvice</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResponseStatusExceptionResolver和@ResponseStatus"><span class="toc-number">6.3.</span> <span class="toc-text">ResponseStatusExceptionResolver和@ResponseStatus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DefaultHandlerExceptionResolver"><span class="toc-number">6.4.</span> <span class="toc-text">DefaultHandlerExceptionResolver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleMappingExceptionResolver"><span class="toc-number">6.5.</span> <span class="toc-text">SimpleMappingExceptionResolver</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

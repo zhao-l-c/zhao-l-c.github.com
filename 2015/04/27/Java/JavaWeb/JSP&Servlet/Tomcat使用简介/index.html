@@ -1,0 +1,379 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Tomcat使用简介 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="Tomcat的安装
+1）安装目录不能有空格或中文字符，直接解压就行2）必须配置一个JAVA_HOME或者JRE_HOME环境变量，指向JDK或者JRE的安装目录。第一次安装完成，双击bin目录的startup.bat文件即可启动Tomcat服务器，浏览器输入http://localhost:8080">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/Tomcat使用简介/" title="Tomcat使用简介" itemprop="url">Tomcat使用简介</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Tomcat的安装"><span class="toc-number">1.</span> <span class="toc-text">Tomcat的安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tomcat的目录结构"><span class="toc-number">2.</span> <span class="toc-text">Tomcat的目录结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标准的JavaWeb应用的目录结构(由Servlet规范规定的)"><span class="toc-number">3.</span> <span class="toc-text">标准的JavaWeb应用的目录结构(由Servlet规范规定的)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#server-xml配置文件介绍"><span class="toc-number">4.</span> <span class="toc-text">server.xml配置文件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Web应用的3种方式"><span class="toc-number">5.</span> <span class="toc-text">配置Web应用的3种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_将应用文件夹放到Tomcat安装目录下webapps目录下面。"><span class="toc-number">5.1.</span> <span class="toc-text">1. 将应用文件夹放到Tomcat安装目录下webapps目录下面。</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_配置server-xml文件"><span class="toc-number">5.2.</span> <span class="toc-text">2. 配置server.xml文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_配置conf\Catalina\localhost\目录下的xml文件"><span class="toc-number">5.3.</span> <span class="toc-text">3. 配置conf\Catalina\localhost\目录下的xml文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Tomcat服务器的默认应用"><span class="toc-number">6.</span> <span class="toc-text">配置Tomcat服务器的默认应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置虚拟主机(Host标签的使用)"><span class="toc-number">7.</span> <span class="toc-text">配置虚拟主机(Host标签的使用)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#（好像不太对劲耶）"><span class="toc-number">7.0.1.</span> <span class="toc-text">（好像不太对劲耶）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_SSL_连接器(Connector标签的使用)"><span class="toc-number">8.</span> <span class="toc-text">配置 SSL 连接器(Connector标签的使用)</span></a></li></ol>
+		</div>
+		
+		<h2 id="Tomcat的安装">Tomcat的安装</h2>
+<p>1）安装目录不能有空格或中文字符，直接解压就行<br>2）必须配置一个<code>JAVA_HOME</code>或者<code>JRE_HOME</code>环境变量，指向JDK或者JRE的安装目录。<br>第一次安装完成，双击bin目录的<strong>startup.bat</strong>文件即可启动Tomcat服务器，浏览器输入<code>http://localhost:8080/</code>就能访问。</p>
+<p>注意：<br>1）localhost代表一个网站地址，是在conf/server.xml文件中的Host标签配置的。配置不同的Host标签代表不同的网站访问地址。<br>2）8080 是访问的端口，也是在conf/server.xml文件中Connector标签配置。</p>
+<h2 id="Tomcat的目录结构">Tomcat的目录结构</h2>
+<p>bin：存放可执行程序<br>conf：存放Tomcat的配置文件<br>lib：存放Tomcat运行依赖的jar文件<br>logs：存放Tomcat的运行日志<br>webapps：存放Tomcat所管理的应用。该文件夹下有几个文件夹，就代表当前管理着几个应用。</p>
+<h2 id="标准的JavaWeb应用的目录结构(由Servlet规范规定的)">标准的JavaWeb应用的目录结构(由Servlet规范规定的)</h2>
+<p>下面的目录和文件是必须有且用户不能直接访问：<br>WEB-INF目录<br>——classes目录<br>——lib目录<br>——web.xml文件<br>注意：<br>Tomcat\lib下的jar 包，能被 Tomcat 自身访问，还能被所有的JavaWeb应用访问。<br>而JavaWeb应用\WEB-INF\lib下的jar，只能被当前应用访问。</p>
+<h2 id="server-xml配置文件介绍">server.xml配置文件介绍</h2>
+<p>Host：虚拟主机，配置一个Host元素代表一个网站。Host中有以下它的属性：<br>name：网站名称，若name=”localhost”表示Tomcat管理的默认网站。<br>appBase：存放应用的目录。<br>unpackWARs：自动解压war包。<br>autoDeploy：自动部署。</p>
+<p>Context：虚拟目录，代表网站中的应用。</p>
+<h2 id="配置Web应用的3种方式">配置Web应用的3种方式</h2>
+<h3 id="1-_将应用文件夹放到Tomcat安装目录下webapps目录下面。">1. 将应用文件夹放到Tomcat安装目录下webapps目录下面。</h3>
+<p><strong>优点：不用重启 Tomcat 服务器， 能自动部署映射。</strong></p>
+<h3 id="2-_配置server-xml文件">2. 配置server.xml文件</h3>
+<p>在conf/server.xml文件中Host标签下添加一个Context子标签，如<br><code>&lt;Context path=&quot;/tt&quot; docBase=&quot;c:/test&quot; raloadable=&quot;true&quot; /&gt;</code><br>注意：路径一定要用<code>/</code>分割符！！<br>其中：<br>path：表示的是虚拟路径，用于浏览器访问时地址栏输入。<br>docBase：指定的是应用所在的绝对路径。<br>最后在c:/test目录下新建一个应用，如：testapps1，里面加入相应的资源文件，如hello.html。<br>然后在浏览器中输入<code>localhost:8080/tt/testapps1/hello.html</code>访问页面。<br><strong>缺点：必须重新启动Tomcat服务器，不推荐使用。</strong></p>
+<h3 id="3-_配置conf\Catalina\localhost\目录下的xml文件">3. 配置conf\Catalina\localhost\目录下的xml文件</h3>
+<p>在Tomcat安装目录下conf\Catalina\localhost\ 添加一个xml文件：<strong>mybbs.xml</strong>，这个文件名就是应用的上下文件路径名。里面输入：<br><code>&lt;Context docBase=&quot;c:/test/testapps2&quot; reloadable=&quot;true&quot;/&gt;</code><br>上面用docBase属性，指明了一个访问页面的路径，在c:/test/下新建一个testapps2文件夹，该给文件夹就是Web应用的目录。<br>而Context中可以不使用path属性，<strong>因为文件名mybbs.xml 就是应用的上下文件路径名</strong>。<br>然后在testapps2里面新建一个index.html 文件，浏览器中输入<code>localhost:8080/mybbs</code>即可访问该index.html 文件。</p>
+<p>注意：<br>1）reloadable=”true”属性可以实现自动加载修改后的class文件。<br>2）conf 目录下的Catalina文件夹是根据server.xml文件中的Engine标签建立的，而Catalina文件夹下的localhost文件夹则是根据Host标签建立的。<br>3）如果文件名为ROOT.xml，表示这是Tomcat服务器的默认应用的配置文件，它的默认端口、默认应用和默认主页为： <a href="http://localhsot" target="_blank" rel="external">http://localhsot</a></p>
+<h2 id="配置Tomcat服务器的默认应用">配置Tomcat服务器的默认应用</h2>
+<p>1）修改端口：<br>修改Tomcat的server.xml中的Connector标签的8080端口改为80<br>2）添加应用：<br>在Tomcat安装目录\conf[enginename][hostname]\建立一个ROOT.xml文件，输入如下配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="gbk"?&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">Context</span> <span class="attribute">docBase</span>=<span class="value">"D:\MyApp"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<p>3）配置默认主页:<br>修改应用的web.xml文件，在根元素中增加以下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">welcome-file-list</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">welcome-file</span>&gt;</span>index.html<span class="tag">&lt;/<span class="title">welcome-file</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">welcome-file-list</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+<h2 id="配置虚拟主机(Host标签的使用)">配置虚拟主机(Host标签的使用)</h2>
+<h4 id="（好像不太对劲耶）">（好像不太对劲耶）</h4>
+<p>对于一个Tomcat服务器，可以在上面部署多个网站，每个网站对应的是一个Host标签，如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">Host</span> <span class="attribute">name</span>=<span class="value">"www.hit.com"</span> <span class="attribute">appBase</span>=<span class="value">"F:\apps1"</span> <span class="attribute">unpackWARs</span>=<span class="value">"true"</span> <span class="attribute">autoDeploy</span>=<span class="value">"true"</span> <span class="attribute">xmlValidation</span>=<span class="value">"false"</span> <span class="attribute">xmlNamespaceAware</span>=<span class="value">"false"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<p>然后把端口号修改为<code>80</code>，最后在 C:\Windows\System32\drivers\etc目录下向hosts 文件添加：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>    www.hit.<span class="keyword">com</span></div><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>    www.scut.<span class="keyword">com</span></div></pre></td></tr></table></figure>
+
+<p>这时就能可直接通过访问 www.hit.com 或者 www.scut.com 的方式访问到这个网站。</p>
+<h2 id="配置_SSL_连接器(Connector标签的使用)">配置 SSL 连接器(Connector标签的使用)</h2>
+<p>1）SSL 协议和 HTTPS 协议：SSL 是一种安全协议，利用数据加密和身份验证达到安全目的。建立在 SSL 协议上的 HTTP 协议称为 HTTPS 协议。</p>
+<p>2）生成自己的安全证书：<br>在终端输入：<code>keytool -genkey -alias tomcat-validator -keyalg RSA</code>。<br>输入相应的提示信息后生成一份名为<code>.keystore</code>的证书，默认存放在用户目录下。</p>
+<p>3）在 server.xml 文件中配置 Connector 标签，如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">Connector</span> <span class="attribute">port</span>=<span class="value">"8443"</span> <span class="attribute">protocol</span>=<span class="value">"org.apache.coyote.http11.Http11Protocol"</span> <span class="attribute">SSLEnabled</span>=<span class="value">"true"</span></span></div><div class="line">             <span class="attribute">maxThreads</span>=<span class="value">"150"</span> <span class="attribute">scheme</span>=<span class="value">"https"</span> <span class="attribute">secure</span>=<span class="value">"true"</span></div><div class="line">             <span class="attribute">clientAuth</span>=<span class="value">"false"</span> <span class="attribute">sslProtocol</span>=<span class="value">"TLS"</span> <span class="attribute">keystoreFile</span>=<span class="value">"c:\.keystore"</span> <span class="attribute">keystorePass</span>=<span class="value">"123456"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<p>注意：<br>对于解压式的安装Tomcat方法，protocol属性必须使用上面指定的类。</p>
+<p>4）访问页面：浏览器中输入 <a href="https://localhost:8443" target="_blank" rel="external">https://localhost:8443</a> 即可访问Tomcat服务器。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/JSP-Servlet/">JSP&Servlet</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/JavaWeb/JSP&Servlet/Tomcat使用简介/" data-title="Tomcat使用简介 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/自定义标签/" title="自定义标签">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  自定义标签</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/Servlet详解/"  title="Servlet详解">
+ <strong>NEXT:</strong><br/> 
+ <span>Servlet详解
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Tomcat的安装"><span class="toc-number">1.</span> <span class="toc-text">Tomcat的安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tomcat的目录结构"><span class="toc-number">2.</span> <span class="toc-text">Tomcat的目录结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标准的JavaWeb应用的目录结构(由Servlet规范规定的)"><span class="toc-number">3.</span> <span class="toc-text">标准的JavaWeb应用的目录结构(由Servlet规范规定的)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#server-xml配置文件介绍"><span class="toc-number">4.</span> <span class="toc-text">server.xml配置文件介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Web应用的3种方式"><span class="toc-number">5.</span> <span class="toc-text">配置Web应用的3种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_将应用文件夹放到Tomcat安装目录下webapps目录下面。"><span class="toc-number">5.1.</span> <span class="toc-text">1. 将应用文件夹放到Tomcat安装目录下webapps目录下面。</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_配置server-xml文件"><span class="toc-number">5.2.</span> <span class="toc-text">2. 配置server.xml文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_配置conf\Catalina\localhost\目录下的xml文件"><span class="toc-number">5.3.</span> <span class="toc-text">3. 配置conf\Catalina\localhost\目录下的xml文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置Tomcat服务器的默认应用"><span class="toc-number">6.</span> <span class="toc-text">配置Tomcat服务器的默认应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置虚拟主机(Host标签的使用)"><span class="toc-number">7.</span> <span class="toc-text">配置虚拟主机(Host标签的使用)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#（好像不太对劲耶）"><span class="toc-number">7.0.1.</span> <span class="toc-text">（好像不太对劲耶）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_SSL_连接器(Connector标签的使用)"><span class="toc-number">8.</span> <span class="toc-text">配置 SSL 连接器(Connector标签的使用)</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

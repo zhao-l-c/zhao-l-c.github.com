@@ -1,0 +1,378 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>多线程基础（二） | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="线程间通信
+在线程间通信也就是多个线程之间对共享的数据进行操作，因此也涉及到数据的安全问题，所以线程间通信的时候共享数据通信需要同步。示例：
+1234567891011121314151617181920212223242526272829303132333435363738394041424344">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Concurrent/多线程基础（二）/" title="多线程基础（二）" itemprop="url">多线程基础（二）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程间通信"><span class="toc-number">1.</span> <span class="toc-text">线程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）等待唤醒机制"><span class="toc-number">1.1.</span> <span class="toc-text">1）等待唤醒机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）优化上面的示例程序"><span class="toc-number">1.2.</span> <span class="toc-text">2）优化上面的示例程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wait方法再次说明"><span class="toc-number">1.3.</span> <span class="toc-text">wait方法再次说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#某个线程试图去执行某个实例的wait方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达wait方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行notify、notifyAll或interrupt退出。最后退出等待进入下一个语句之前必须再次获取锁定。"><span class="toc-number">1.3.1.</span> <span class="toc-text">某个线程试图去执行某个实例的wait方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达wait方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行notify、notifyAll或interrupt退出。最后退出等待进入下一个语句之前必须再次获取锁定。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多线程通信问题（生产者和消费者）"><span class="toc-number">2.</span> <span class="toc-text">多线程通信问题（生产者和消费者）</span></a></li></ol>
+		</div>
+		
+		<h2 id="线程间通信">线程间通信</h2>
+<p>在线程间通信也就是多个线程之间对共享的数据进行操作，因此也涉及到数据的安全问题，所以线程间通信的时候共享数据通信需要同步。<br>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.section04;</div><div class="line"><span class="comment">// 线程间通信的示例代码</span></div><div class="line">class Resource {</div><div class="line">    String name;</div><div class="line">    <span class="keyword">char</span> sex;</div><div class="line">}</div><div class="line"> </div><div class="line">class InputThread implements Runnable {</div><div class="line">    <span class="keyword">private</span> Resource r;</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">InputThread</span>(Resource r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">boolean</span> flag = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">synchronized</span>(r) {</div><div class="line">                <span class="keyword">if</span> (flag) {</div><div class="line">                    r.name = <span class="string">"Mick"</span>;</div><div class="line">                    r.sex = <span class="string">'M'</span>;</div><div class="line">                    flag = <span class="keyword">false</span>;</div><div class="line">                } <span class="keyword">else</span> {</div><div class="line">                    r.name = <span class="string">"Lucy"</span>;</div><div class="line">                    r.sex = <span class="string">'F'</span>;</div><div class="line">                    flag = <span class="keyword">true</span>;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class OutputThread implements Runnable {</div><div class="line">    <span class="keyword">private</span> Resource r;</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">OutputThread</span>(Resource r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">synchronized</span> (r) {</div><div class="line">                System.out.println(<span class="string">"name="</span> + r.name + <span class="string">", sex="</span> + r.sex);</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadCommunication</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Resource r = <span class="keyword">new</span> Resource();</div><div class="line">        InputThread in = <span class="keyword">new</span> InputThread(r);</div><div class="line">        OutputThread out = <span class="keyword">new</span> OutputThread(r);</div><div class="line"> </div><div class="line">        Thread t1 = <span class="keyword">new</span> Thread(in);</div><div class="line">        Thread t2 = <span class="keyword">new</span> Thread(out);</div><div class="line">        t1.start();</div><div class="line">        t2.start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>上述代码中，线程<code>InputThread</code>和<code>OutputThread</code>分别操作共享数据<code>Resource</code>，因此在每个线程类的<code>run</code>方法中都需要把操作共享数据代码块进行同步，<br>其中因为<code>r</code>对象是共享的，因此可以作为锁对象使用。同时也可以使用<code>InputThread.class</code>或者<code>OutputThread.class</code>对象作为锁。</p>
+<h3 id="1）等待唤醒机制">1）等待唤醒机制</h3>
+<p>对于调用<code>wait</code>、<code>notify</code>和<code>notifyAll</code>的方法，<strong>都只能在同步代码块或同步函数中使用，而且调用这些方法的对象应该是线程的锁对象（监视器） </strong> 。<br>因此在同步代码块中，就应该由锁对象调用；而在同步函数中，则是当前对象调用（即<code>this</code>对象）；而在静态同步函数中则应该由Class对象调用。</p>
+<blockquote>
+<p>下面是JDK 文档中对wait方法的说明：<br>The current thread must own this object’s monitor. The thread <strong>releases ownership of this monitor</strong> and waits until another thread notifies threads waiting on this object’s monitor to wake up either through a call to the notify method or the notifyAll method. The thread then waits until it can re-obtain ownership of the monitor and resumes execution.<br>This method should always be used in a loop:</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">synchronized (obj) {</div><div class="line">    <span class="keyword">while</span> (&lt;condition does not hold&gt;)</div><div class="line">        obj.wait();</div><div class="line">    <span class="keyword">...</span> // Perform action appropriate to condition</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>This method should only be called by a thread that is the owner of this object’s monitor.</p>
+<p>从上面知道，<code>wait</code>方法执行时会释放线程持有的锁对象。</p>
+<p>下面的示例中，共享数据处于待写入状态时，线程<code>Input</code>往共享数据中写入数据，然后唤醒其它线程；否则线程等待。<br>而共享数据处于待输出状态时，线程<code>Output</code>把结果输出，然后唤醒其它线程；否则线程也等待。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.section04;</div><div class="line"> </div><div class="line"><span class="comment">// 线程间等待唤醒机制的示例代码</span></div><div class="line">class Resource2 {</div><div class="line">    String name;</div><div class="line">    String sex;</div><div class="line">    <span class="keyword">boolean</span> switchThread = <span class="keyword">false</span>;</div><div class="line">}</div><div class="line"> </div><div class="line">class Input implements Runnable {</div><div class="line">    <span class="keyword">private</span> Resource2 r;</div><div class="line">    <span class="keyword">public</span> <span class="title">Input</span>(Resource2 r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">boolean</span> switchSex = <span class="keyword">false</span>; <span class="comment">// 局部变量，非共享对象</span></div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">synchronized</span>(r) {</div><div class="line">                <span class="keyword">if</span>(r.switchThread)</div><div class="line">                    <span class="comment">// 持有锁对象r的线程等待，直到持有r对象的线程执行notify或者notifyAll</span></div><div class="line">                    <span class="keyword">try</span> { r.wait(); } <span class="keyword">catch</span> (InterruptedException e) { }</div><div class="line">                <span class="keyword">if</span>(switchSex) {</div><div class="line">                    r.name = <span class="string">"Mkie"</span>;</div><div class="line">                    r.sex = <span class="string">"male"</span>;</div><div class="line">                    switchSex = <span class="keyword">false</span>;</div><div class="line">                }<span class="keyword">else</span> {</div><div class="line">                    r.name = <span class="string">"Jane"</span>;</div><div class="line">                    r.sex = <span class="string">"female"</span>;</div><div class="line">                    switchSex = <span class="keyword">true</span>;</div><div class="line">                }</div><div class="line">                r.switchThread = <span class="keyword">true</span>;</div><div class="line">                <span class="comment">// 唤醒其它持有r对象的等待线程</span></div><div class="line">                r.notify();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class Output implements Runnable {</div><div class="line">    <span class="keyword">private</span> Resource2 r;</div><div class="line">    <span class="keyword">public</span> <span class="title">Output</span>(Resource2 r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">synchronized</span>(r) {</div><div class="line">                <span class="keyword">if</span>(!r.switchThread)</div><div class="line">                    <span class="comment">// 同上</span></div><div class="line">                    <span class="keyword">try</span> { r.wait(); } <span class="keyword">catch</span> (InterruptedException e) { }</div><div class="line">                System.out.println(<span class="string">"name= "</span> + r.name + <span class="string">", sex= "</span> + r.sex);</div><div class="line">                r.switchThread = <span class="keyword">false</span>;</div><div class="line">                r.notify();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WaitNofityDemo</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Resource2 r = <span class="keyword">new</span> Resource2();</div><div class="line">        Input in = <span class="keyword">new</span> Input(r);</div><div class="line">        Output out = <span class="keyword">new</span> Output(r);</div><div class="line"> </div><div class="line">        Thread t1 = <span class="keyword">new</span> Thread(in);</div><div class="line">        Thread t2 = <span class="keyword">new</span> Thread(out);</div><div class="line">        t1.start();</div><div class="line">        t2.start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>注意：上面三个方法都是定义在<code>Object</code>类中，因为任何对象都可以作为锁来使用。</p>
+<h3 id="2）优化上面的示例程序">2）优化上面的示例程序</h3>
+<p>上面的示例程序中使用的是同步代码块，这里使用同步函数进行优化。前面说过，同步函数时，调用<code>wait</code>、<code>notify</code>和<code>notifyAll</code>函数的是<code>this</code>对象！</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.section05;</div><div class="line"> </div><div class="line"><span class="comment">// 根据WaitNotifyDemo 中的代码进行优化</span></div><div class="line">class ResourceOpt {</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">private</span> String sex;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> switchThread = <span class="keyword">false</span>;</div><div class="line"> </div><div class="line">    <span class="comment">/*</span></div><div class="line">     * 假如这个方法获得了锁，且switchThread此时为false，线程不会执行wati方法，而是执行后面的代码。</div><div class="line">     * 后面的代码会把switchThread设置为true并执行notify唤醒其它正在执行wait的线程。</div><div class="line">     * 此时假如线程再次获得了锁，但switchThread已经为true了，所以线程会执行wait方法。</div><div class="line">     * 执行wait方法后线程就会释放锁，其它线程就能获取锁了。</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setResource</span>(String name, String sex) {</div><div class="line">        <span class="keyword">if</span>(switchThread)</div><div class="line">            <span class="keyword">try</span> { <span class="keyword">this</span>.wait(); } <span class="keyword">catch</span> (InterruptedException e) { }</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">        <span class="keyword">this</span>.sex = sex;</div><div class="line">        switchThread = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">this</span>.notify();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">/*</span></div><div class="line">     * 假如这个方法获得了锁，且switchThread此时为false，线程执行wait方法。</div><div class="line">     * 执行wait方法时线程会把锁释放并等待，别的线程（例如执行setResource方法的线程）就能获取该锁了。</div><div class="line">     * 等待的线程被别的线程notify或者notifyAll后唤醒，只有重新获取锁之后才能继续执行wait的下一句代码。</div><div class="line">     * 也就是这个方法对锁的操作是：获取锁-&gt;释放锁-&gt;再次获取锁</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">outResource</span>() {</div><div class="line">        <span class="keyword">if</span>(!switchThread)</div><div class="line">            <span class="keyword">try</span> { <span class="keyword">this</span>.wait(); } <span class="keyword">catch</span> (InterruptedException e) { }</div><div class="line">        System.out.println(<span class="string">"name= "</span> + <span class="keyword">this</span>.name + <span class="string">", sex= "</span> + <span class="keyword">this</span>.sex);</div><div class="line">        switchThread = <span class="keyword">false</span>;</div><div class="line">        <span class="keyword">this</span>.notify();</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class InputOpt implements Runnable {</div><div class="line">    <span class="keyword">private</span> ResourceOpt r;</div><div class="line">    <span class="keyword">public</span> <span class="title">InputOpt</span>(ResourceOpt r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">boolean</span> switchSex = <span class="keyword">false</span>; <span class="comment">// 局部变量，非共享对象</span></div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">            <span class="keyword">if</span>(switchSex) {</div><div class="line">                r.setResource(<span class="string">"Mike"</span>, <span class="string">"Male"</span>);</div><div class="line">            }<span class="keyword">else</span> {</div><div class="line">                r.setResource(<span class="string">"Jane"</span>, <span class="string">"Female"</span>);</div><div class="line">            }</div><div class="line">            switchSex = !switchSex;</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line">class OutputOpt implements Runnable {</div><div class="line">    <span class="keyword">private</span> ResourceOpt r;</div><div class="line">    <span class="keyword">public</span> <span class="title">OutputOpt</span>(ResourceOpt r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">            r.outResource();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WaitNotifyDemoOptimize</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        ResourceOpt r = <span class="keyword">new</span> ResourceOpt();</div><div class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> InputOpt(r)).start();</div><div class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> OutputOpt(r)).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>代码的执行过程见里面的注释，已经详细说明了线程在执行<code>wait</code>方法过程中对锁的处理。</p>
+<h3 id="wait方法再次说明">wait方法再次说明</h3>
+<h4 id="某个线程试图去执行某个实例的wait方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达wait方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行notify、notifyAll或interrupt退出。最后退出等待进入下一个语句之前必须再次获取锁定。">某个线程试图去执行某个实例的<code>wait</code>方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达<code>wait</code>方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行<code>notify</code>、<code>notifyAll</code>或<code>interrupt</code>退出。最后退出等待进入下一个语句之前必须再次获取锁定。</h4>
+<h2 id="多线程通信问题（生产者和消费者）">多线程通信问题（生产者和消费者）</h2>
+<p>上面的示例中，只有一个<code>Input</code>线程写入数据，一个<code>Output</code>线程输出数据。但是若<code>Input</code>线程和<code>Output</code>线程都为多个的时候会产生什么问题呢？<br>下面就是探讨这种情况下出现的问题，也可也简称为生产者和消费者问题。<br>如下的示例代码中，有2个生产者线程和2个消费者线程，这种情况下有可能出现生产一个产品后被2个消费者线程消费。或者生产了2个产品后只有1个消费者线程进行消费。<br>这些情况都是错误的！</p>
+<p>编写生产者和消费者的程序时，需要注意几个问题，下面是一个有错误的示例代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.section06;</div><div class="line"> </div><div class="line"><span class="javadoc">/**</span></div><div class="line"> * 错误的示例代码</div><div class="line"> */</div><div class="line">class Res {</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> flag = <span class="keyword">false</span>; <span class="comment">// flag标志是否有产品可供消费</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> productCount = <span class="number">0</span>;</div><div class="line"> </div><div class="line">    <span class="comment">// 生成商品</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">product</span>() {</div><div class="line">        <span class="keyword">if</span>(flag)</div><div class="line">            <span class="keyword">try</span>{<span class="keyword">this</span>.wait(); }<span class="keyword">catch</span>(Exception e){}</div><div class="line">        <span class="keyword">this</span>.productCount ++;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" 生产产品编号： "</span> + <span class="keyword">this</span>.productCount);</div><div class="line">        flag = <span class="keyword">true</span>;</div><div class="line">        notify();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 消费商品</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">consume</span>() {</div><div class="line">        <span class="keyword">if</span>(!flag)</div><div class="line">            <span class="keyword">try</span>{<span class="keyword">this</span>.wait(); }<span class="keyword">catch</span>(Exception e){}</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"==== 消费产品编号： "</span> + <span class="keyword">this</span>.productCount);</div><div class="line">        <span class="keyword">this</span>.productCount --;</div><div class="line">        flag = <span class="keyword">false</span>;</div><div class="line">        notify();</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="comment">// 生成者</span></div><div class="line">class Productor implements Runnable {</div><div class="line">    <span class="keyword">private</span> Res r;</div><div class="line">    <span class="keyword">public</span> <span class="title">Productor</span>(Res r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)</div><div class="line">            r.product(); <span class="comment">// 调用共享数据的生产方法</span></div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="comment">// 消费者</span></div><div class="line">class Consumer implements Runnable {</div><div class="line">    <span class="keyword">private</span> Res r;</div><div class="line">    <span class="keyword">public</span> <span class="title">Consumer</span>(Res r) {</div><div class="line">        <span class="keyword">this</span>.r = r;</div><div class="line">    }</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)</div><div class="line">            r.consume(); <span class="comment">// 调用共享数据的消费方法</span></div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductorConsumer</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Res r = <span class="keyword">new</span> Res();</div><div class="line">        <span class="comment">// 两个生成者线程</span></div><div class="line">        Productor p1 = <span class="keyword">new</span> Productor(r);</div><div class="line">        Productor p2 = <span class="keyword">new</span> Productor(r);</div><div class="line">        <span class="comment">// 两个消费者线程</span></div><div class="line">        Consumer c1 = <span class="keyword">new</span> Consumer(r);</div><div class="line">        Consumer c2 = <span class="keyword">new</span> Consumer(r);</div><div class="line"> </div><div class="line">        Thread t1 = <span class="keyword">new</span> Thread(p1);</div><div class="line">        Thread t2 = <span class="keyword">new</span> Thread(p2);</div><div class="line">        Thread t3 = <span class="keyword">new</span> Thread(c1);</div><div class="line">        Thread t4 = <span class="keyword">new</span> Thread(c2);</div><div class="line"> </div><div class="line">        t1.start();</div><div class="line">        t2.start();</div><div class="line">        t3.start();</div><div class="line">        t4.start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>出现上面所说的问题主要是：</p>
+<ul>
+<li>在判断标志位flag的时候用的是<code>if</code><br>假如flag为false，此时有一个消费者线程获取了锁，根据判断该线程执行wait方法等待并释放锁；接着又有一个消费者线程获得了锁，同样该线程执行wait方法并等待。<br>这时候有一个生产者线程获取了锁，执行了wait后面的代码，增加了一个产品，并把 flag设置为true，同时唤醒其中一个消费者线程。<br>该消费者线程被唤醒并获得了锁，从if判断结构出来执行后面的代码，减少一个产品，并把flag设置为false同时唤醒了另一个消费者线程。<br>此时另一个消费者线程也直接从if判断结构出来，也就是没有判断flag！！这样它也减少了一个产品并设置flag为false和唤醒一个其它线程。这样就出现生产一个产品消费两个的情况。<br>这个问题的原因是消费者线程被唤醒后没有再次判断flag的值（flag代表是否有产品）。<br>所以 正确的方法是使用<code>while</code>进行判断</li>
+</ul>
+<ul>
+<li>用<code>while</code>循环判断取代<code>if</code>判断后，还会出现一个问题，那就是线程有可能都处于等待状态。这是因为唤醒线程是使用的是<code>notify</code>，<br>而这种情况下唤醒的线程没有保证，很有可能造成生产者只唤醒另一个生产者，消费者也只唤醒另一个消费者的情况。<br>所以应该使用<code>notifyAll</code>方法进行唤醒。</li>
+</ul>
+<p>下面是修改后的代码，共4处地方进行修改：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">class Res {</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> productCount = <span class="number">1000</span>;</div><div class="line"> </div><div class="line">    <span class="comment">// 生成商品</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">product</span>() {</div><div class="line"><span class="comment">//        if(flag)</span></div><div class="line">        <span class="keyword">while</span> (flag)</div><div class="line">            <span class="keyword">try</span>{<span class="keyword">this</span>.wait(); }<span class="keyword">catch</span>(Exception e){}</div><div class="line">        <span class="keyword">this</span>.productCount ++;</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" 生产产品编号： "</span> + <span class="keyword">this</span>.productCount);</div><div class="line">        flag = <span class="keyword">true</span>;</div><div class="line"><span class="comment">//        notify();</span></div><div class="line">        notifyAll();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 消费商品</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">consume</span>() {</div><div class="line"><span class="comment">//        if(!flag)</span></div><div class="line">        <span class="keyword">while</span> (!flag)</div><div class="line">            <span class="keyword">try</span>{<span class="keyword">this</span>.wait(); }<span class="keyword">catch</span>(Exception e){}</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">"==== 消费产品编号： "</span> + <span class="keyword">this</span>.productCount);</div><div class="line">        flag = <span class="keyword">false</span>;</div><div class="line"><span class="comment">//        notify();</span></div><div class="line">        notifyAll();</div><div class="line">    }</div><div class="line">}</div><div class="line">......其余代码没有变化</div></pre></td></tr></table></figure>
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Concurrent/">Concurrent</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Concurrent/多线程基础（二）/" data-title="多线程基础（二） | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Concurrent/多线程基础（四）/" title="多线程基础（四）">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  多线程基础（四）</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Concurrent/多线程基础（三）/"  title="多线程基础（三）">
+ <strong>NEXT:</strong><br/> 
+ <span>多线程基础（三）
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程间通信"><span class="toc-number">1.</span> <span class="toc-text">线程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）等待唤醒机制"><span class="toc-number">1.1.</span> <span class="toc-text">1）等待唤醒机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）优化上面的示例程序"><span class="toc-number">1.2.</span> <span class="toc-text">2）优化上面的示例程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wait方法再次说明"><span class="toc-number">1.3.</span> <span class="toc-text">wait方法再次说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#某个线程试图去执行某个实例的wait方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达wait方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行notify、notifyAll或interrupt退出。最后退出等待进入下一个语句之前必须再次获取锁定。"><span class="toc-number">1.3.1.</span> <span class="toc-text">某个线程试图去执行某个实例的wait方法时，这个线程必须获取该实例的锁定。然而当程序执行流到达wait方法的代码后，线程会释放锁并且等待，这时候别的线程就能获得锁了。等待的线程可能被别的线程执行notify、notifyAll或interrupt退出。最后退出等待进入下一个语句之前必须再次获取锁定。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多线程通信问题（生产者和消费者）"><span class="toc-number">2.</span> <span class="toc-text">多线程通信问题（生产者和消费者）</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

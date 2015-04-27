@@ -1,0 +1,425 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>MyBatis教程（一） | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="HelloWorld工程
+安装
+想要使用 MyBatis 只需将 mybatis-x.x.x.jar 文件置于 classpath 中。
+如果使用 Maven 构建项目，则需将下面的 dependency 置于 pom.xml 中：
+12345&amp;lt;dependency&amp;gt;  &amp;lt;grou">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/MyBatis/MyBatis教程（一）/" title="MyBatis教程（一）" itemprop="url">MyBatis教程（一）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HelloWorld工程"><span class="toc-number">1.</span> <span class="toc-text">HelloWorld工程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">1.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从_XML_中构建_SqlSessionFactory"><span class="toc-number">1.2.</span> <span class="toc-text">从 XML 中构建 SqlSessionFactory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实体类与SQL映射文件"><span class="toc-number">1.3.</span> <span class="toc-text">实体类与SQL映射文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从_SqlSessionFactory_中获取_SqlSession"><span class="toc-number">1.4.</span> <span class="toc-text">从 SqlSessionFactory 中获取 SqlSession</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命名空间的一点注释"><span class="toc-number">1.5.</span> <span class="toc-text">命名空间的一点注释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#范围（Scope）和生命周期"><span class="toc-number">1.6.</span> <span class="toc-text">范围（Scope）和生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSessionFactoryBuilder"><span class="toc-number">1.6.1.</span> <span class="toc-text">SqlSessionFactoryBuilder</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSessionFactory"><span class="toc-number">1.6.2.</span> <span class="toc-text">SqlSessionFactory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSession"><span class="toc-number">1.6.3.</span> <span class="toc-text">SqlSession</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#映射器实例（Mapper_Instances）"><span class="toc-number">1.6.4.</span> <span class="toc-text">映射器实例（Mapper Instances）</span></a></li></ol></li></ol></li></ol>
+		</div>
+		
+		<h2 id="HelloWorld工程">HelloWorld工程</h2>
+<h3 id="安装">安装</h3>
+<p>想要使用 MyBatis 只需将 mybatis-x.x.x.jar 文件置于 classpath 中。</p>
+<p>如果使用 Maven 构建项目，则需将下面的 dependency 置于 pom.xml 中：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.mybatis<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>mybatis<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">version</span>&gt;</span>x.x.x<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="从_XML_中构建_SqlSessionFactory">从 XML 中构建 SqlSessionFactory</h3>
+<p>XML 配置文件中包含了对 MyBatis 系统的核心设置，包含获取数据库连接实例的数据源（<code>DataSource</code>）和决定事务范围和控制方式的事务管理器（<code>TransactionManager</code>）。XML 配置文件的详细内容后面再探讨，这里给出一个简单的示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></div><div class="line"><span class="doctype">&lt;!DOCTYPE configuration</span></div><div class="line">  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"</div><div class="line">  "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;</div><div class="line"><span class="tag">&lt;<span class="title">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">environments</span> <span class="attribute">default</span>=<span class="value">"development"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">environment</span> <span class="attribute">id</span>=<span class="value">"development"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">transactionManager</span> <span class="attribute">type</span>=<span class="value">"JDBC"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dataSource</span> <span class="attribute">type</span>=<span class="value">"POOLED"</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"driver"</span> <span class="attribute">value</span>=<span class="value">"com.mysql.jdbc.Driver"</span> /&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"url"</span> <span class="attribute">value</span>=<span class="value">"jdbc:mysql://localhost:3306/mybatis"</span> /&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"username"</span> <span class="attribute">value</span>=<span class="value">"root"</span> /&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"password"</span> <span class="attribute">value</span>=<span class="value">"mysql"</span> /&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dataSource</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">environment</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">environments</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">mappers</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">mapper</span> <span class="attribute">resource</span>=<span class="value">"test/section01/UserMapper.xml"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">mappers</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">configuration</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>每个基于 MyBatis 的应用都是以一个 <code>SqlSessionFactory</code> 的实例为中心的。<code>SqlSessionFactory</code> 的实例可以通过<code>SqlSessionFactoryBuilder</code>获得。<code>SqlSessionFactoryBuilder</code>可以从 XML 配置文件或一个预先定制的<code>Configuration</code>的实例构建出<code>SqlSessionFactory</code>的实例。</p>
+<p>从 XML 文件中构建<code>SqlSessionFactory</code>的实例非常简单，建议使用类路径下的资源文件进行配置。但是也可以使用任意的<code>InputStream</code> 实例，包括字符串形式或 URL 形式的文件路径来配置。MyBatis 包含一个叫 <code>Resources</code>的工具类，它包含一些静态方法，可使从 classpath 或其他位置加载资源文件更容易。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="constant">String resource</span> = <span class="string">"org/mybatis/example/mybatis-config.xml"</span>;</div><div class="line"><span class="constant">InputStream inputStream</span> = Resources.getResourceAsStream(resource);</div><div class="line"><span class="constant">SqlSessionFactory   sqlSessionFactory</span> = new SqlSessionFactoryBuilder().build(inputStream);</div></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> config = <span class="string">"conf.xml"</span>;</div><div class="line">InputStream <span class="keyword">is</span> = HelloWorldTest.<span class="keyword">class</span>.getClassLoader().getResourceAsStream(config);</div><div class="line"> </div><div class="line">SqlSessionFactory factory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(<span class="keyword">is</span>);</div></pre></td></tr></table></figure>
+
+<h3 id="实体类与SQL映射文件">实体类与SQL映射文件</h3>
+<p>编写相应的实体类代码后，还需要提供该类的SQL映射文件。</p>
+<p>例如这里有一个名为<code>User</code>的实体类，这时候可以提供它的映射文件UserMapper.xml：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></div><div class="line"><span class="doctype">&lt;!DOCTYPE mapper</span></div><div class="line">  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"</div><div class="line">  "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</div><div class="line"><span class="tag">&lt;<span class="title">mapper</span> <span class="attribute">namespace</span>=<span class="value">"test.section01.UserMapper"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">select</span> <span class="attribute">id</span>=<span class="value">"selectUser"</span> <span class="attribute">resultType</span>=<span class="value">"test.section01.User"</span> <span class="attribute">parameterType</span>=<span class="value">"int"</span>&gt;</span></div><div class="line">        select * from Users where id = #{id}</div><div class="line">    <span class="tag">&lt;/<span class="title">select</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">mapper</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>上面UserMapper.xml文件中有3点要注意的：</p>
+<ul>
+<li>mapper中的 namespace：这是标记这个mapper的唯一id。这里使用Package + Mpper的格式。</li>
+</ul>
+<ul>
+<li>select中的id：这是标记这个SQL映射语句的id，<strong>根据mapper的namespace和SQL语句的id就能定位到具体的SQL语句！</strong></li>
+</ul>
+<ul>
+<li>这个UserMapper.xml文件需要加入到项目的配置文件，如 conf.xml 文件中所示：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">mappers</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="title">mapper</span> <span class="attribute">resource</span>=<span class="value">"test/section01/UserMapper.xml"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">mappers</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="从_SqlSessionFactory_中获取_SqlSession">从 SqlSessionFactory 中获取 SqlSession</h3>
+<p>既然有了<code>SqlSessionFactory</code>，顾名思义，我们就可以从中获得<code>SqlSession</code>的实例了。<code>SqlSession</code>完全包含了面向数据库执行 SQL 命令所需的所有方法。你可以通过 <code>SqlSession</code>实例来直接执行已映射的 SQL 语句。例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">SqlSession <span class="variable">session =</span> factory.openSession();</div><div class="line"></div><div class="line">int <span class="variable">userId =</span> <span class="number">2</span>;                                          </div><div class="line">String <span class="variable">statement =</span> <span class="string">"test.section01.UserMapper.selectUser"</span>;</div><div class="line">try {                                                    </div><div class="line">    User <span class="variable">user =</span> session.selectOne(statement, userId);    </div><div class="line">    System.out.println(user.<span class="built_in">toString</span>());                 </div><div class="line">} finally {                                              </div><div class="line">    session.close();                                      </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意，上面例子中就使用了在UserMapper.xml文件中定义的查询SQL语句的namespace：<code>test.section01.UserMapper</code>和id：<code>selectUser</code>，组成了完全限定名：<code>test.section01.UserMapper.selectUser</code>。这也是上提到需要注意的2点。</strong></p>
+<p>最后提供完成的HelloWorld测试代码中的main函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">    String config = <span class="string">"conf.xml"</span>;</div><div class="line">    InputStream <span class="keyword">is</span> = HelloWorldTest.class.getClassLoader().getResourceAsStream(config);</div><div class="line"> </div><div class="line">    SqlSessionFactory factory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(<span class="keyword">is</span>);</div><div class="line">    SqlSession session = factory.openSession();</div><div class="line"> </div><div class="line">    <span class="keyword">int</span> userId = <span class="number">2</span>;</div><div class="line">    String statement = <span class="string">"test.section01.UserMapper.selectUser"</span>;</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        User user = session.selectOne(statement, userId);</div><div class="line">        System.<span class="keyword">out</span>.println(user.toString());</div><div class="line">    } <span class="keyword">finally</span> {</div><div class="line">        session.close();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>新版本中更加安全的做法：映射器类</p>
+</blockquote>
+<p>诚然这种方式能够正常工作，并且对于之前版本 MyBatis 的用户来说也比较熟悉，不过现在有了一种更直白的方式。通过使用对于给定语句能够合理描述参数和返回值的接口（比如说UserMapper.class），你现在不但可以执行更清晰和类型安全的代码，而且还不用担心易错的字符串字面值以及强制类型转换。</p>
+<p>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="constant">SqlSession session</span> = factory.openSession();</div><div class="line">try {</div><div class="line"><span class="constant">  UserMapper mapper</span> = session.getMapper(UserMapper.class);</div><div class="line"><span class="constant">  User user</span> = mapper.selectUser(<span class="number">101</span>);</div><div class="line">} finally {</div><div class="line">  session.close();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p>下面是官方手册上的一些补充内容，具体见：<br><a href="http://mybatis.github.io/mybatis-3/zh/getting-started.html" target="_blank" rel="external">入门</a></p>
+</blockquote>
+<h3 id="命名空间的一点注释">命名空间的一点注释</h3>
+<p>命名空间（Namespaces）在之前版本的 MyBatis 中是可选的，容易引起混淆因此是没有益处的。现在的命名空间则是必须的，目的是希望能比只是简单的使用更长的完全限定名来区分语句更进一步。</p>
+<p>命名解析：为了减少输入量，MyBatis 对所有的命名配置元素（包括语句，结果映射，缓存等）使用了如下的命名解析规则。</p>
+<ul>
+<li><p>完全限定名（比如“com.mypackage.MyMapper.selectAllThings”）将被直接查找并且找到即用。</p>
+</li>
+<li><p>短名称（比如“selectAllThings”）如果全局唯一也可以作为一个单独的引用。如果不唯一，有两个或两个以上的相同名称（比如“com.foo.selectAllThings ”和“com.bar.selectAllThings”），那么使用时就会收到错误报告说短名称是不唯一的，这种情况下就必须使用完全限定名。</p>
+</li>
+</ul>
+<p>对于像UserMapper 这样的映射器类（Mapper class）来说，还有另一招来处理映射。它们的映射的语句可以不需要用 XML 来做，取而代之的可以是 Java 注解。比如，上面的 XML 示例可被替换如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> org.mybatis.example;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BlogMapper</span> </span>{</div><div class="line">  <span class="annotation">@Select</span>(<span class="string">"SELECT * FROM blog WHERE id = #{id}"</span>)</div><div class="line">  Blog selectBlog(<span class="keyword">int</span> id);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>对于简单语句来说，注解使代码显得更加简洁，然而 Java 注解对于稍微复杂的语句就会力不从心并且会显得更加混乱。因此，如果需要做很复杂的事情，那么最好使用 XML 来映射语句。</p>
+<h3 id="范围（Scope）和生命周期">范围（Scope）和生命周期</h3>
+<p>理解我们目前已经讨论过的不同范围和生命周期类是至关重要的，因为错误的使用会导致非常严重的并发问题。</p>
+<blockquote>
+<p>对象的生命周期和依赖注入框架</p>
+</blockquote>
+<p>依赖注入框架可以创建线程安全的、基于事务的 SqlSession 和映射器（mapper）并将它们直接注入到你的 bean 中，因此可以直接忽略它们的生命周期。如果对如何通过依赖注入框架来使用 MyBatis 感兴趣可以研究一下 MyBatis-Spring 或 MyBatis-Guice 两个子项目。</p>
+<h4 id="SqlSessionFactoryBuilder">SqlSessionFactoryBuilder</h4>
+<p>这个类可以被实例化、使用和丢弃，一旦创建了 <code>SqlSessionFactory</code>，就不再需要它了。因此 <code>SqlSessionFactoryBuilder</code> 例的最佳范围是方法范围（也就是本地方法变量）。你可以重用 <code>SqlSessionFactoryBuilder</code>来创建多个 <code>SqlSessionFactory</code> 实例，但是最好还是不要让其一直存在以保证所有的 XML 解析资源开放给更重要的事情。</p>
+<h4 id="SqlSessionFactory">SqlSessionFactory</h4>
+<p><code>SqlSessionFactory</code> 一旦被创建就应该在应用的运行期间一直存在，没有任何理由对它进行清除或重建。使用 <code>SqlSessionFactory</code>的最佳实践是在应用运行期间不要重复创建多次，多次重建 <code>SqlSessionFactory</code>被视为一种代码“坏味道（bad smell）”。因此 <code>SqlSessionFactory</code>的最佳范围是应用范围。有很多方法可以做到，最简单的就是使用单例模式或者静态单例模式。</p>
+<h4 id="SqlSession">SqlSession</h4>
+<p>每个线程都应该有它自己的 <code>SqlSession</code>实例。<code>SqlSession</code>的实例不是线程安全的，因此是不能被共享的，所以它的最佳的范围是请求或方法范围。绝对不能将 <code>SqlSession</code>实例的引用放在一个类的静态域，甚至一个类的实例域也不行。也绝不能将 <code>SqlSession</code> 例的引用放在任何类型的管理范围中，比如 Serlvet 架构中的<code>HttpSession</code>。如果你现在正在使用一种 Web 框架，要考虑 <code>SqlSession</code>放在一个和 HTTP 请求对象相似的范围中。换句话说，每次收到的 HTTP 请求，就可以打开一个 <code>SqlSession</code>；返回一个响应，就关闭它。这个关闭操作是很重要的，你应该把这个关闭操作放到 finally 块中以确保每次都能执行关闭。下面的示例就是一个确保 <code>SqlSession</code>关闭的标准模式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">SqlSession session = sqlSessionFactory.openSession();</div><div class="line">try {</div><div class="line">  // <span class="operator"><span class="keyword">do</span> <span class="keyword">work</span></span></div><div class="line">} finally {</div><div class="line">  <span class="keyword">session</span>.<span class="keyword">close</span>();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>你应该在你的所有的代码中一致性地使用这种模式来保证所有数据库资源都能被正确地关闭。</p>
+<h4 id="映射器实例（Mapper_Instances）">映射器实例（Mapper Instances）</h4>
+<p>映射器是创建用来绑定映射语句的接口。映射器接口的实例是从 <code>SqlSession</code>中获得的。因此从技术层面讲，映射器实例的最大范围是和 SqlSession 相同的，因为它们都是从 <code>SqlSession</code>里被请求的。尽管如此，映射器实例的最佳范围是方法范围。也就是说，映射器实例应该在调用它们的方法中被请求，用过之后即可废弃。并不需要显示的关闭映射器实例，尽管在整个请求范围（request scope）保持映射器实例也不会有什么问题，但是很快你会发现，像 <code>SqlSession</code>一样，在这个范围上管理太多的资源的话会难于控制。所以要保持简单，最好把映射器映射器放在方法范围（method scope）内。下面的示例就展示了这个实践：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SqlSession session = sqlSessionFactory.openSession();</div><div class="line">try {</div><div class="line">  BlogMapper mapper = session.getMapper(BlogMapper.class);</div><div class="line">  // <span class="operator"><span class="keyword">do</span> <span class="keyword">work</span></span></div><div class="line">} finally {</div><div class="line">  <span class="keyword">session</span>.<span class="keyword">close</span>();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/MyBatis/">MyBatis</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/MyBatis/MyBatis教程（一）/" data-title="MyBatis教程（一） | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/MyBatis/MyBatis教程（二）/" title="MyBatis教程（二）">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  MyBatis教程（二）</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Maven/Maven（四）：仓库管理和发布项目/"  title="Maven（四）：仓库管理和发布项目">
+ <strong>NEXT:</strong><br/> 
+ <span>Maven（四）：仓库管理和发布项目
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HelloWorld工程"><span class="toc-number">1.</span> <span class="toc-text">HelloWorld工程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">1.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从_XML_中构建_SqlSessionFactory"><span class="toc-number">1.2.</span> <span class="toc-text">从 XML 中构建 SqlSessionFactory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实体类与SQL映射文件"><span class="toc-number">1.3.</span> <span class="toc-text">实体类与SQL映射文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从_SqlSessionFactory_中获取_SqlSession"><span class="toc-number">1.4.</span> <span class="toc-text">从 SqlSessionFactory 中获取 SqlSession</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命名空间的一点注释"><span class="toc-number">1.5.</span> <span class="toc-text">命名空间的一点注释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#范围（Scope）和生命周期"><span class="toc-number">1.6.</span> <span class="toc-text">范围（Scope）和生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSessionFactoryBuilder"><span class="toc-number">1.6.1.</span> <span class="toc-text">SqlSessionFactoryBuilder</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSessionFactory"><span class="toc-number">1.6.2.</span> <span class="toc-text">SqlSessionFactory</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SqlSession"><span class="toc-number">1.6.3.</span> <span class="toc-text">SqlSession</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#映射器实例（Mapper_Instances）"><span class="toc-number">1.6.4.</span> <span class="toc-text">映射器实例（Mapper Instances）</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

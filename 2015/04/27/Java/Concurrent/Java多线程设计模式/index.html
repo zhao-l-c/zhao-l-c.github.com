@@ -1,0 +1,409 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Java多线程设计模式 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="这是《Java多线程设计模式》书中的部分读书笔记。
+
+double和long的操作并不是原子性的
+Java语言中double和long类型的操作并不是原子的，例如对于变量longField，某个线程操作：
+1longField = 123L;
+
+而另外一个线程操作：
+1longField = 234">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Concurrent/Java多线程设计模式/" title="Java多线程设计模式" itemprop="url">Java多线程设计模式</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#double和long的操作并不是原子性的"><span class="toc-number">1.</span> <span class="toc-text">double和long的操作并不是原子性的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Immutable_Pattern"><span class="toc-number">2.</span> <span class="toc-text">Immutable Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#StringBuffer与String类"><span class="toc-number">3.</span> <span class="toc-text">StringBuffer与String类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Read-Write_Lock_Pattern"><span class="toc-number">4.</span> <span class="toc-text">Read-Write Lock Pattern</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物理锁和逻辑锁"><span class="toc-number">4.1.</span> <span class="toc-text">物理锁和逻辑锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Thread-per-message"><span class="toc-number">5.</span> <span class="toc-text">Thread-per-message</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程和线程"><span class="toc-number">5.1.</span> <span class="toc-text">进程和线程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Future"><span class="toc-number">6.</span> <span class="toc-text">Future</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#回调与Future_Pattern"><span class="toc-number">6.1.</span> <span class="toc-text">回调与Future Pattern</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Two-Pase_Termination"><span class="toc-number">7.</span> <span class="toc-text">Two-Pase Termination</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#没有Race_condition就不需要同步"><span class="toc-number">7.1.</span> <span class="toc-text">没有Race condition就不需要同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#中断状态与InterruptedException异常的相互转换"><span class="toc-number">7.2.</span> <span class="toc-text">中断状态与InterruptedException异常的相互转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Thread-Specific_Storage"><span class="toc-number">8.</span> <span class="toc-text">Thread-Specific Storage</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#线程间通信：Actor-based和Task-based"><span class="toc-number">8.1.</span> <span class="toc-text">线程间通信：Actor-based和Task-based</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java内存模型"><span class="toc-number">9.</span> <span class="toc-text">Java内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#volatile关键字"><span class="toc-number">9.1.</span> <span class="toc-text">volatile关键字</span></a></li></ol></li></ol>
+		</div>
+		
+		<blockquote>
+<p>这是《Java多线程设计模式》书中的部分读书笔记。</p>
+</blockquote>
+<h2 id="double和long的操作并不是原子性的">double和long的操作并不是原子性的</h2>
+<p>Java语言中double和long类型的操作并不是原子的，例如对于变量<code>longField</code>，某个线程操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">longField = <span class="number">123</span>L;</div></pre></td></tr></table></figure>
+
+<p>而另外一个线程操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">longField = <span class="number">234</span>L;</div></pre></td></tr></table></figure>
+
+<p>之后变量<code>longField</code>的值是什么无法保证，有可能是123L，或者是234L，又或者是123456L，甚至是0L。<br>这时候操作这种类型的变量的方法需要加上<code>synchronized</code>，还有一种方法就是用<code>volatile</code>修饰这些变量。</p>
+<h2 id="Immutable_Pattern">Immutable Pattern</h2>
+<p>Java标准类库中使用Immutable Pattern的类：<br>java.lang.String<br>java.lang.Integer等包装类<br>java.awt.Color</p>
+<h2 id="StringBuffer与String类">StringBuffer与String类</h2>
+<p>StringBuffer是可变的（mutable）<br>String类则是不可变的（immutable）</p>
+<p>由多个字符串创建出新字符串，StringBuffer比String快。（为什么？）</p>
+<h2 id="Read-Write_Lock_Pattern">Read-Write Lock Pattern</h2>
+<p>来源：(《》)</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">R/W</th>
+<th style="text-align:center">读取</th>
+<th style="text-align:center">写入</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">读取</td>
+<td style="text-align:center">不会冲突</td>
+<td style="text-align:center">read-write conflict</td>
+</tr>
+<tr>
+<td style="text-align:center">写入</td>
+<td style="text-align:center">read-write conflict</td>
+<td style="text-align:center">write-write conflict</td>
+</tr>
+</tbody>
+</table>
+<p>通过上面的表分析，线程的读取不会出现冲突，因此读取操作不需要等待，所以程序中不需要记录“等待读取的线程”的数目，而记录“正在读取线程”的数目；<br>反观写入操作，因为某一时刻只能有一个写入操作，因此若已经有一个线程在执行写入，则其他写入线程需要等待，所以“正在写入的线程”和“等待写入的线程”数目都需要记录。下面就是程序中对应的这3个段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"> </div></pre></td></tr></table></figure>
+
+
+<p>利用多个线程进行“读取”操作时彼此不会冲突的特定提高程序的性能。在代码中的体现是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>() {</div><div class="line"> </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>不过对应需要频繁写入操作的程序来说则不会提高效率。</p>
+<h3 id="物理锁和逻辑锁">物理锁和逻辑锁</h3>
+<p>这里说所的物理锁指的就是<code>synchronized</code>，它是在Java语言规范中定义，Java执行环境中实现的。<br>而我们上面程序中实现的类<code>ReadWriteLocker</code>则是自己定义的逻辑锁，提供读和写操作时的锁定。</p>
+<h2 id="Thread-per-message">Thread-per-message</h2>
+<h3 id="进程和线程">进程和线程</h3>
+<p>一般任务进程可以分为多个线程执行，…<br>进程之间是不会共享内存的，因此不同的程序直接才能有序执行。<br>而线程之间则是可以共享内存，<br>Java中内存模型中，共享的是</p>
+<h2 id="Future">Future</h2>
+<h3 id="回调与Future_Pattern">回调与Future Pattern</h3>
+<p>注意理解这里所说的回调的实现，也就是利用<code>Host</code>参与者启动的线程去调用<code>Client</code>参与者的方法。这时<code>Client</code>参与者中的方法必须考虑线程安全的问题确保返回值是正确的。</p>
+<h2 id="Two-Pase_Termination">Two-Pase Termination</h2>
+<p>这里类似前面介绍过的“如何让线程停止”一章的内容。</p>
+<h3 id="没有Race_condition就不需要同步">没有Race condition就不需要同步</h3>
+<p>例如<code>shutdownRequest</code>方法会设置变量<code>shutdownRequested</code>为true，但<code>shutdownRequested</code>不会被设置回false，因此不会出现有的线程要求设置为true，有的线程要求设置为false的请求，所有就不需要同步<code>synchronized</code>。</p>
+<h3 id="中断状态与InterruptedException异常的相互转换">中断状态与InterruptedException异常的相互转换</h3>
+<p>（还没明白转换的意义）</p>
+<h2 id="Thread-Specific_Storage">Thread-Specific Storage</h2>
+<h3 id="线程间通信：Actor-based和Task-based">线程间通信：Actor-based和Task-based</h3>
+<p>（？）</p>
+<h2 id="Java内存模型">Java内存模型</h2>
+<h3 id="volatile关键字">volatile关键字</h3>
+<p><a href="http://www.importnew.com/12685.html" target="_blank" rel="external">http://www.importnew.com/12685.html</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Concurrent/">Concurrent</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Concurrent/Java多线程设计模式/" data-title="Java多线程设计模式 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Concurrent/interrupt和LockSupport相关问题补充/" title="interrupt和LockSupport相关问题补充">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  interrupt和LockSupport相关问题补充</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Concurrent/JUC API参考资料/"  title="JUC API参考资料">
+ <strong>NEXT:</strong><br/> 
+ <span>JUC API参考资料
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#double和long的操作并不是原子性的"><span class="toc-number">1.</span> <span class="toc-text">double和long的操作并不是原子性的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Immutable_Pattern"><span class="toc-number">2.</span> <span class="toc-text">Immutable Pattern</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#StringBuffer与String类"><span class="toc-number">3.</span> <span class="toc-text">StringBuffer与String类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Read-Write_Lock_Pattern"><span class="toc-number">4.</span> <span class="toc-text">Read-Write Lock Pattern</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物理锁和逻辑锁"><span class="toc-number">4.1.</span> <span class="toc-text">物理锁和逻辑锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Thread-per-message"><span class="toc-number">5.</span> <span class="toc-text">Thread-per-message</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程和线程"><span class="toc-number">5.1.</span> <span class="toc-text">进程和线程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Future"><span class="toc-number">6.</span> <span class="toc-text">Future</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#回调与Future_Pattern"><span class="toc-number">6.1.</span> <span class="toc-text">回调与Future Pattern</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Two-Pase_Termination"><span class="toc-number">7.</span> <span class="toc-text">Two-Pase Termination</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#没有Race_condition就不需要同步"><span class="toc-number">7.1.</span> <span class="toc-text">没有Race condition就不需要同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#中断状态与InterruptedException异常的相互转换"><span class="toc-number">7.2.</span> <span class="toc-text">中断状态与InterruptedException异常的相互转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Thread-Specific_Storage"><span class="toc-number">8.</span> <span class="toc-text">Thread-Specific Storage</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#线程间通信：Actor-based和Task-based"><span class="toc-number">8.1.</span> <span class="toc-text">线程间通信：Actor-based和Task-based</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java内存模型"><span class="toc-number">9.</span> <span class="toc-text">Java内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#volatile关键字"><span class="toc-number">9.1.</span> <span class="toc-text">volatile关键字</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

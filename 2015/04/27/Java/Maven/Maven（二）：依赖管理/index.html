@@ -1,0 +1,423 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Maven（二）：依赖管理 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="maven常用命令
+注意，如果要在命令行执行，则需要在Maven项目的根目录中执行，也就是可以看到pom.xml文件。
+
+mvn compile编译[root]/src/main/java目录下的Java源文件，并在[root]/target/classes目录下生成class文件。
+
+mvn te">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Maven/Maven（二）：依赖管理/" title="Maven（二）：依赖管理" itemprop="url">Maven（二）：依赖管理</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#maven常用命令"><span class="toc-number">1.</span> <span class="toc-text">maven常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#依赖_dependency"><span class="toc-number"></span> <span class="toc-text">依赖 dependency</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的定位"><span class="toc-number">1.</span> <span class="toc-text">依赖的定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的传递性"><span class="toc-number">2.</span> <span class="toc-text">依赖的传递性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的作用域"><span class="toc-number">3.</span> <span class="toc-text">依赖的作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决依赖冲突问题"><span class="toc-number">4.</span> <span class="toc-text">解决依赖冲突问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#聚合与继承"><span class="toc-number"></span> <span class="toc-text">聚合与继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#聚合"><span class="toc-number">1.</span> <span class="toc-text">聚合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#继承"><span class="toc-number">2.</span> <span class="toc-text">继承</span></a></li></ol>
+		</div>
+		
+		<h3 id="maven常用命令">maven常用命令</h3>
+<p><strong>注意，如果要在命令行执行，则需要在Maven项目的根目录中执行，也就是可以看到pom.xml文件。</strong></p>
+<ul>
+<li><p><code>mvn compile</code><br>编译<code>[root]/src/main/java</code>目录下的Java源文件，并在<code>[root]/target/classes</code>目录下生成class文件。</p>
+</li>
+<li><p><code>mvn test</code><br>编辑并运行<code>[root]/src/test/java</code>目录下的文件，并在<code>[root/target/</code>下生成测试报告和class文件， 测试报告和class文件分别放到名为surefire-reports和test-classes的文件夹中。</p>
+</li>
+<li><p><code>mvn clean</code><br>删除<code>[root]/target</code>目录下的文件。</p>
+</li>
+<li><p><code>mvn package</code><br>完成编译、测试，并打jar 包。jar包放置到<code>[root]/target</code> 目录下，以pom.xml文件中的<strong>artifactId</strong>作为jar包名称。</p>
+</li>
+</ul>
+<ul>
+<li><code>mvn install</code><br>完成打jar包的操作，并拷贝jar包到本地仓库中，<strong>这样项目就可以在别的pom.xml文件中作为<code>&lt;dependency&gt;</code>项使用了</strong>！</li>
+</ul>
+<ul>
+<li><code>mvn deploy</code><br>把jar文件发布到私有服务器上，这样做的目的是后面使用maven工具时，若在本地找不到相应的jar包，则会到私有服务器上寻找； 若私有服务器也没有，则到公有服务器上寻找（网络）。</li>
+</ul>
+<p>Maven命令可以组合使用，例如一般都会和clean命令一起使用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean <span class="keyword">compile</span></div></pre></td></tr></table></figure>
+
+<p>表示先删除之前的target文件夹，再执行compile，生成新的target文件夹和class文件。</p>
+<h2 id="依赖_dependency">依赖 dependency</h2>
+<h3 id="依赖的定位">依赖的定位</h3>
+<p>所有依赖都是通过坐标来定位的<strong>（GAV，即groupId，artifactId， version）</strong>。一些网上的仓库提供了依赖的查询，例如： <a href="http://mvnrepository.com/" target="_blank" rel="external">http://mvnrepository.com/</a> 。</p>
+<p>在pom.xml 文件中通过<code>&lt;dependencies/&gt;</code>标签设置，一个简单的示例如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">version</span>&gt;</span>4.10<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>hello.maven<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>hello-first-version<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependencies</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="依赖的传递性">依赖的传递性</h3>
+<p>传递性的解析：如B依赖C，A依赖B，则A依赖C。<br><strong>注意，当A依赖B时，A就会把B和B依赖的jar包加入到Classpath中，除非在A项目中把B依赖的作用域声明为test（下面会介绍作用域）！！</strong></p>
+<h3 id="依赖的作用域">依赖的作用域</h3>
+<p>依赖通过<code>&lt;scope/&gt;</code>节点设置，它有以下取值：</p>
+<ul>
+<li><p>test： 只是在测试范围有效，在编译和打jar包时不会加入依赖；<br><strong>注意，如果是test作用域，则一定要放到测试代码的目录 <code>[root]/src/test/java</code>下面，否则编译和打jar包的时候找不到test的依赖包就报错！！</strong><br><strong>作用域声明为test的依赖是不会传递的！</strong></p>
+</li>
+<li><p>compile： 编译范围有效，在编译和打jar包时都会把依赖加入；</p>
+</li>
+<li><p>provided： 编译和测试时会生效，但在打成war包是不会放入，例如Servlet API，因为Tomcat容器中已经有了该API。</p>
+</li>
+<li><p>runtime： 在运行时有依赖，但编译时没有。</p>
+</li>
+</ul>
+<p><strong>默认的依赖取值为compile。</strong></p>
+<h3 id="解决依赖冲突问题">解决依赖冲突问题</h3>
+<p>所谓依赖冲突，是指多个依赖中某个jar的版本不一致时候，最后应用使用哪一个的问题。例如模块A依赖B的1.0版本，模块C依赖B的2.0版本，此时D依赖A和C，所以D中就有了B的1.0和2.0版本！</p>
+<p>下面介绍依赖冲突的解决方法：</p>
+<ul>
+<li>先标注先使用<br>A依赖B(version1.0)，C依赖B(version2.0)，D依赖A和C，此时在D模块的pom.xml 文件中，若A先写则D依赖与B的version1.0 版本； 若是C先写则D依赖与B的version2.0 版本。<strong> 即遵循先标注先使用的规则。</strong></li>
+</ul>
+<ul>
+<li>最短路径原则<br>A依赖B(version1.0)，C依赖B(version2.0)，D 依赖A和C，而E依赖D和C，则此时E中使用的B版本遵循的是最短路径原则， 因此E依赖的B版本是version2.0。</li>
+</ul>
+<ul>
+<li>手动排除节点<br>假如模块D先依赖了A模块，再依赖C模块，根据<strong>先标注先使用</strong>的原则，此时D模块中依赖的B是1.0版本。但若希望改为2.0版本，则可以这样：<br>在模块D的pom.xml文件中声明依赖A的时候，把A中的B模块排除，使用的是 <code>&lt;exclusions&gt;</code>标签，示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">// 这是B的pom.xml文件！</div><div class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>A<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>A-model-1<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">exclusions</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">exclusion</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>B<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>B-modle<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">exclusion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">exclusions</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>另一种方法是直接在D的pom.xml文件中 引入B的version2.0 版本，因为根据最短路径的原则，当前模块会优先使用<code>&lt;dependency&gt;</code>标签引入的依赖包。**</p>
+<h2 id="聚合与继承">聚合与继承</h2>
+<p>当一个项目中有多个模块时，使用聚合与继承管理这些模块。</p>
+<h3 id="聚合">聚合</h3>
+<p>子模块一般都需要经常执行package、install等操作，把子模块包含到父模块中，在父模块下执行package、install命令，那么父模块和子模块都会生效，这样就有效的管理了这些子模块。此时的pom.xml文件使用<code>&lt;modules&gt;</code>和<code>&lt;module&gt;</code>标签包含子模块：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span></span></div><div class="line">         <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">         <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.example.user<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-guide<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="title">packaging</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">modules</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">module</span>&gt;</span>UserCore<span class="tag">&lt;/<span class="title">module</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">module</span>&gt;</span>UserService<span class="tag">&lt;/<span class="title">module</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">modules</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，一般父模块的<code>packaging</code>元素声明为pom类型，表示它用于管理子模块。</strong></p>
+<h3 id="继承">继承</h3>
+<p>多个子模块直接经常使用相同的依赖， 例如junit的jar包，这时候可以把子模块的<code>&lt;dependency&gt;</code>都配置都父模块中，然后子模块声明使用父模块的哪些依赖，<strong>此时子模块中的依赖就可以不用声明具体的版本</strong>。</p>
+<p>举例，这里的父模块是maven-guide，子模块分别为user-core和user-service。</p>
+<p>首先子模块要声明使用的父模块，例如user-service中pom.xml文件为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span></span></div><div class="line">         <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">         <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">parent</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的groupId--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.example.user<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的artifactId--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-guide<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的版本--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--指定父模块的pom.xml文件的位置，可以省略--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">relativePath</span>&gt;</span>../pom.xml<span class="tag">&lt;/<span class="title">relativePath</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">parent</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="comment">&lt;!--子模块的artifactId一定要提供--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>user-service<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="title">packaging</span>&gt;</span>                  </div><div class="line">    // 省略</div><div class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>子模块一定要声明自己的artifactId元素；</li>
+<li>子模块中没有声明的元素就会使用父模块的内容；</li>
+</ul>
+<p>然后就可以把子模块中的依赖都加入到父模块中，此时父模块使用<code>dependencyManagement</code>元素配置这些依赖，示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span></span></div><div class="line">         <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">         <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.example.user<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-guide<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="title">packaging</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">modules</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">module</span>&gt;</span>UserCore<span class="tag">&lt;/<span class="title">module</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">module</span>&gt;</span>UserService<span class="tag">&lt;/<span class="title">module</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">modules</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="title">dependencyManagement</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">dependencies</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">version</span>&gt;</span>4.11<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.2.17<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">version</span>&gt;</span>5.1.23<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.hibernate<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>hibernate-core<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">version</span>&gt;</span>4.1.0.Final<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.easymock<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>easymock<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="title">version</span>&gt;</span>3.2<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这样在子模块中，就可以直接引用父模块的依赖，例如user-service的完成内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span></span></div><div class="line">         <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">         <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">parent</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的groupId--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.example.user<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的artifactId--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-guide<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--父模块的版本--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--指定父模块的pom.xml文件的位置，可以省略--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">relativePath</span>&gt;</span>../pom.xml<span class="tag">&lt;/<span class="title">relativePath</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">parent</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="comment">&lt;!--子模块的artifactId一定要提供--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>user-service<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="title">packaging</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="title">dependencies</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.easymock<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>easymock<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!--依赖前面的Maven模块--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!--user-service和user-core的groupId一致，可以还有隐式变量--&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>${project.groupId}<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>user-core<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>对于不在父模块中声明的依赖，需要在独自声明并指定版本号。</strong></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Maven/">Maven</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Maven/Maven（二）：依赖管理/" data-title="Maven（二）：依赖管理 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Maven/Maven（四）：仓库管理和发布项目/" title="Maven（四）：仓库管理和发布项目">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Maven（四）：仓库管理和发布项目</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Maven/Maven（三）：声明周期和插件/"  title="Maven（三）：声明周期和插件">
+ <strong>NEXT:</strong><br/> 
+ <span>Maven（三）：声明周期和插件
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#maven常用命令"><span class="toc-number">1.</span> <span class="toc-text">maven常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#依赖_dependency"><span class="toc-number"></span> <span class="toc-text">依赖 dependency</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的定位"><span class="toc-number">1.</span> <span class="toc-text">依赖的定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的传递性"><span class="toc-number">2.</span> <span class="toc-text">依赖的传递性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#依赖的作用域"><span class="toc-number">3.</span> <span class="toc-text">依赖的作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决依赖冲突问题"><span class="toc-number">4.</span> <span class="toc-text">解决依赖冲突问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#聚合与继承"><span class="toc-number"></span> <span class="toc-text">聚合与继承</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#聚合"><span class="toc-number">1.</span> <span class="toc-text">聚合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#继承"><span class="toc-number">2.</span> <span class="toc-text">继承</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

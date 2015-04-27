@@ -1,0 +1,362 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>策略模式 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="概述
+GOF中对策略模式的定义：策略模式定义了一系列的算法，并将每一个算法封装起来，而且使它们还可以相互替换。策略模式让算法独立于使用它的客户而独立变化。
+理解
+策略模式的主要应用场景就是：程序某特定功能在不同情况下采用不同的策略（算法），在运行时可以动态选择采用的策略。也就是把同步的策略抽象为接口">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/设计模式/策略模式/" title="策略模式" itemprop="url">策略模式</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#理解"><span class="toc-number">1.1.</span> <span class="toc-text">理解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码"><span class="toc-number">2.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java标准库中的应用"><span class="toc-number">3.</span> <span class="toc-text">Java标准库中的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_JComponent"><span class="toc-number">3.1.</span> <span class="toc-text">1. JComponent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_HttpServlet"><span class="toc-number">3.2.</span> <span class="toc-text">2. HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-"><span class="toc-number">3.3.</span> <span class="toc-text">3.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-"><span class="toc-number">3.4.</span> <span class="toc-text">4.</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="概述">概述</h2>
+<p>GOF中对策略模式的定义：策略模式定义了一系列的算法，并将每一个算法封装起来，而且使它们还可以相互替换。策略模式让算法独立于使用它的客户而独立变化。</p>
+<h3 id="理解">理解</h3>
+<p>策略模式的主要应用场景就是：<br>程序某特定功能在不同情况下采用不同的策略（算法），在运行时可以动态选择采用的策略。<br>也就是把同步的策略抽象为接口，然后提供接口的实现类。在具体类中把接口作为属性，但创建类对象时则用接口的实现类赋值给这些接口属性。</p>
+<blockquote>
+<p>《Head First Design Patterns》书中介绍策略模式时提到了重要的2点：<br>1）找到系统中变化的部分，将变化的部分同其它稳定的部分隔开<br>2）面向接口编程，而不要面向实现编程</p>
+</blockquote>
+<h2 id="代码">代码</h2>
+<p>这里也采用该书在的“鸭子”的例子作为示例代码，这个例子就是某公司开发鸭子游戏，鸭子都会游泳，飞翔和叫等。但不同的鸭子之间飞翔方式、叫的方式不一样。<br>有的鸭子甚至不会飞。<br>这时候需要把会改变的部分（飞和叫）提取为接口，而且不同功能提取不同接口，然后再提供这些接口的实现；最后定义鸭子的抽象父类，<br>而具体实现这些功能则有接口的实现类的方法来完成。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> dp.strategy;</div><div class="line"> </div><div class="line"><span class="comment">/*</span></div><div class="line">* 策略模式示例代码</div><div class="line">*/</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StrategyDemo</span> </span>{</div><div class="line">    <span class="comment">// 可变的行为一</span></div><div class="line">    interface FlyBehavior {</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fly</span>();</div><div class="line">    }</div><div class="line">    <span class="comment">// 行为一的不同实现方式</span></div><div class="line">    class FlyNoWay implements FlyBehavior {</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fly</span>() {</div><div class="line">            System.out.println(<span class="string">"duck can not fly"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class FlyWithWings implements FlyBehavior {</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fly</span>() {</div><div class="line">            System.out.println(<span class="string">"duck fly with wings"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line"> </div><div class="line">    class FlyWithRocket implements FlyBehavior {</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fly</span>() {</div><div class="line">            System.out.println(<span class="string">"duck fly with rocket"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 可变的行为二</span></div><div class="line">    interface QuackBehavior {</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quack</span>();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 行为二的不同实现方式</span></div><div class="line">    class Quack1 implements QuackBehavior {</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quack</span>() {</div><div class="line">            System.out.println(<span class="string">"duck quack 呱呱呱"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class Quack2 implements QuackBehavior {</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quack</span>() {</div><div class="line">            System.out.println(<span class="string">"duck quack 嘎嘎噶"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 抽象的父类，可变的方法有接口实现类实现，不变的方法子类公用，还能定义abstract方法</span></div><div class="line">    <span class="keyword">abstract</span> class Duck {</div><div class="line">        <span class="comment">// 不同的子类实现的方法不同，抽象为接口</span></div><div class="line">        FlyBehavior flyBehavior;</div><div class="line">        QuackBehavior quackBehavior;</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">performFly</span>() {</div><div class="line">            <span class="keyword">if</span>(flyBehavior != <span class="keyword">null</span>)</div><div class="line">                flyBehavior.fly();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">performQuack</span>() {</div><div class="line">            <span class="keyword">if</span>(quackBehavior != <span class="keyword">null</span>)</div><div class="line">                quackBehavior.quack();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">swim</span>() {</div><div class="line">            System.out.println(<span class="string">"any ducks can swim!"</span>);</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="comment">// 提供动态改变策略的方法</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFlyBehavior</span>(FlyBehavior flyBehavior) {</div><div class="line">            <span class="keyword">this</span>.flyBehavior = flyBehavior;</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setQuackBehavior</span>(QuackBehavior quackBehavior) {</div><div class="line">            <span class="keyword">this</span>.quackBehavior = quackBehavior;</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="comment">// 具体内容由子类实现</span></div><div class="line">        <span class="keyword">abstract</span> <span class="keyword">void</span> display();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 鸭子具体实现子类一</span></div><div class="line">    class MallardDuck extends Duck {</div><div class="line">        <span class="keyword">public</span> <span class="title">MallardDuck</span>() {</div><div class="line">            <span class="comment">// 鸭子不会飞，同时也可以在对象执行时调用setFlyBehavior方法修改属性</span></div><div class="line">            <span class="keyword">this</span>.flyBehavior = <span class="keyword">new</span> FlyNoWay();</div><div class="line">            <span class="keyword">this</span>.quackBehavior = <span class="keyword">new</span> Quack1();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">void</span> display() {</div><div class="line">            System.out.println(<span class="string">"MallardDuck..."</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 鸭子子类二</span></div><div class="line">    class RocketDuck extends Duck {</div><div class="line">        <span class="keyword">public</span> <span class="title">RocketDuck</span>() {</div><div class="line">            <span class="keyword">this</span>.flyBehavior = <span class="keyword">new</span> FlyWithRocket();</div><div class="line">            <span class="keyword">this</span>.quackBehavior = <span class="keyword">new</span> Quack2();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">void</span> display() {</div><div class="line">            System.out.println(<span class="string">"RocketDuck..."</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        StrategyDemo sd = <span class="keyword">new</span> StrategyDemo();</div><div class="line">        MallardDuck mDuck = sd.<span class="keyword">new</span> MallardDuck();</div><div class="line">        mDuck.performFly();</div><div class="line">        mDuck.performQuack();</div><div class="line"> </div><div class="line">        RocketDuck rDuck = sd.<span class="keyword">new</span> RocketDuck();</div><div class="line">        <span class="comment">// 执行对象时动态修改行为</span></div><div class="line">        rDuck.setFlyBehavior(sd.<span class="keyword">new</span> FlyNoWay());</div><div class="line">        rDuck.performFly();</div><div class="line">        rDuck.performQuack();</div><div class="line">    }</div><div class="line"> </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="Java标准库中的应用">Java标准库中的应用</h2>
+<h3 id="1-_JComponent">1. JComponent</h3>
+<p>在<code>javax.swing.JComponent</code>中，看它的<code>paintBorder</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">JComponent</span> <span class="keyword">extends</span> <span class="title">Container</span> <span class="keyword">implements</span> <span class="title">Serializable</span>,</span></div><div class="line">                                              <span class="title">TransferHandler</span>.<span class="title">HasGetTransferHandler</span></div><div class="line">{</div><div class="line">    <span class="comment">// ......</span></div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">paintBorder</span>(Graphics g) {</div><div class="line">        Border border = getBorder();</div><div class="line">        <span class="keyword">if</span> (border != <span class="keyword">null</span>) {</div><div class="line">            border.paintBorder(<span class="keyword">this</span>, g, <span class="number">0</span>, <span class="number">0</span>, getWidth(), getHeight());</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="comment">// ......</span></div></pre></td></tr></table></figure>
+
+<p>其中<code>Border</code>是一个接口，该接口定义了<code>paintBorder</code>方法。</p>
+<h3 id="2-_HttpServlet">2. HttpServlet</h3>
+<p><code>javax.servlet.http.HttpServlet</code>类中的<code>service</code>方法和<code>doXXX</code>方法都是用到了策略模式，这些方法都是通过<code>HttpServletResponse</code>和<code>HttpServletRequest</code>等子类中的方法完成的。</p>
+<h3 id="3-">3.</h3>
+<p><code>java.util.Comparator#compare()</code></p>
+<h3 id="4-">4.</h3>
+<p><code>javax.servlet.Filter#doFilter()</code></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/设计模式/策略模式/" data-title="策略模式 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/设计模式/装饰模式/" title="装饰模式">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  装饰模式</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/设计模式/模板模式/"  title="模板模式">
+ <strong>NEXT:</strong><br/> 
+ <span>模板模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#理解"><span class="toc-number">1.1.</span> <span class="toc-text">理解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码"><span class="toc-number">2.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java标准库中的应用"><span class="toc-number">3.</span> <span class="toc-text">Java标准库中的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_JComponent"><span class="toc-number">3.1.</span> <span class="toc-text">1. JComponent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_HttpServlet"><span class="toc-number">3.2.</span> <span class="toc-text">2. HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-"><span class="toc-number">3.3.</span> <span class="toc-text">3.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-"><span class="toc-number">3.4.</span> <span class="toc-text">4.</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

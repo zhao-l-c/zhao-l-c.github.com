@@ -1,0 +1,401 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>多线程基础（四） | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="多线程问题补充
+利用匿名内部类快速创建线程
+1234567891011121314151617181920package heima.section10; // 利用匿名内部类快速创建线程public class AnonymousDemo {     public static void main">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Concurrent/多线程基础（四）/" title="多线程基础（四）" itemprop="url">多线程基础（四）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#多线程问题补充"><span class="toc-number">1.</span> <span class="toc-text">多线程问题补充</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#利用匿名内部类快速创建线程"><span class="toc-number">1.1.</span> <span class="toc-text">利用匿名内部类快速创建线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用synchronized修饰run方法"><span class="toc-number">1.2.</span> <span class="toc-text">用synchronized修饰run方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一个线程不安全的经典例子"><span class="toc-number">1.3.</span> <span class="toc-text">一个线程不安全的经典例子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#利用匿名内部类创建线程"><span class="toc-number">1.3.1.</span> <span class="toc-text">利用匿名内部类创建线程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#抛出InterruptedException的方法"><span class="toc-number">1.4.</span> <span class="toc-text">抛出InterruptedException的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_sleep与interrupt"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. sleep与interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_wait与interrrupt"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. wait与interrrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_join与interrupt"><span class="toc-number">1.4.3.</span> <span class="toc-text">3. join与interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-"><span class="toc-number">1.4.4.</span> <span class="toc-text">4.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_isInterrupted方法"><span class="toc-number">1.4.5.</span> <span class="toc-text">5. isInterrupted方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_interrupted方法介绍"><span class="toc-number">1.4.6.</span> <span class="toc-text">6. interrupted方法介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_注意区分interrupt和interrupted方法"><span class="toc-number">1.4.7.</span> <span class="toc-text">7. 注意区分interrupt和interrupted方法</span></a></li></ol></li></ol></li></ol>
+		</div>
+		
+		<h1 id="多线程问题补充">多线程问题补充</h1>
+<h2 id="利用匿名内部类快速创建线程">利用匿名内部类快速创建线程</h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.section10;</div><div class="line"> </div><div class="line"><span class="comment">// 利用匿名内部类快速创建线程</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AnonymousDemo</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="comment">// ......</span></div><div class="line">            }</div><div class="line">        }.start();</div><div class="line"> </div><div class="line">        Runnable r = <span class="keyword">new</span> Runnable() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="comment">// ......</span></div><div class="line">            }</div><div class="line">        };</div><div class="line">        <span class="keyword">new</span> Thread(r).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="用synchronized修饰run方法">用synchronized修饰run方法</h2>
+<p>首先看下面的代码，用<code>synchronized</code>直接修饰<code>run</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> heima.test01;</div><div class="line"> </div><div class="line"><span class="comment">// 介绍用synchronized修改run方法的问题</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchFunctionDemo</span> </span>{</div><div class="line">    <span class="comment">// 通过继承Thread类实现线程类</span></div><div class="line">    class MyThread extends Thread {</div><div class="line">        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">run</span>() { <span class="comment">// synchronized直接修饰run方法</span></div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {</div><div class="line">                System.out.println(Thread.currentThread().getName());</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 通过实现Runnable接口实现线程类</span></div><div class="line">    class MyRunnable implements Runnable {</div><div class="line">        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">run</span>() { <span class="comment">// synchronized直接修饰run方法</span></div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {</div><div class="line">                System.out.println(<span class="string">"Runnable "</span> + Thread.currentThread().getName());</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        SynchFunctionDemo demo = <span class="keyword">new</span> SynchFunctionDemo();</div><div class="line"> </div><div class="line">        <span class="javadoc">/**</span></div><div class="line">         * 用第一种方法创建3个线程</div><div class="line">         * 这些线程的锁对象是不同的MyThread对象</div><div class="line">         */</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) {</div><div class="line">            MyThread t = demo.<span class="keyword">new</span> MyThread();</div><div class="line">            t.start();</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="javadoc">/**</span></div><div class="line">         * 用第二种方法创建3个线程</div><div class="line">         * 这些线程的锁对象是同一个MyRunnable对象</div><div class="line">         */</div><div class="line">        MyRunnable r = demo.<span class="keyword">new</span> MyRunnable();</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) {</div><div class="line">            Thread t = <span class="keyword">new</span> Thread(r);</div><div class="line">            t.start();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>上述代码中，对于<code>public synchronized void run</code>方法，等价于<code>synchronized(this)</code>，而第一种创建线程的方法中，<br><code>this</code>对象是不同的<code>MyThread</code>对象，因此3个线程之间并没有获取同一个锁，所有同步无效。<br>而第二种方法中的<code>this</code>是同一个<code>MyRunnable</code>对象，因此3个线程获取的是同一个锁，所有同步有效。</p>
+<h2 id="一个线程不安全的经典例子">一个线程不安全的经典例子</h2>
+<p>首先看下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap7;</div><div class="line"> </div><div class="line"><span class="comment">// 下面演示一种线程不安全的例子</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedErrorDemo</span> </span>{</div><div class="line"> </div><div class="line">    class Data {</div><div class="line">        <span class="keyword">private</span> <span class="keyword">int</span> number = <span class="number">100</span>;</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">handle</span>() {</div><div class="line">            number --;</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                Thread.sleep(<span class="number">10</span>);</div><div class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            }</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNumber</span>() {</div><div class="line">            <span class="keyword">return</span> number;</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class TestThread extends Thread {</div><div class="line">        <span class="keyword">private</span> Data data;</div><div class="line">        <span class="keyword">public</span> <span class="title">TestThread</span>(Data data) {</div><div class="line">            <span class="keyword">this</span>.data = data;</div><div class="line">        }</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">                <span class="keyword">if</span>(data.getNumber() &gt; <span class="number">0</span>) {</div><div class="line">                    <span class="keyword">try</span> {</div><div class="line">                        Thread.sleep(<span class="number">10</span>);</div><div class="line">                    } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                    }</div><div class="line">                    System.out.println(Thread.currentThread().getName() + <span class="string">" number="</span> + data.getNumber());</div><div class="line">                    data.handle();</div><div class="line">                }<span class="keyword">else</span></div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        SynchronizedErrorDemo sd = <span class="keyword">new</span> SynchronizedErrorDemo();</div><div class="line">        Data data = sd.<span class="keyword">new</span> Data();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>观察输出结果发现有0甚至-1出现，这明显是不对的。<br>但是从线程类<code>TestThread</code>的<code>run</code>方法中看到，它调用的<code>getNumber</code>和<code>handle</code>方法明显都加上了<code>synchronized</code>，为什么还是不对的呢？<br>原因分析：<br>线程A执行完<code>getNumber</code>方法后就会释放锁，此时线程B就能获取锁。因此会出现<code>number=1</code>时，线程A刚判断完<code>if(data.getNumber() &gt; 0) {</code>后释放锁，<br>这是线程B也进入到循环中并执行了<code>handle</code>，此时<code>number=0</code>，因此到线程A执行时输出结果就为0了。</p>
+<p>避免这种问题出现的关键是，多线程操作的共享数据其实是<code>number</code>，因此在<code>run</code>方法中需要对涉及<code>number</code>共享对象的代码进行同步，可以利用同步代码块或者同步函数的方式实现，例如下面是修正后的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap7;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedErrorDemo2</span> </span>{</div><div class="line">    class Data {</div><div class="line">        <span class="keyword">private</span> <span class="keyword">int</span> number = <span class="number">100</span>;</div><div class="line"> </div><div class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handle</span>() {</div><div class="line">            number --;</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                Thread.sleep(<span class="number">10</span>);</div><div class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            }</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">execute</span>() {</div><div class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">                <span class="keyword">if</span>(number &gt; <span class="number">0</span>) {</div><div class="line">                    <span class="keyword">try</span> {</div><div class="line">                        Thread.sleep(<span class="number">10</span>);</div><div class="line">                    } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                    }</div><div class="line">                    System.out.println(Thread.currentThread().getName() + <span class="string">" number="</span> + number);</div><div class="line">                    handle();</div><div class="line">                }<span class="keyword">else</span></div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class TestThread extends Thread {</div><div class="line">        <span class="keyword">private</span> Data data;</div><div class="line">        <span class="keyword">public</span> <span class="title">TestThread</span>(Data data) {</div><div class="line">            <span class="keyword">this</span>.data = data;</div><div class="line">        }</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">            data.execute();</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        SynchronizedErrorDemo2 sd = <span class="keyword">new</span> SynchronizedErrorDemo2();</div><div class="line">        Data data = sd.<span class="keyword">new</span> Data();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看到把<code>run</code>方法中的代码提取为统一的方法并用<code>synchronized</code>修饰，合并到<code>Data</code>类中。<br>同样可以在<code>run</code>方法中用<code>synchronized(obj)</code>的同步代码块方式实现线程安全，下面是实现代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap7;</div><div class="line"> </div><div class="line"><span class="comment">// 利用同步代码块实现线程安全</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedErrorDemo3</span> </span>{</div><div class="line">    class Data {</div><div class="line">        <span class="keyword">private</span> <span class="keyword">int</span> number = <span class="number">100</span>;</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span>() {</div><div class="line">            number--;</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                Thread.sleep(<span class="number">10</span>);</div><div class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            }</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNumber</span>() {</div><div class="line">            <span class="keyword">return</span> number;</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class TestThread extends Thread {</div><div class="line">        <span class="keyword">private</span> Data data;</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="title">TestThread</span>(Data data) {</div><div class="line">            <span class="keyword">this</span>.data = data;</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">            <span class="keyword">synchronized</span> (data) {</div><div class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) {</div><div class="line">                    <span class="keyword">if</span> (data.getNumber() &gt; <span class="number">0</span>) {</div><div class="line">                        <span class="keyword">try</span> {</div><div class="line">                            Thread.sleep(<span class="number">10</span>);</div><div class="line">                        } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                        }</div><div class="line">                        System.out.println(Thread.currentThread().getName()</div><div class="line">                                + <span class="string">" number="</span> + data.getNumber());</div><div class="line">                        data.handle();</div><div class="line">                    } <span class="keyword">else</span></div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        SynchronizedErrorDemo3 sd = <span class="keyword">new</span> SynchronizedErrorDemo3();</div><div class="line">        Data data = sd.<span class="keyword">new</span> Data();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">        sd.<span class="keyword">new</span> TestThread(data).start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>注意：<code>synchronized</code>中的所对象是<code>data</code>，要使用</p>
+<h3 id="利用匿名内部类创建线程">利用匿名内部类创建线程</h3>
+<p>上面分析过调用共享数据的方法<code>synchronized</code>方法并不能实现线程安全，下面再看一种情况，就是利用匿名内部创建线程的方法。<br>看下面的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap7;</div><div class="line"> </div><div class="line"><span class="comment">// 利用匿名内部类的方式创建线程</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAnonymousThread</span> </span>{</div><div class="line">    class Data {</div><div class="line">        <span class="keyword">private</span> <span class="keyword">int</span> number = <span class="number">100</span>;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span>() {</div><div class="line">            number --;</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                Thread.sleep(<span class="number">10</span>);</div><div class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            }</div><div class="line">        }</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNumber</span>() {</div><div class="line">            <span class="keyword">return</span> number;</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    class Host {</div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span>(<span class="keyword">final</span> <span class="keyword">int</span> input, <span class="keyword">final</span> Data data) {</div><div class="line">            <span class="annotation">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line">            <span class="keyword">final</span> Data tmpData = <span class="keyword">new</span> Data(); <span class="comment">// 在这里创建的对象并不会共享，每个线程对象都会有一个</span></div><div class="line"> </div><div class="line">            <span class="keyword">new</span> Thread() {</div><div class="line">                <span class="comment">// run无法加synchronized，因为每个线程都是new创建的，所以线程之间的this对像并不相同</span></div><div class="line">                <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                    <span class="comment">//input --; // 编译错误，不能对final进行修改</span></div><div class="line">                    <span class="keyword">while</span>(<span class="keyword">true</span>) {</div><div class="line">                        <span class="keyword">synchronized</span> (data) { <span class="comment">// 把synchronized加到这里才是线程安全的，且锁对象是data</span></div><div class="line">                            <span class="keyword">if</span>(data.getNumber() &gt; <span class="number">0</span>) {</div><div class="line">                                <span class="keyword">try</span> {</div><div class="line">                                    Thread.sleep(<span class="number">10</span>);</div><div class="line">                                } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                                }</div><div class="line">                                System.out.println(Thread.currentThread().getName() + <span class="string">" number="</span> + data.getNumber());</div><div class="line">                                data.handle();</div><div class="line">                            }<span class="keyword">else</span></div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                        }</div><div class="line">                    }</div><div class="line">                }</div><div class="line">            }.start();</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        TestAnonymousThread testThread = <span class="keyword">new</span> TestAnonymousThread();</div><div class="line">        Host host = testThread.<span class="keyword">new</span> Host();</div><div class="line">        Data data = testThread.<span class="keyword">new</span> Data();</div><div class="line">        host.execute(<span class="number">0</span>, data);</div><div class="line">        host.execute(<span class="number">1</span>, data);</div><div class="line">        host.execute(<span class="number">2</span>, data);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>上面的代码中在<code>execute</code>方法中创建<code>Thread</code>匿名内部类的方式新建线程，因此每一个线程都是一个线程对象，所以在<code>execute</code>方法中的局部变量都是独立的，并不会有线程安全的问题，例如示例代码中的<code>tmpData</code>变量。<br>而通过方法的参数传递进来的变量，它们都是<code>final</code>修饰的，并对于基本类型变量则不能重新赋值，而对于引用类型变量，除了直接引用的变量不能重新赋值外，变量中的属性是可以改变的。因此引用类型参数对象其实是线程共享的。所以示例中的<code>Data</code>参数对象调用<code>getNumber</code>和<code>handle</code>方法时，是在一个同步代码块中调用，否则有线程安全问题。</p>
+<h2 id="抛出InterruptedException的方法">抛出InterruptedException的方法</h2>
+<p>Java标准API中的方法会抛出<code>InterruptedException</code>异常的代表方法有：</p>
+<blockquote>
+<p>java.lang.Object类的wait<br>java.lang.Thread类的sleep<br>java.lang.Thread类的join</p>
+</blockquote>
+<p>这3个方法的特定是都需“要花费时间”，例如执行<code>wait</code>方法的线程，在等待期间不执行；执行<code>jon</code>的线程，会等待指定的线程执行完毕才继续执行。<br>当然它们也可以取消等待，那就是执行该线程的<code>interrupt</code>方法。</p>
+<h3 id="1-_sleep与interrupt">1. sleep与interrupt</h3>
+<p>例如下面的程序，线程<code>t1</code>在等待状态，所以要暂停<code>t1</code>必须在其它线程中进行，这里<code>main</code>线程执行<code>t1</code>线程的<code>interrupt</code>方法，<br><code>t1</code>线程就会终止并抛出<code>InterruptedException</code>异常，那么<code>t1</code>线程的控制权就变成了捕获代码块<code>catch</code>了，也就是说，<br>在sleep和catch之间的代码不会被执行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap5;</div><div class="line"> </div><div class="line"><span class="comment">// sleep与interrupt方法</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SleepInterrupt</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Thread t = <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="keyword">try</span> {</div><div class="line">                    Thread.sleep(<span class="number">604800000</span>);</div><div class="line">                    <span class="comment">// 这里之间的代码不会执行</span></div><div class="line">                } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                    System.out.println(<span class="string">"sleep interrupt!"</span>);</div><div class="line">                }</div><div class="line">            }</div><div class="line">        };</div><div class="line">        t.start();</div><div class="line">        t.interrupt(); <span class="comment">// 终止t1线程的执行</span></div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="2-_wait与interrrupt">2. wait与interrrupt</h3>
+<p>同样，对执行了<code>wait</code>的方法的线程实例执行<code>interrupt</code>方法，会给线程传达“不用等notify/notifyAll了，从等待区出来把”的意图。<br>当对<code>wait</code>中的线程执行<code>interrupt</code>方法时，会先重新获取锁定，然后抛出<code>InterruptedException</code>异常。</p>
+<p><strong>注意：执行wait方法的线程必须获取锁，否则会抛出<code>IllegalMonitorStateException</code>异常。</strong> </p>
+<blockquote>
+<p>notify与interrupt的区别<br>这两个方法意义有点接近，但还是有差别的：<br>1）notify/notifyAll是Object类的方法，调用该方法需要获取锁定。而interrupt是Thread的方法，直接对线程对象调用。<br>2）被notify/notifyAll唤醒的线程执行wait的下一句代码，而被interrupt唤醒的线程则转向catch中继续执行。</p>
+</blockquote>
+<h3 id="3-_join与interrupt">3. join与interrupt</h3>
+<p>类似<code>sleep</code>方法，不需要获取锁。</p>
+<h3 id="4-">4.</h3>
+<p>在API中对<code>wait</code>方法抛出<code>InterruptedException</code>异常有下面一句话：<br><strong>如果在当前线程等待通知之前或者正在等待通知时，任何线程中断了当前线程。在抛出此异常时，当前线程的中断状态 被清除。</strong><br>例如线程在执行sleep方法前就已经处于中断状态，则会抛出异常。<br>因此在执行<code>sleep</code>、<code>wait</code>和<code>join</code>方法的时候，我们一般需要手动处理线程的中断状态并清除这个状态，这时可以使用<code>interrupted</code>方法 ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(Thread.  interrupted) {</div><div class="line">    ... <span class="comment">// 相应处理</span></div><div class="line">}</div><div class="line">...<span class="comment">// sleep、wait、join方法</span></div></pre></td></tr></table></figure>
+
+
+
+
+<h3 id="5-_isInterrupted方法">5. isInterrupted方法</h3>
+<p>返回true，说明线程还在执行；返回false，说明线程在等待或者已经停止。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap5;</div><div class="line"> </div><div class="line"><span class="comment">// isInterrupted方法的介绍</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IsinterruptedDemo</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Thread t = <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="keyword">boolean</span> flag = <span class="keyword">true</span>;</div><div class="line">                <span class="keyword">while</span>(flag)</div><div class="line">                    <span class="keyword">try</span> {</div><div class="line">                        wait();</div><div class="line">                    } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">                        flag = <span class="keyword">false</span>;</div><div class="line">                    }</div><div class="line">            }</div><div class="line">        };</div><div class="line">        t.start();</div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" is interrupted? "</span> + t.isInterrupted()); <span class="comment">// false</span></div><div class="line">        <span class="comment">// 停止线程t</span></div><div class="line">        t.interrupt();</div><div class="line">        <span class="comment">// 线程已经停止了也同样返回false</span></div><div class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" is interrupted? "</span> + t.isInterrupted()); <span class="comment">// false</span></div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="6-_interrupted方法介绍">6. interrupted方法介绍</h3>
+<p>Thread.interrupted静态方法用于检查并清除当前线程的中断状态，若当前线程处于中断状态，则返回true；否则返回false。<br>这个方法也可以用于停止线程。<br>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> chap5;</div><div class="line"> </div><div class="line"><span class="comment">// interrupted方法介绍</span></div><div class="line"><span class="comment">// 同样可以用于停止线程</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InterruptedDemo</span> </span>{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        Thread t = <span class="keyword">new</span> Thread() {</div><div class="line">            <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">run</span>() {</div><div class="line">                <span class="keyword">boolean</span> flag = <span class="keyword">true</span>;</div><div class="line">                <span class="keyword">while</span>(flag) {</div><div class="line">                    <span class="comment">// 判断线程t是否处于中断状态，若是返回true，否则返回false</span></div><div class="line">                    <span class="keyword">boolean</span> isInterrupted = Thread.interrupted();</div><div class="line">                    System.out.println(Thread.currentThread().getName() + <span class="string">" is interrupted? "</span> + isInterrupted); <span class="comment">// false</span></div><div class="line">                    <span class="keyword">if</span>(!isInterrupted) <span class="comment">// 结束线程t</span></div><div class="line">                        flag = <span class="keyword">false</span>;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        };</div><div class="line">        t.start();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="7-_注意区分interrupt和interrupted方法">7. 注意区分interrupt和interrupted方法</h3>
+<p>前一个方法用于中断特定线程的等待，且没有返回值，一般调用方式是：<code>线程实例.interrutp()</code>；<br>后一个方法用于当前线程的中断，有返回值，只清楚线程的中断状态，并不是中断线程的等待！一般的调用方式是：<code>boolean flag = Thread.interrupted()</code>；</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Concurrent/">Concurrent</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Concurrent/多线程基础（四）/" data-title="多线程基础（四） | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Concurrent/ConcurrentAPI/Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍/" title="Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Concurrent API（一）：AtomicInteger和CountDownLatch的使用介绍.md</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Concurrent/多线程基础（二）/"  title="多线程基础（二）">
+ <strong>NEXT:</strong><br/> 
+ <span>多线程基础（二）
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#多线程问题补充"><span class="toc-number">1.</span> <span class="toc-text">多线程问题补充</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#利用匿名内部类快速创建线程"><span class="toc-number">1.1.</span> <span class="toc-text">利用匿名内部类快速创建线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用synchronized修饰run方法"><span class="toc-number">1.2.</span> <span class="toc-text">用synchronized修饰run方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一个线程不安全的经典例子"><span class="toc-number">1.3.</span> <span class="toc-text">一个线程不安全的经典例子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#利用匿名内部类创建线程"><span class="toc-number">1.3.1.</span> <span class="toc-text">利用匿名内部类创建线程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#抛出InterruptedException的方法"><span class="toc-number">1.4.</span> <span class="toc-text">抛出InterruptedException的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_sleep与interrupt"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. sleep与interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_wait与interrrupt"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. wait与interrrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_join与interrupt"><span class="toc-number">1.4.3.</span> <span class="toc-text">3. join与interrupt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-"><span class="toc-number">1.4.4.</span> <span class="toc-text">4.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_isInterrupted方法"><span class="toc-number">1.4.5.</span> <span class="toc-text">5. isInterrupted方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_interrupted方法介绍"><span class="toc-number">1.4.6.</span> <span class="toc-text">6. interrupted方法介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_注意区分interrupt和interrupted方法"><span class="toc-number">1.4.7.</span> <span class="toc-text">7. 注意区分interrupt和interrupted方法</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

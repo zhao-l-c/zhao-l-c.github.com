@@ -1,0 +1,475 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="基于注解的Bean配置方式
+
+参考内容重要：SpringMVC3.1+Hibernate4.1.7完全基于注解配置(零配置文件)详解 Spring 3.0 基于 Annotation 的依赖注入实现
+
+使用 @Repository、@Service、@Controller 和 @Component ">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Spring/Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置/" title="Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置" itemprop="url">Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基于注解的Bean配置方式"><span class="toc-number">1.</span> <span class="toc-text">基于注解的Bean配置方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Repository、@Service、@Controller_和_@Component_将类标识为_Bean"><span class="toc-number">1.1.</span> <span class="toc-text">使用 @Repository、@Service、@Controller 和 @Component 将类标识为 Bean</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@PostConstruct_和_@PreDestroy_指定声明周期"><span class="toc-number">1.2.</span> <span class="toc-text">@PostConstruct 和 @PreDestroy 指定声明周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Autowired_和_@Qualifier_指定_Bean_的自动装配策略"><span class="toc-number">1.3.</span> <span class="toc-text">使用 @Autowired 和 @Qualifier 指定 Bean 的自动装配策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_JSR-250_中的_@Resource_和_@Qualifier_注解自动装配"><span class="toc-number">1.4.</span> <span class="toc-text">使用 JSR-250 中的 @Resource 和 @Qualifier 注解自动装配</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于注解的Spring_IOC容器配置"><span class="toc-number">2.</span> <span class="toc-text">基于注解的Spring IOC容器配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Configuration、@ComponentScan和_@Bean_进行IOC容器声明"><span class="toc-number">2.1.</span> <span class="toc-text">使用 @Configuration、@ComponentScan和 @Bean 进行IOC容器声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@Bean的补充"><span class="toc-number">2.2.</span> <span class="toc-text">@Bean的补充</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AnnotationConfigApplicationContext的补充"><span class="toc-number">2.3.</span> <span class="toc-text">AnnotationConfigApplicationContext的补充</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="基于注解的Bean配置方式">基于注解的Bean配置方式</h2>
+<blockquote>
+<p>参考内容<br><a href="http://www.coderli.com/spring-hibernate-base-annotation/" target="_blank" rel="external">重要：SpringMVC3.1+Hibernate4.1.7完全基于注解配置(零配置文件)</a><br><a href="http://www.ibm.com/developerworks/cn/opensource/os-cn-spring-iocannt/" target="_blank" rel="external">详解 Spring 3.0 基于 Annotation 的依赖注入实现</a></p>
+</blockquote>
+<h3 id="使用_@Repository、@Service、@Controller_和_@Component_将类标识为_Bean">使用 @Repository、@Service、@Controller 和 @Component 将类标识为 Bean</h3>
+<p>在Spring注解中常用4个注解为：</p>
+<ul>
+<li>@Component<br>是一个泛化的概念，仅仅表示一个组件 (Bean) ，可以作用在任何层次。</li>
+</ul>
+<ul>
+<li>@Repository<br>通常作用在 访问层 (DAO 层 ) 。</li>
+</ul>
+<ul>
+<li>@Controller<br>通常作用在控制层，但是目前该功能与 @Component 相同。</li>
+</ul>
+<ul>
+<li>@Service<br>通常作用在业务层，但是目前该功能与 @Component 相同。</li>
+</ul>
+<p>为了使用这4个注解，需要在 XML 配置文件中启用 Bean 的自动扫描功能，这可以通过<code>&lt;context:component-scan/&gt;</code>实现。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 配置文件扫描包</span></div><div class="line">&lt;context:component-scan <span class="keyword">base</span>-package=<span class="string">"section03"</span>/&gt;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 使用注解注释Bean</span></div><div class="line">@Component(<span class="keyword">value</span>=<span class="string">"user"</span>)</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> User {</div><div class="line">    <span class="comment">// 属性和getter、setter方法</span></div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// 测试获取</span></div><div class="line">ApplicationContext ctx = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"spring-config2.xml"</span>);</div><div class="line"><span class="comment">// 使用@Component直接注解一个类                                                            </span></div><div class="line">User user = ctx.getBean(<span class="string">"user"</span>, User.class);</div></pre></td></tr></table></figure>
+
+<p>使用的时候注意：</p>
+<ul>
+<li>通过使用这4个注解，Spring 会自动创建相应的 BeanDefinition 对象，并注册到<code>ApplicationContext</code>中。这些类就成了 Spring 受管组件；</li>
+</ul>
+<ul>
+<li>4个注解都可以为Bean设置name名称值，如果没有设置，则使用默认的Bean命令策略：<strong>即类名第一个字母小写</strong>；</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">@Repository(value=<span class="string">"demo"</span>)</div><div class="line">public class Demo { <span class="keyword">...</span> }</div></pre></td></tr></table></figure>
+
+<ul>
+<li>如果你不想使用默认Bean命名策略，可以提供一个自定义的命名策略。首先实现<code>BeanNameGenerator</code> 接口，确认包含了一个默认的无参数构造方法。然后在配置扫描器时提供一个全限定类名，如下所示：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;beans <span class="keyword">...</span>&gt;</div><div class="line">&lt;context:component-scan</div><div class="line">    base-package=<span class="string">"a.b"</span> name-generator=<span class="string">"a.SimpleNameGenerator"</span>/&gt;</div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>和使用XML配置一样，默认Bean的作用域是”singleton”。<strong>如果希望设置作用域，可以使用 @Scope 注解</strong>。使用该注解时只需提供作用域的名称就行了，如下所示：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@Scope(<span class="string">"prototype"</span>)</div><div class="line">@Repository</div><div class="line">public class Demo   { <span class="keyword">...</span> }</div></pre></td></tr></table></figure>
+
+<ul>
+<li>如果想提供一个自定义的作用域解析策略而不使用基于注解的方法，只需实现<code>ScopeMetadataResolver</code>接口，确认包含一个默认的没有参数的构造方法。然后在配置扫描器时提供全限定类名：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="keyword">context</span>:<span class="keyword">component</span>-scan base-<span class="keyword">package</span>=<span class="string">"a.b"</span></div><div class="line">    scope-resolver=<span class="string">"footmark.SimpleScopeResolver"</span> /&gt;</div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="@PostConstruct_和_@PreDestroy_指定声明周期">@PostConstruct 和 @PreDestroy 指定声明周期</h3>
+<p>在使用XML配置时，可以使用Bean的元素<strong>init-method</strong>和destroy-method<strong>设置初始化和销毁方法。同样在注解中对应的分别是</strong> @PostConstruct <strong>和</strong> @PreDestroy**。</p>
+<p>使用非常简单，只需分别将他们标注于初始化之后执行的方法或者销毁之前执行的方法上。由于使用了注解，因此需要配置相应的 Bean 后处理器，亦即在 XML 中增加如下一行：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;contex<span class="variable">t:annotation</span>-config /&gt;</div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="使用_@Autowired_和_@Qualifier_指定_Bean_的自动装配策略">使用 @Autowired 和 @Qualifier 指定 Bean 的自动装配策略</h3>
+<p>在XML的配置方式中，可以使用Bean的autowire属性进行自动装配的配置，这里注解提供了<strong>@Autowired</strong>的方式：</p>
+<ul>
+<li>使用 @Autowired 注解进行装配，只能是<strong>根据类型进行匹配</strong>；</li>
+</ul>
+<ul>
+<li>@Autowired 注解可以用于 Setter 方法、构造函数、字段，甚至普通方法，前提是方法必须有至少一个参数；</li>
+</ul>
+<ul>
+<li>@Autowired 还可以用于数组和使用泛型的集合类型。然后 Spring 会将容器中所有类型符合的 Bean 注入进来。@Autowired 标注作用于 Map 类型时，如果 Map 的 key 为 String 类型，则 Spring 会将容器中所有类型符合 Map 的 value 对应的类型的 Bean 增加进来，用 Bean 的 id 或 name 作为 Map 的 key（了解）；</li>
+</ul>
+<ul>
+<li>使用@Autowired 后自动注入不能满足，则会抛出异常。<strong>可以给 @Autowired 标注增加一个 required=false 属性表示并不是必须的</strong>。另外，每一个类中只能有一个构造函数的 @Autowired.required() 属性为 true，否则就出问题了。如果用 @Autowired 同时标注了多个构造函数，那么，Spring 将采用贪心算法匹配构造函数 ( 构造函数最长 )；</li>
+</ul>
+<ul>
+<li>@Autowired 还有一个作用就是，如果将其标注在<code>BeanFactory</code> 类型、<code>ApplicationContext</code>类型、<code>ResourceLoader</code>类型、<code>ApplicationEventPublisher</code>类型、<code>MessageSource</code> 类型上，那么 Spring 会自动注入这些实现类的实例，不需要额外的操作。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Component</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AutowiredTest</span> </span>{</div><div class="line">    <span class="comment">// 自动注入ApplicationContext的对象</span></div><div class="line">    <span class="annotation">@Autowired</span></div><div class="line">    <span class="keyword">private</span> ApplicationContext ctx;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ul>
+<li>当容器中存在多个 Bean 的类型与需要注入的相同时，可以用<strong> @Qualifier 标注</strong>指定具体的名字。前面说过，默认的命名规则是第一个字母小写。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Autowired</span>(required=<span class="keyword">false</span>)</div><div class="line"><span class="annotation">@Qualifier</span>(<span class="string">"setPerson"</span>)</div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPerson</span>(person p){}</div></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>@Qualifier 甚至可以作用于方法的参数</strong>，举例如下：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Autowired</span>(required=<span class="keyword">false</span>)</div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span>(@<span class="title">Qualifier</span>("person")Person p,String name){}</div></pre></td></tr></table></figure>
+
+<h3 id="使用_JSR-250_中的_@Resource_和_@Qualifier_注解自动装配">使用 JSR-250 中的 @Resource 和 @Qualifier 注解自动装配</h3>
+<p><strong>如果希望根据 name 执行自动装配，那么应该使用 JSR-250 提供的 @Resource 注解，而不应该使用 @Autowired 与 @Qualifier 的组合。</strong></p>
+<p>@Resource的具体用法：</p>
+<ul>
+<li>@Resource 使用<strong> byName 的方式执行自动封装</strong>。</li>
+</ul>
+<ul>
+<li>@Resource 标注可以作用于带一个参数的 Setter 方法、字段，以及带一个参数的普通方法上。</li>
+</ul>
+<ul>
+<li>@Resource 注解有一个 name 属性，用于指定 Bean 在配置文件中对应的名字。<strong>也就是使用一个@Resource注解可以直接代替@Autowired和@Qualifier 2个注解</strong>。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@Controller(<span class="keyword">value</span>=<span class="string">"userAction"</span>)</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> UserAction {</div><div class="line">    <span class="comment">// 使用@Resource代替 @Autowired和 @Qualifier</span></div><div class="line">    <span class="comment">// @Autowired</span></div><div class="line">    <span class="comment">// @Qualifier(value="userService")</span></div><div class="line">    @Resource(name=<span class="string">"userService"</span>)</div><div class="line">    <span class="keyword">private</span> UserService userService;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="基于注解的Spring_IOC容器配置">基于注解的Spring IOC容器配置</h2>
+<p>前面都是使用XML文件配置Spring，其实 还可以使用<strong>Java类进配置</strong>。 ** 方法是使用<code>@Configuration</code>和<code>@Bean</code>注解！</p>
+<h3 id="使用_@Configuration、@ComponentScan和_@Bean_进行IOC容器声明">使用 @Configuration、@ComponentScan和 @Bean 进行IOC容器声明</h3>
+<p>注解 @Configuration的作用是声明一个配置类，而@Bean则类似于XML中的<code>&lt;bean&gt;</code>标签。示例如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 配置Spring IOC容器注解类</span></div><div class="line"><span class="annotation">@Configuration</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserConfiguration</span> </span>{</div><div class="line">    <span class="annotation">@Bean</span>(name = <span class="string">"getUserDao"</span>)</div><div class="line">    <span class="keyword">public</span> UserDao <span class="title">getUserDao</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UserDao();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="annotation">@Bean</span>(name=<span class="string">"getUserService"</span>)</div><div class="line">    <span class="keyword">public</span> UserService <span class="title">getUserService</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UserService();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意，@Bean配置的是方法，默认的name名称为方法的返回值类型第一个字母小写。</strong><br>上述的配置等价于XML文件中用<code>&lt;bean&gt;</code>标签的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">”getUserDao”</span> <span class="attribute">class</span>=<span class="value">”section03.UserDao”</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">”getUserService”</span> <span class="attribute">class</span>=<span class="value">"section03.UserService"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这时候需要用 <strong><code>AnnotationConfigApplicationContext</code></strong>获取IOC容器。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> AnnotationConfigTest {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(String[] args) {</div><div class="line">        <span class="comment">// 获取使用注解配置的IOC容器</span></div><div class="line">        AnnotationConfigApplicationContext ctx =</div><div class="line">                <span class="keyword">new</span> AnnotationConfigApplicationContext(<span class="string">"section03"</span>);</div><div class="line">        UserDao userDao = ctx.getBean(<span class="string">"getUserDao"</span>, UserDao.class);</div><div class="line">        userDao.save(<span class="keyword">new</span> User());</div><div class="line"> </div><div class="line">        User user = ctx.getBean(<span class="string">"user"</span>, User.class);</div><div class="line">        System.<span class="keyword">out</span>.println(user);</div><div class="line"> </div><div class="line">        <span class="comment">// 对于扫描包下使用@Repository注解的类一样可以获取到</span></div><div class="line">        RoleDao roleDao = ctx.getBean(<span class="string">"roleDao"</span>, RoleDao.class);</div><div class="line">        roleDao.save(<span class="keyword">new</span> Role(<span class="string">"hehe"</span>));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>使用<code>AnnotationConfigApplicationContext</code>的好处是能做到零配置，此时扫描包下的类只要使用了@Repository等就能通过这个容器获取。</strong></p>
+<h3 id="@Bean的补充">@Bean的补充</h3>
+<p>@Bean 具有以下四个属性：</p>
+<ul>
+<li>name：指定一个或者多个 Bean 的名字。这等价于 XML 配置中 Bean 的 name 属性。</li>
+<li>initMethod：容器在初始化完 Bean 之后，会调用该属性指定的方法。这等价于 XML 配置中 Bean 的 init-method 属性。</li>
+<li>destroyMethod：该属性与 initMethod 功能相似，在容器销毁 Bean 之前，会调用该属性指定的方法。这等价于 XML 配置中 Bean 的 destroy-method 属性。</li>
+<li>autowire：指定 Bean 属性的自动装配策略，取值是 Autowire 类型的三个静态属性。Autowire.BY_NAME，Autowire.BY_TYPE，Autowire.NO。与 XML 配置中的 autowire 属性的取值相比，这里少了 constructor，这是因为 constructor 在这里已经没有意义了。</li>
+</ul>
+<p><strong>@Bean 没有直接提供指定作用域的属性，可以通过 @Scope 来实现该功能。</strong></p>
+<h3 id="AnnotationConfigApplicationContext的补充">AnnotationConfigApplicationContext的补充</h3>
+<p>下面讲解基于注解的容器初始化。<code>AnnotationConfigApplicationContext</code>提供了三个构造函数用于初始化容器：</p>
+<ul>
+<li>AnnotationConfigApplicationContext()：该构造函数初始化一个空容器，容器不包含任何 Bean 信息，需要在稍后通过调用其 register() 方法注册配置类，并调用 refresh() 方法刷新容器。</li>
+</ul>
+<ul>
+<li>AnnotationConfigApplicationContext(Class&lt;?&gt;… annotatedClasses)：这是最常用的构造函数，通过将涉及到的配置类传递给该构造函数，以实现将相应配置类中的 Bean 自动注册到容器中。</li>
+</ul>
+<ul>
+<li>AnnotationConfigApplicationContext(String… basePackages)：该构造函数会自动扫描以给定的包及其子包下的所有类，并自动识别所有的 Spring Bean，将其注册到容器中。它不但识别标注 @Configuration 的配置类并正确解析，而且同样能识别使用 @Repository、@Service、@Controller、@Component 标注的类。</li>
+</ul>
+<p>除了使用上面第三种类型的构造函数让容器自动扫描 Bean 的配置信息以外，<code>AnnotationConfigApplicationContext</code>还提供了<code>scan()</code>方法，该方法主要用在容器初始化之后动态增加 Bean 至容器中。调用了该方法以后，通常需要立即手动调用<code>refresh()</code>刷新容器，以让变更立即生效。</p>
+<blockquote>
+<p>在一般的项目中，为了结构清晰，通常会根据软件的模块或者结构定义多个 XML 配置文件，然后再定义一个入口的配置文件，该文件使用<code>&lt;import/&gt;</code>将其他的配置文件组织起来。最后只需将该文件传给<code>ClassPathXmlApplicationContext</code>的构造函数即可。<br>针对基于注解的配置，Spring 也提供了类似的功能，只需定义一个入口配置类，并在该类上使用<code>@Import</code> 注解引入其他的配置类即可，最后只需要将该入口类传递给 <code>AnnotationConfigApplicationContext。</code>具体示例如下：</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@Import({BookStoreServiceConfig.class,BookStoreDaoConfig.class})</div><div class="line">public class BookStoreConfig { <span class="keyword">...</span> }</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Spring/">Spring</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Spring/Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置/" data-title="Spring4完全教程（二）：基于注解的Bean配置和IOC容器配置 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Spring/Spring4完全教程（五）：Spring 事务管理/" title="Spring4完全教程（五）：Spring 事务管理">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Spring4完全教程（五）：Spring 事务管理</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Spring/Spring4完全教程（三）：Spring AOP编程/"  title="Spring4完全教程（三）：Spring AOP编程">
+ <strong>NEXT:</strong><br/> 
+ <span>Spring4完全教程（三）：Spring AOP编程
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基于注解的Bean配置方式"><span class="toc-number">1.</span> <span class="toc-text">基于注解的Bean配置方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Repository、@Service、@Controller_和_@Component_将类标识为_Bean"><span class="toc-number">1.1.</span> <span class="toc-text">使用 @Repository、@Service、@Controller 和 @Component 将类标识为 Bean</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@PostConstruct_和_@PreDestroy_指定声明周期"><span class="toc-number">1.2.</span> <span class="toc-text">@PostConstruct 和 @PreDestroy 指定声明周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Autowired_和_@Qualifier_指定_Bean_的自动装配策略"><span class="toc-number">1.3.</span> <span class="toc-text">使用 @Autowired 和 @Qualifier 指定 Bean 的自动装配策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_JSR-250_中的_@Resource_和_@Qualifier_注解自动装配"><span class="toc-number">1.4.</span> <span class="toc-text">使用 JSR-250 中的 @Resource 和 @Qualifier 注解自动装配</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于注解的Spring_IOC容器配置"><span class="toc-number">2.</span> <span class="toc-text">基于注解的Spring IOC容器配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_@Configuration、@ComponentScan和_@Bean_进行IOC容器声明"><span class="toc-number">2.1.</span> <span class="toc-text">使用 @Configuration、@ComponentScan和 @Bean 进行IOC容器声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#@Bean的补充"><span class="toc-number">2.2.</span> <span class="toc-text">@Bean的补充</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AnnotationConfigApplicationContext的补充"><span class="toc-number">2.3.</span> <span class="toc-text">AnnotationConfigApplicationContext的补充</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,545 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Struts2完全教程（2）- OGNL表达式和s标签 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="OGNL
+
+参考资料Struts2学习笔记（13）Struts2中OGNL详解Apache Struts 2 Documentation
+
+Struts2的OGNL
+OGNL是Object Graphic Navigation Language（对象图导航语言）的缩写，它是一个开源项目。 Strut">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Struts2/Struts2完全教程（2）- OGNL表达式和s标签/" title="Struts2完全教程（2）- OGNL表达式和s标签" itemprop="url">Struts2完全教程（2）- OGNL表达式和s标签</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL"><span class="toc-number">1.</span> <span class="toc-text">OGNL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2的OGNL"><span class="toc-number">1.1.</span> <span class="toc-text">Struts2的OGNL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Context"><span class="toc-number">1.2.</span> <span class="toc-text">Context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#值栈"><span class="toc-number">1.3.</span> <span class="toc-text">值栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何获取值栈中的属性值"><span class="toc-number">1.4.</span> <span class="toc-text">如何获取值栈中的属性值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从对象栈获取属性"><span class="toc-number">1.5.</span> <span class="toc-text">从对象栈获取属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从Map栈获取属性"><span class="toc-number">1.6.</span> <span class="toc-text">从Map栈获取属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么可以使用EL表达式获取属性值？"><span class="toc-number">1.7.</span> <span class="toc-text">为什么可以使用EL表达式获取属性值？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OGNL的其它用法"><span class="toc-number">1.8.</span> <span class="toc-text">OGNL的其它用法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts2_标签"><span class="toc-number">2.</span> <span class="toc-text">Struts2 标签</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通用标签"><span class="toc-number">2.1.</span> <span class="toc-text">通用标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#表单标签"><span class="toc-number">2.2.</span> <span class="toc-text">表单标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#表单标签的回显"><span class="toc-number">2.3.</span> <span class="toc-text">表单标签的回显</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主题"><span class="toc-number">3.</span> <span class="toc-text">主题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改主题的方法"><span class="toc-number">3.1.</span> <span class="toc-text">修改主题的方法</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="OGNL">OGNL</h2>
+<blockquote>
+<p>参考资料<br><a href="http://www.bkjia.com/webzh/888710.html" target="_blank" rel="external">Struts2学习笔记（13）Struts2中OGNL详解</a><br><a href="http://struts.apache.org/docs/ognl.html" target="_blank" rel="external">Apache Struts 2 Documentation</a></p>
+</blockquote>
+<h3 id="Struts2的OGNL">Struts2的OGNL</h3>
+<p>OGNL是Object Graphic Navigation Language（对象图导航语言）的缩写，它是一个开源项目。 Struts 2框架使用OGNL作为默认的表达式语言。</p>
+<p>下面介绍Struts2使用的OGNL：</p>
+<h3 id="Context">Context</h3>
+<p>OGNL 有一个上下文（Context）概念，说白了上下文就是一个MAP结构，它实现了<code>java.utils.Map</code>接口。在Struts2中上下文的实现为<code>ActionContext</code>，下面是上下文的结构示意图：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--application</span></div><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--session</span></div><div class="line">context map---<span class="string">|</span></div><div class="line">              <span class="string">|--value stack(root)</span></div><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--action (the current action)</span></div><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--request</span></div><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--parameters</span></div><div class="line">              <span class="string">|</span></div><div class="line">              <span class="string">|--attr (searches page, request, session, then application scopes)</span></div><div class="line">              <span class="string">|</span></div></pre></td></tr></table></figure>
+
+<p>上下文中除了application、session、request、parameters和attr外，还包括了value stack和current action这两个重要的对象。</p>
+<h3 id="值栈">值栈</h3>
+<p>OGNL还有一个<strong>ValueStack，称为值栈</strong>。值栈在Struts2中的实现类为 <code>OgnlValueStack</code>。值栈中有两个逻辑部分，分别是context和root，其中：</p>
+<ul>
+<li>context是上下文对象，<strong>下面称它为Map栈</strong>，它的类型为<code>OgnlContext</code>，其实<strong>它的本质是就是<code>ActionContext</code>的一个引用</strong>；</li>
+</ul>
+<ul>
+<li>root称为值栈的根对象，<strong>下面称它为对象栈</strong>，它的类型为<code>CompoundRoot</code>，它是继承了<code>ArrayList</code>实现的一个栈结构。<strong> 对象栈中的栈顶是当前Action类对象（可以通过<s:debug>标签查看）。</s:debug></strong></li>
+</ul>
+<blockquote>
+<p>OgnlValueStack和ActionContext的关系：<br>从前面的分析可知，Struts源码中，<code>OgnlValueStack</code>可以通过<code>ActionContext</code>获取，同时 <code>ActionContext</code>也是 <code>OgnlValueStack</code> 的一个成员。</p>
+</blockquote>
+<p><strong>区分值栈、对象栈和Map栈的概念，其中值栈包含了对象栈和Map栈。</strong></p>
+<h3 id="如何获取值栈中的属性值">如何获取值栈中的属性值</h3>
+<p>Struts2是<strong>利用s:property标签和OGNL表达式获取值栈中的属性值</strong>。</p>
+<p>注意，由于值栈有2部分组成，因此获取属性值分为：</p>
+<ul>
+<li>对于对象栈，是获取栈中某个对象的属性。</li>
+</ul>
+<ul>
+<li>对于Map栈，是获取application、session等对象中的属性值。</li>
+</ul>
+<h3 id="从对象栈获取属性">从对象栈获取属性</h3>
+<p><strong>首先要知道的是，Struts2 处理请求是会把当前Action类放置到对象栈的栈顶，所以这时候可以直接获取Action类中属性的值！</strong></p>
+<p>OGNL表达式和s:property标签表示的基本格式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"[n].propertyName"</span>&gt;</div><div class="line">或者</div><div class="line">&lt;s:property <span class="keyword">value</span> =<span class="string">"[n]['propertyName']"</span>&gt;</div><div class="line">或者</div><div class="line">&lt;s:property <span class="keyword">value</span> =<span class="string">'[n]["propertyName"]'</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>其中栈顶对象的下标为<code>[0]</code>，同时这个下标也可以省略，即简写为<code>&lt;s:property value=&quot;propertyName&quot;&gt;</code>。</p>
+<p>当不声明下标时，获取对象的顺序为：<br>先从 栈顶中查询属性值，若不存在则从第二个对象寻找，如果没有找到就从第三个对象寻找，依次往下访问，直到找到为止。</p>
+<p>可以在Action类中通过修改对象栈的栈顶对象的方式测试，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="variable">ActionContext</span>.get<span class="variable">ValueStack</span>().put...</div></pre></td></tr></table></figure>
+
+<p>此时在JSP中使用<code>&lt;s:debug/&gt;</code>标签显示值栈中的内容为：</p>
+<h3 id="从Map栈获取属性">从Map栈获取属性</h3>
+<p>此时需要使用<code>#</code>符号标注命名空间。其中：</p>
+<ul>
+<li><code>application</code>： 用于访问 ServletContext对象，例如<code>&lt;s:property value=&quot; #application.userName &quot;/&gt;</code>相当于调用<code>ServletContext. getAttribute(&quot; userName &quot;)</code>， 对应的EL表达式写法为<code>\${applicationScope.userName}</code>；</li>
+</ul>
+<ul>
+<li><code>session</code>：用于访问HttpSession对象，例如<code>&lt;s:property value=&quot; #session.userName &quot;/&gt;</code>相当于调用<code>HttpSession .getAttribute(&quot;userName&quot;)</code> ， 对应的EL表达式写法为<code>\${sessionScope.userName}</code> ；</li>
+</ul>
+<ul>
+<li><code>request</code>： 用于访问 HttpServletRequest对象，例如<code>&lt;s:property value=&quot; #request.userName &quot;/&gt;</code>相当于调用<code>HttpServletRequest .getAttribute(&quot;userName&quot;)</code> ， 对应的EL表达式写法为<code>\${requestScope.userName}</code> ；</li>
+</ul>
+<ul>
+<li><code>parameters</code>：用于访问HTTP的请求参数，例如<code>&lt;s:property value=&quot; #parameters.userName &quot;/&gt;</code>相当于调用<code>request.getParameter(&quot;username&quot;)</code> ， 对应的EL表达式写法为<code>\${param.userName}</code> ；</li>
+</ul>
+<ul>
+<li><code>attr</code>：用于按page-&gt;request-&gt;session-&gt;application顺序访问属性。</li>
+</ul>
+<p>如果Map中设置的属性是对象，还可以一级一级的往下获取，例如：<code>&lt;s:property value=&quot;#application.product.productName&quot;/&gt;</code>。</p>
+<p><strong>注意，如果直接在Action类中设置属性到Map栈，则这时候直接使用 <code>&lt;s:property value=&quot;#key&quot;/&gt;</code>的方式获取</strong>，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 某个Action类中</span></div><div class="line">ActionContext.getContext().put(<span class="string">"hehe"</span>, <span class="string">"xxxxx"</span>);</div></pre></td></tr></table></figure>
+
+<p>这时候在JSP中：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"#hehe"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="为什么可以使用EL表达式获取属性值？">为什么可以使用EL表达式获取属性值？</h3>
+<p>Struts2 的项目中，JSP页面最后同样是解析为Servlet代码，但是Struts2 会把请求对象封装为<code>StrutsRequestWrapper</code>类型，查看它的继承关系可以发现它是<code>HttpServletRequest</code>的实现类。<strong>因此在执行解析后的Servlet中的 <code>_jspService</code>方法时，会把这个封装类作为参数传递进去。</strong></p>
+<p>然后引擎在EL表达式进行解析（这里可以参考” EL和JSTL”里面相关内容的介绍 ），最后获取值的时候是调用 <code>StrutsRequestWrapper</code> 对象的<code>getAttribute</code>方法获获取的，这个方法的源码为 ：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//  StrutsRequestWrapper</span></div><div class="line"><span class="keyword">public</span> <span class="built_in">Object</span> getAttribute(<span class="built_in">String</span> key) {                                                       </div><div class="line">    <span class="comment">// ……省略</span></div><div class="line">    ActionContext ctx = ActionContext.getContext();                                            </div><div class="line">    <span class="built_in">Object</span> attribute = <span class="keyword">super</span>.getAttribute(key);                                                </div><div class="line">    <span class="keyword">if</span> (ctx != <span class="literal">null</span> && attribute == <span class="literal">null</span>) {                                                    </div><div class="line">        <span class="built_in">boolean</span> alreadyIn = isTrue((<span class="built_in">Boolean</span>) ctx.get(REQUEST_WRAPPER_GET_ATTRIBUTE));          </div><div class="line">        <span class="comment">// 不带#的访问                     </span></div><div class="line">        <span class="keyword">if</span> (!alreadyIn && !key.contains(<span class="string">"#"</span>)) {                                                </div><div class="line">            <span class="keyword">try</span> {                                                                              </div><div class="line">                <span class="comment">// If not found, then try the ValueStack                                       </span></div><div class="line">                ctx.put(REQUEST_WRAPPER_GET_ATTRIBUTE, <span class="built_in">Boolean</span>.TRUE);                          </div><div class="line">                ValueStack stack = ctx.getValueStack();                                        </div><div class="line">                <span class="keyword">if</span> (stack != <span class="literal">null</span>) {                                                           </div><div class="line">                    attribute = stack.findValue(key);                                          </div><div class="line">                }                                                                              </div><div class="line">            } <span class="keyword">finally</span> {                                                                        </div><div class="line">                ctx.put(REQUEST_WRAPPER_GET_ATTRIBUTE, <span class="built_in">Boolean</span>.FALSE);                         </div><div class="line">            }                                                                                  </div><div class="line">        }                                                                                      </div><div class="line">    }                                                                                          </div><div class="line">    <span class="keyword">return</span> attribute;                                                                          </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>（可以通过调试JSP页面的EL表达式确定）。<br><strong>所以，在JSP页面中，EL表达式： <code>\${requestScope.productName}</code>并不是真正从request域中获取属性值，而是从值栈ValueStack中获取的！</strong></p>
+<p><strong>这也可以得出一个结论，一般在当前页面使用s标签设置的临时变量都会放置在requestScope中，因为只有request进行了封装。</strong></p>
+<h3 id="OGNL的其它用法">OGNL的其它用法</h3>
+<p>OGNL除了获取栈顶或者Map栈中的属性值，还可以进行以下的操作：</p>
+<ul>
+<li>调用任何一个 Java 类里的<strong>静态字段或静态方法</strong>。但是注意， 默认情况下, Struts2 不允许调用Java类静态方法,  需要重新设置<code>struts.ognl.allowStaticMethodAccess</code>标记变量的值为 true才可以。<br>调用静态字段或方法需要使用如下所示的语法：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="variable">@fullyQualifiedClassName</span><span class="variable">@fieldName</span> -- 调用静态字段</div><div class="line"><span class="variable">@fullyQualifiedClassName</span><span class="variable">@methodName</span>(argumentList) -- 调用静态方法</div></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="keyword">s</span>:property value=<span class="string">"<span class="variable">@java</span>.lang.Math<span class="variable">@PI</span>"</span>/&gt;</div><div class="line"></div><div class="line">&lt;<span class="keyword">s</span>:property value=<span class="string">"<span class="variable">@java</span>.lang.Math<span class="variable">@cos</span>(0)"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>调用被压入到 ValueStack 栈的对象上的公共字段和方法。</li>
+</ul>
+<p>示例，假如栈顶中有getProductName()方法，session域对象中有product对象，该对象有 getProductName，则可以这样调用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"getProductName()"</span>/&gt;</div><div class="line"></div><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"#session.product.getProductName()"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>访问数组类型的属性，例如可以获取length属性或者数组元素。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%                                                                   </span></div><div class="line">    <span class="built_in">String</span>[] seasons = <span class="keyword">new</span> <span class="built_in">String</span>[]{<span class="string">"spring"</span>, <span class="string">"summer"</span>, <span class="string">"autumn"</span>, <span class="string">"win</span></div><div class="line">    request.setAttribute("seasons<span class="string">", seasons);                        </span></div><div class="line">%&gt;                                                                   </div><div class="line">获取数组长度：<span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.seasons.length"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span>            </div><div class="line">获取数组元素：<span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.seasons[2]"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+
+
+
+<ul>
+<li>访问 List 类型的属性或者Map类型的属性。它们都可以使用<code>size</code>、<code>size()</code>和<code>isEmpty</code>、<code>isEmpty()</code>这些属性和方法。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%                                                                             </span></div><div class="line">    ArrayList&lt;<span class="built_in">String</span>&gt; colors = <span class="keyword">new</span> ArrayList&lt;<span class="built_in">String</span>&gt;();                        </div><div class="line">    colors.add(<span class="string">"black"</span>);                                                       </div><div class="line">    colors.add(<span class="string">"white"</span>);                                                       </div><div class="line">    colors.add(<span class="string">"red"</span>);                                                         </div><div class="line">    <span class="built_in">request</span>.setAttribute(<span class="string">"colors"</span>, colors);                                                                     </div><div class="line">%&gt;                                                                             </div><div class="line">size()方法或专用关键字 size 的方法查出给定List 的长度：<span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                      </div><div class="line"><span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.colors.size"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                </div><div class="line">或者<span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                                        </div><div class="line"><span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.colors.size()"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                </div><div class="line">同样可以通过使用 isEmpty() 方法或专用关键字 isEmpty 来得知给定的 List 是不是空:                          </div><div class="line"><span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.color.isEmpty"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                              </div><div class="line">还可以获取List中的元素：                                                                 </div><div class="line"><span class="tag">&lt;<span class="title">s:property</span> <span class="attribute">value</span>=<span class="value">"#request.colors[0]"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li>可以直接使用OGNL构造List或者Map集合。<br>例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">使用OGNL创建一个List：                                     </div><div class="line">&lt;<span class="attribute">s</span>:property value=<span class="string">"{'red', 'black', 'blue'}"</span><span class="regexp">/&gt;&lt;br/</span>&gt; </div><div class="line">使用OGNL创建一个Map：                                      </div><div class="line">&lt;<span class="attribute">s</span>:property value=<span class="string">"<span class="subst">#{<span class="number">1</span>:<span class="string">'male'</span>, <span class="number">0</span>: <span class="string">'female'</span>}</span>"</span><span class="regexp">/&gt;&lt;br/</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>注意创建Map集合的时候前面加上<code>#</code>符号。</p>
+<blockquote>
+<p>悬疑问题<br>为什么EL表达式可以实现OGNL和s:property标签的作用获取属性值？</p>
+</blockquote>
+<h2 id="Struts2_标签">Struts2 标签</h2>
+<p>Struts2 也提供了大量的标签，可以大致分为两类：<strong>通用标签和表单标签。</strong></p>
+<h3 id="通用标签">通用标签</h3>
+<ul>
+<li>property：前面已经介绍过，分为从对象栈获取属性值和从Map栈获取属性值。同时许多情况下可以使用EL表达式简化。</li>
+</ul>
+<ul>
+<li>url：动态地创建一个URL。<br>下面分别对该标签的属性进行说：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- value：直接提供URL值。var：变量名。 --&gt;</span>                                      </div><div class="line"><span class="tag">&lt;<span class="title">s:url</span> <span class="attribute">value</span>=<span class="value">"/testURL"</span> <span class="attribute">var</span>=<span class="value">"url1"</span>&gt;</span>                                   </div><div class="line">    <span class="tag">&lt;<span class="title">s:param</span> <span class="attribute">name</span>=<span class="value">"name"</span> <span class="attribute">value</span>=<span class="value">"1001"</span>&gt;</span><span class="tag">&lt;/<span class="title">s:param</span>&gt;</span>                      </div><div class="line"><span class="tag">&lt;/<span class="title">s:url</span>&gt;</span>                                                              </div><div class="line">${requestScope.url1 }                                                 </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                                 </div><div class="line"><span class="comment">&lt;!-- 注意，标签自动对value值为字符串的属进行OGNL解析 --&gt;</span>                                 </div><div class="line"><span class="tag">&lt;<span class="title">s:url</span> <span class="attribute">value</span>=<span class="value">"/testURL"</span> <span class="attribute">var</span>=<span class="value">"url2"</span>&gt;</span>                                   </div><div class="line">    <span class="tag">&lt;<span class="title">s:param</span> <span class="attribute">name</span>=<span class="value">"name"</span> <span class="attribute">value</span>=<span class="value">"username"</span>&gt;</span><span class="tag">&lt;/<span class="title">s:param</span>&gt;</span>                  </div><div class="line"><span class="tag">&lt;/<span class="title">s:url</span>&gt;</span>                                                              </div><div class="line">${requestScope.url2 }                                                 </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                                 </div><div class="line"><span class="comment">&lt;!-- 若不希望自定解析，可以加上单引号 --&gt;</span>                                             </div><div class="line"><span class="tag">&lt;<span class="title">s:url</span> <span class="attribute">value</span>=<span class="value">"/testURL"</span> <span class="attribute">var</span>=<span class="value">"url3"</span>&gt;</span>                                   </div><div class="line">    <span class="tag">&lt;<span class="title">s:param</span> <span class="attribute">name</span>=<span class="value">"name"</span> <span class="attribute">value</span>=<span class="value">"'username'"</span>&gt;</span><span class="tag">&lt;/<span class="title">s:param</span>&gt;</span>                </div><div class="line"><span class="tag">&lt;/<span class="title">s:url</span>&gt;</span>                                                              </div><div class="line">${requestScope.url3 }                                                 </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                                 </div><div class="line"><span class="comment">&lt;!-- action和method：产生struts格式的URL。 --&gt;</span>                                </div><div class="line"><span class="tag">&lt;<span class="title">s:url</span> <span class="attribute">action</span>=<span class="value">"section04.UserAction"</span> <span class="attribute">method</span>=<span class="value">"execute"</span> <span class="attribute">var</span>=<span class="value">"url4"</span>/&gt;</span>    </div><div class="line">${requestScope.url4 }                                                 </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                                                 </div><div class="line"><span class="comment">&lt;!-- includeParams属性：自动把请求URL的参数设置到新创建的URL中 --&gt;</span>                          </div><div class="line"><span class="tag">&lt;<span class="title">s:url</span> <span class="attribute">value</span>=<span class="value">"/testURL"</span> <span class="attribute">includeParams</span>=<span class="value">"get"</span>/&gt;</span>                         </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<p>总结上面的一个小点：<strong>s标签中value属性一般都会自动进行OGNL解析，若不希望自动解析，可以加上单引号；还有的情况需要强制解析，此时加上<code>%{}</code>符号即可。</strong></p>
+<ul>
+<li>if-elseif-else：Struts2 的if-elseif-else标签比c:if更强大。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="symbol">s:</span><span class="keyword">if</span> test=<span class="string">"age &gt; 35"</span>&gt;      </div><div class="line">    中年人                     </div><div class="line"><span class="input"><span class="prompt">&lt;/s:if&gt;</span>                     </span></div><div class="line">&lt;<span class="symbol">s:</span>elseif test=<span class="string">"age &gt; 18"</span>&gt;  </div><div class="line">    年轻人                     </div><div class="line"><span class="input"><span class="prompt">&lt;/s:elseif&gt;</span>                 </span></div><div class="line"><span class="input"><span class="prompt">&lt;s:else&gt;</span>                    </span></div><div class="line">    未成年                     </div><div class="line">&lt;<span class="regexp">/s:else&gt;</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li>iterator：标签用来遍历一个数组、Collection、Map或List，并把这个可遍历对象里的每一个元素依次<strong>压入和弹出 ValueStack 栈</strong>。还提供了status属性，这个属性比c:forEach标签中的varStatus有更多的属性值，包括index、count、first、last、even、odd和modulus。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&lt;%                                                                                  </div><div class="line">    <span class="type">List</span>&lt;<span class="type">Person</span>&gt; persons = new <span class="type">ArrayList</span>&lt;<span class="type">Person</span>&gt;();                                 </div><div class="line">    persons.add(new <span class="type">Person</span>(<span class="string">"aa"</span>, <span class="number">20</span>));                                              </div><div class="line">    persons.add(new <span class="type">Person</span>(<span class="string">"bb"</span>, <span class="number">21</span>));                                              </div><div class="line">    persons.add(new <span class="type">Person</span>(<span class="string">"cc"</span>, <span class="number">22</span>));                                              </div><div class="line">    persons.add(new <span class="type">Person</span>(<span class="string">"dd"</span>, <span class="number">23</span>));                                              </div><div class="line">    persons.add(new <span class="type">Person</span>(<span class="string">"ee"</span>, <span class="number">24</span>));                                              </div><div class="line">    request.setAttribute(<span class="string">"persons"</span>, persons);                                       </div><div class="line">%&gt;                                                                                  </div><div class="line">&lt;s:<span class="keyword">iterator</span> value=<span class="string">"#request.persons"</span> status=<span class="string">"status"</span>&gt;                               </div><div class="line">    index:&lt;s:property value=<span class="string">"#status.index"</span>/&gt;,                                      </div><div class="line">    count:&lt;s:property value=<span class="string">"#status.count"</span>/&gt;,                                      </div><div class="line">    name:&lt;s:property value=<span class="string">"name"</span>/&gt;,                                                </div><div class="line">    age:&lt;s:property value=<span class="string">"age"</span>/&gt; &lt;br/&gt;                                             </div><div class="line">&lt;/s:<span class="keyword">iterator</span>&gt;                                                                       </div><div class="line">&lt;br/&gt;                                                                               </div><div class="line">&lt;br/&gt;                                                                               </div><div class="line">也可以使用<span class="type">EL</span>表达式：&lt;br/&gt;                                                                    </div><div class="line">&lt;s:<span class="keyword">iterator</span> value=<span class="string">"#request.persons"</span> status=<span class="string">"status"</span>&gt;                               </div><div class="line">    index:${status.index }, count:${status.count }, name:${name}, age:${age } &lt;br/&gt; </div><div class="line">&lt;/s:<span class="keyword">iterator</span>&gt;</div></pre></td></tr></table></figure>
+
+
+
+
+<ul>
+<li>其它标签参考PPT的内容。</li>
+</ul>
+<h3 id="表单标签">表单标签</h3>
+<p>使用表单标签的好处是可以<strong>自动回显</strong>。而 表单回显功能的其实是把栈顶对象的属性设置到相应的标签中，所以若手动修改栈顶对象，则回显值会改变。</p>
+<ul>
+<li>form：不修改主题的情况下自动格式化。<strong>可以查看生成的HTML源码了解转换的结果。</strong><br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;s:form <span class="variable">action=</span><span class="string">"submitForm.action"</span> <span class="variable">method=</span><span class="string">"post"</span>&gt;    </div><div class="line">    &lt;s:hidden <span class="variable">name=</span><span class="string">"userId"</span> <span class="variable">label=</span><span class="string">"userId"</span>/&gt;         </div><div class="line">    &lt;s:textfield <span class="variable">name=</span><span class="string">"username"</span> <span class="variable">label=</span><span class="string">"username"</span>/&gt;  </div><div class="line">    &lt;s:password <span class="variable">name=</span><span class="string">"password"</span> <span class="variable">label=</span><span class="string">"password"</span>/&gt;   </div><div class="line">    &lt;s:textfield <span class="variable">name=</span><span class="string">"age"</span> <span class="variable">label=</span><span class="string">"age"</span>/&gt;            </div><div class="line">    &lt;s:textarea <span class="variable">name=</span><span class="string">"desc"</span> <span class="variable">label=</span><span class="string">"desc"</span>/&gt;           </div><div class="line">    &lt;s:submit <span class="variable">label=</span><span class="string">"提交"</span>/&gt;                           </div><div class="line">&lt;/s:form&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>checkbox：checkbox除了发送本身声明的属性外，还会发送一个<strong>值为true的隐藏域</strong>。<br>例如JSP中：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;s:checkbox <span class="variable">name=</span><span class="string">"married"</span> <span class="variable">label=</span><span class="string">"married"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<p>此时解析后的源码为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;input <span class="variable">type=</span><span class="string">"checkbox"</span> <span class="variable">name=</span><span class="string">"married"</span> <span class="variable">value=</span><span class="string">"true"</span> <span class="variable">checked=</span><span class="string">"checked"</span> <span class="variable">id=</span><span class="string">"submitForm_action_married"</span>/&gt;</div><div class="line">&lt;input <span class="variable">type=</span><span class="string">"hidden"</span> <span class="variable">id=</span><span class="string">"__checkbox_submitForm_action_married"</span> <span class="variable">name=</span><span class="string">"__checkbox_married"</span> <span class="variable">value=</span><span class="string">"true"</span> /&gt;</div></pre></td></tr></table></figure>
+
+<p><strong>这就确保了无论什么情况，checkbox对应的属性都会被正确赋值。 </strong> 例如该Action类中设置对应的属性为true：<code>private boolean married = true;</code>，但提交是checkbox并没有勾选，那么最后结果也是没有勾选！</p>
+<ul>
+<li>radio、select、checkboxlist：这三个标签可以操作<strong>String、数组、Enumeration、Iterator、Map或 Collection类型的数据，或者直接创建的List和Map数据</strong>。<br>下面测试radio：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&lt;%-- 直接在标签中定义List和Map数据 --%&gt;                                                                    </div><div class="line">&lt;s:radio <span class="variable">name=</span><span class="string">"city1"</span> <span class="variable">list=</span><span class="string">"{'Beijing', 'Tianjin', 'Shanghai'}"</span> <span class="variable">label=</span><span class="string">"city"</span>/&gt;                 </div><div class="line">&lt;s:radio <span class="variable">name=</span><span class="string">"city2"</span> <span class="variable">list=</span><span class="string">"#{'1':'Beijing', '2':'Tianjin ', '3':'Shanghai'}"</span> <span class="variable">label=</span><span class="string">"city"</span>/&gt;        </div><div class="line"></div><div class="line">&lt;%                                                                                                             </div><div class="line">    City[] <span class="variable">cityArray =</span> new City[]{new City(<span class="number">1</span>, <span class="string">"Beijing"</span>), new City(<span class="number">2</span>, <span class="string">"Tianjin"</span>), new City(<span class="number">3</span>, <span class="string">"Shanghai"</span>)};    </div><div class="line">    request.setAttribute(<span class="string">"cityArray"</span>, cityArray);                                                              </div><div class="line"> </div><div class="line">    List&lt;City&gt; <span class="variable">cityList =</span> new ArrayList&lt;City&gt;();                                                               </div><div class="line">    cityList.add(new City(<span class="number">1</span>, <span class="string">"Beijing"</span>));                                                                      </div><div class="line">    cityList.add(new City(<span class="number">2</span>, <span class="string">"Tianjin"</span>));                                                                      </div><div class="line">    cityList.add(new City(<span class="number">3</span>, <span class="string">"Shanghai"</span>));                                                                     </div><div class="line">    request.setAttribute(<span class="string">"cityList"</span>, cityList);                                                                </div><div class="line"> </div><div class="line">    Map&lt;Integer, City&gt; <span class="variable">cityMap =</span> new HashMap&lt;Integer, City&gt;();                                                 </div><div class="line">    cityMap.put(<span class="number">1</span>, new City(<span class="number">1</span>, <span class="string">"Beijing"</span>));                                                                    </div><div class="line">    cityMap.put(<span class="number">5</span>, new City(<span class="number">2</span>, <span class="string">"Tianjin"</span>));                                                                    </div><div class="line">    cityMap.put(<span class="number">3</span>, new City(<span class="number">3</span>, <span class="string">"Shanghai"</span>));                                                                   </div><div class="line">    request.setAttribute(<span class="string">"cityMap"</span>, cityMap);                                                                  </div><div class="line">%&gt;                                                                                                              </div><div class="line">&lt;%-- 操作数组、List和Map数据 --%&gt;                                                                       </div><div class="line">&lt;s:radio <span class="variable">name=</span><span class="string">"city3"</span> <span class="variable">list=</span><span class="string">"#request.cityArray"</span> <span class="variable">label=</span><span class="string">"city"</span> <span class="variable">listKey=</span><span class="string">"id"</span> <span class="variable">listValue=</span><span class="string">"name"</span>/&gt;    </div><div class="line">&lt;s:radio <span class="variable">name=</span><span class="string">"city4"</span> <span class="variable">list=</span><span class="string">"#request.cityList"</span> <span class="variable">label=</span><span class="string">"city"</span> <span class="variable">listKey=</span><span class="string">"id"</span> <span class="variable">listValue=</span><span class="string">"name"</span>/&gt;     </div><div class="line">&lt;s:radio <span class="variable">name=</span><span class="string">"city5"</span> <span class="variable">list=</span><span class="string">"#request.cityMap"</span> <span class="variable">label=</span><span class="string">"city"</span> <span class="variable">listKey=</span><span class="string">"key"</span> <span class="variable">listValue=</span><span class="string">"value.name"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<p>对于select和checkboxlist也是类似的！</p>
+<ul>
+<li>optgroup：一般作为select的子标签使用。<br>例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">s:select</span> <span class="keyword">list</span>=<span class="string">"{20, 21, 22, 23, 24}"</span> name=<span class="string">"age3"</span> label=<span class="string">"age"</span>&gt;      </div><div class="line">    &lt;<span class="variable">s:optgroup</span> label=<span class="string">"25-30"</span> <span class="keyword">list</span>=<span class="string">"#{21:21, 22:22}"</span>&gt;&lt;/<span class="variable">s:optgroup</span>&gt;  </div><div class="line">&lt;/<span class="variable">s:select</span>&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="表单标签的回显">表单标签的回显</h3>
+<p>这里要注意的是对于checkboxlist标签，需要使用<code>List&lt;?&gt;</code>定义该标签对应的属性，否则无法正确回显！<br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;s:form <span class="variable">action=</span><span class="string">"submitForm.action"</span> <span class="variable">method=</span><span class="string">"post"</span>&gt;                                                            </div><div class="line">    &lt;s:hidden <span class="variable">name=</span><span class="string">"userId"</span> <span class="variable">label=</span><span class="string">"userId"</span>/&gt;                                                                 </div><div class="line">    &lt;s:textfield <span class="variable">name=</span><span class="string">"username"</span> <span class="variable">label=</span><span class="string">"username"</span>/&gt;                                                          </div><div class="line">    &lt;s:password <span class="variable">name=</span><span class="string">"password"</span> <span class="variable">label=</span><span class="string">"password"</span>/&gt;                                                           </div><div class="line">    &lt;s:textarea <span class="variable">name=</span><span class="string">"desc"</span> <span class="variable">label=</span><span class="string">"desc"</span>/&gt;                                                                   </div><div class="line">    &lt;%--checkbox --%&gt;                                                                                        </div><div class="line">    &lt;s:checkbox <span class="variable">name=</span><span class="string">"married"</span> <span class="variable">label=</span><span class="string">"married"</span> /&gt;                                                            </div><div class="line">    &lt;%--radio--%&gt;                                                                                            </div><div class="line">    &lt;s:radio <span class="variable">list=</span><span class="string">"#{'1':'male', '0':'female' }"</span> <span class="variable">name=</span><span class="string">"gender"</span> <span class="variable">label=</span><span class="string">"gender"</span>/&gt;                              </div><div class="line">    &lt;%--checkboxlist --%&gt;                                                                                    </div><div class="line">    &lt;s:checkboxlist <span class="variable">list=</span><span class="string">"#request.cityArray"</span> <span class="variable">listKey=</span><span class="string">"id"</span> <span class="variable">listValue=</span><span class="string">"name"</span> <span class="variable">name=</span><span class="string">"city"</span> <span class="variable">label=</span><span class="string">"city"</span>/&gt;       </div><div class="line">    &lt;%--select --%&gt;                                                                                          </div><div class="line">    &lt;s:select <span class="variable">list=</span><span class="string">"{20, 21, 22, 23, 24}"</span> <span class="variable">name=</span><span class="string">"age"</span> <span class="variable">label=</span><span class="string">"age"</span>/&gt;                                           </div><div class="line">    &lt;s:submit <span class="variable">label=</span><span class="string">"提交"</span>/&gt;                                                                                   </div><div class="line">&lt;/s:form&gt;</div></pre></td></tr></table></figure>
+
+<p>这时候定义的Action类中的属性为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> UserAction {</div><div class="line">    <span class="keyword">private</span> Integer userId;</div><div class="line">    <span class="keyword">private</span> String username;</div><div class="line">    <span class="keyword">private</span> String password;</div><div class="line">    <span class="keyword">private</span> String desc;</div><div class="line">    <span class="keyword">private</span> boolean married = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">private</span> Integer gender;</div><div class="line">    <span class="keyword">private</span> List&lt;Integer&gt; city;</div><div class="line">    <span class="keyword">private</span> Integer age;</div><div class="line">    <span class="comment">// ......省略getter、setter方法和action方法</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="主题">主题</h2>
+<p>Struts2 的标签是有主题的，也就是Struts2会根据标签的主题格式化生成的HTML代码。Struts2有以下几种主题：</p>
+<ul>
+<li>simple：把 UI 标签翻译成最简单的 HTML 对应元素，而且会忽视行标属性；</li>
+<li>xhtml：<strong>是默认的主题</strong>，这个主题的模板通过使用一个布局表格提供了一种自动化的排版机制；</li>
+<li>css_xhtml：这个主题里的模板与 xhtml 主题里的模板很相似, 但它们将使用 css 来进行布局和排版；</li>
+<li>ajax：这个主题里的模板以 xhtml 主题里德模板为基础, 但增加了一些 Ajax 功能。</li>
+</ul>
+<h3 id="修改主题的方法">修改主题的方法</h3>
+<p>可以使用以下几种方法修改主题：</p>
+<ul>
+<li>修改单个标签的主题。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;s:textfield <span class="variable">name=</span><span class="string">"username"</span> <span class="variable">label=</span><span class="string">"username"</span> <span class="variable">theme=</span><span class="string">"simple"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>修改form表单标签的主题，这时候它的子标签的主题都会被修改。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;s:form action=<span class="string">"submitForm.action"</span> <span class="keyword">method</span>=<span class="string">"post"</span> theme=<span class="string">"simple"</span>&gt;</div><div class="line">        &lt;s:hidden name=<span class="string">"userId"</span> label=<span class="string">"userId"</span>/&gt;</div><div class="line">        &lt;s:textfield name=<span class="string">"username"</span> label=<span class="string">"username"</span> /&gt;</div><div class="line">         ......</div><div class="line"></div><div class="line">&lt;/s:form&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>在page、request、session或者application4个JSP域对象中设置主题，对应的域对象中的标签的主题会生效。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="comment">%</span></div><div class="line">    request.set<span class="variable">Attribute</span>(<span class="string">"theme"</span>, <span class="string">"simple"</span>);</div><div class="line"><span class="comment">%&gt;</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li>修改整个项目的主题。也就是可以在项目的struts.xml文件中设置全局的主题，例如： </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="built_in">constant</span> name=<span class="string">"struts.ui.theme"</span> <span class="built_in">value</span>=<span class="string">"simple"</span>&gt;&lt;/<span class="built_in">constant</span>&gt;</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Struts2/">Struts2</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Struts2/Struts2完全教程（2）- OGNL表达式和s标签/" data-title="Struts2完全教程（2）- OGNL表达式和s标签 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Android/Android完全教程（三）：持久化-保存数据到SQLite/" title="Android完全教程（三）：持久化-保存数据到SQLite">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Android完全教程（三）：持久化-保存数据到SQLite</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/Struts2/Struts2完全教程（1）- 入门项目详细说明/"  title="Struts2完全教程（1）- 入门项目详细说明">
+ <strong>NEXT:</strong><br/> 
+ <span>Struts2完全教程（1）- 入门项目详细说明
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL"><span class="toc-number">1.</span> <span class="toc-text">OGNL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2的OGNL"><span class="toc-number">1.1.</span> <span class="toc-text">Struts2的OGNL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Context"><span class="toc-number">1.2.</span> <span class="toc-text">Context</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#值栈"><span class="toc-number">1.3.</span> <span class="toc-text">值栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何获取值栈中的属性值"><span class="toc-number">1.4.</span> <span class="toc-text">如何获取值栈中的属性值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从对象栈获取属性"><span class="toc-number">1.5.</span> <span class="toc-text">从对象栈获取属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从Map栈获取属性"><span class="toc-number">1.6.</span> <span class="toc-text">从Map栈获取属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么可以使用EL表达式获取属性值？"><span class="toc-number">1.7.</span> <span class="toc-text">为什么可以使用EL表达式获取属性值？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OGNL的其它用法"><span class="toc-number">1.8.</span> <span class="toc-text">OGNL的其它用法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts2_标签"><span class="toc-number">2.</span> <span class="toc-text">Struts2 标签</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通用标签"><span class="toc-number">2.1.</span> <span class="toc-text">通用标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#表单标签"><span class="toc-number">2.2.</span> <span class="toc-text">表单标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#表单标签的回显"><span class="toc-number">2.3.</span> <span class="toc-text">表单标签的回显</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主题"><span class="toc-number">3.</span> <span class="toc-text">主题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改主题的方法"><span class="toc-number">3.1.</span> <span class="toc-text">修改主题的方法</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

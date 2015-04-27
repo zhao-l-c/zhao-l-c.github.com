@@ -1,0 +1,424 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Buffer的基本用法 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="原文： http://ifeve.com/buffers/
+Buffer的基本用法
+使用Buffer读写数据一般遵循以下四个步骤：
+1.写入数据到Buffer2.调用flip()方法3.从Buffer中读取数据4.调用clear()方法或者compact()方法
+当向buffer写入数据时，buff">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/NIO/Buffer的基本用法/" title="Buffer的基本用法" itemprop="url">Buffer的基本用法</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的基本用法"><span class="toc-number">1.</span> <span class="toc-text">Buffer的基本用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的capacity,position和limit"><span class="toc-number">2.</span> <span class="toc-text">Buffer的capacity,position和limit</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#capacity"><span class="toc-number">2.1.</span> <span class="toc-text">capacity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#position"><span class="toc-number">2.2.</span> <span class="toc-text">position</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#limit"><span class="toc-number">2.3.</span> <span class="toc-text">limit</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的类型"><span class="toc-number">3.</span> <span class="toc-text">Buffer的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的分配"><span class="toc-number">4.</span> <span class="toc-text">Buffer的分配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#向Buffer中写数据"><span class="toc-number">5.</span> <span class="toc-text">向Buffer中写数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#flip方法"><span class="toc-number">5.1.</span> <span class="toc-text">flip方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从Buffer中读取数据"><span class="toc-number">6.</span> <span class="toc-text">从Buffer中读取数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它方法"><span class="toc-number">7.</span> <span class="toc-text">其它方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rewind()方法"><span class="toc-number">7.1.</span> <span class="toc-text">rewind()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#clear()与compact()方法"><span class="toc-number">7.2.</span> <span class="toc-text">clear()与compact()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mark()与reset()方法"><span class="toc-number">7.3.</span> <span class="toc-text">mark()与reset()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#equals()与compareTo()方法"><span class="toc-number">7.4.</span> <span class="toc-text">equals()与compareTo()方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#equals()"><span class="toc-number">7.4.1.</span> <span class="toc-text">equals()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#compareTo()方法"><span class="toc-number">7.4.2.</span> <span class="toc-text">compareTo()方法</span></a></li></ol></li></ol></li></ol>
+		</div>
+		
+		<p>原文： <a href="http://ifeve.com/buffers/" target="_blank" rel="external">http://ifeve.com/buffers/</a></p>
+<h2 id="Buffer的基本用法">Buffer的基本用法</h2>
+<p>使用Buffer读写数据一般遵循以下四个步骤：</p>
+<p>1.写入数据到Buffer<br>2.调用flip()方法<br>3.从Buffer中读取数据<br>4.调用clear()方法或者compact()方法</p>
+<p>当向buffer写入数据时，buffer会记录下写了多少数据。一旦要读取数据，需要通过flip()方法将Buffer从写模式切换到读模式。在读模式下，可以读取之前写入到buffer的所有数据。</p>
+<p>一旦读完了所有的数据，就需要清空缓冲区，让它可以再次被写入。有两种方式能清空缓冲区：调用clear()或compact()方法。clear()方法会清空整个缓冲区。compact()方法只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。</p>
+<p>下面是一个使用Buffer的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">RandomAccessFile aFile = <span class="keyword">new</span> RandomAccessFile(<span class="string">"data/nio-data.txt"</span>, <span class="string">"rw"</span>);</div><div class="line">FileChannel inChannel = aFile.getChannel();</div><div class="line"> </div><div class="line"><span class="comment">//create buffer with capacity of 48 bytes</span></div><div class="line">ByteBuffer buf = ByteBuffer.allocate(<span class="number">48</span>);</div><div class="line"> </div><div class="line"><span class="keyword">int</span> bytesRead = inChannel.read(buf); <span class="comment">//read into buffer.</span></div><div class="line"><span class="keyword">while</span> (bytesRead != -<span class="number">1</span>) {</div><div class="line"> </div><div class="line">  buf.flip();  <span class="comment">//make buffer ready for read</span></div><div class="line"> </div><div class="line">  <span class="keyword">while</span>(buf.hasRemaining()){</div><div class="line">      System.out.print((<span class="keyword">char</span>) buf.get()); <span class="comment">// read 1 byte at a time</span></div><div class="line">  }</div><div class="line"> </div><div class="line">  buf.clear(); <span class="comment">//make buffer ready for writing</span></div><div class="line">  bytesRead = inChannel.read(buf);</div><div class="line">}</div><div class="line">aFile.close();</div></pre></td></tr></table></figure>
+
+
+<h2 id="Buffer的capacity,position和limit">Buffer的capacity,position和limit</h2>
+<p>缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问该块内存。</p>
+<p>为了理解Buffer的工作原理，需要熟悉它的三个属性：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="title">capacity</span></div><div class="line">position</div><div class="line">limit</div></pre></td></tr></table></figure>
+
+<p>position和limit的含义取决于Buffer处在读模式还是写模式。不管Buffer处在什么模式，capacity的含义总是一样的。</p>
+<p>这里有一个关于capacity，position和limit在读写模式中的说明:</p>
+<h3 id="capacity">capacity</h3>
+<p>作为一个内存块，Buffer有一个固定的大小值，也叫“capacity”.你只能往里写capacity个byte、long，char等类型。一旦Buffer满了，需要将其清空（通过读数据或者清除数据）才能继续写数据往里写数据。</p>
+<h3 id="position">position</h3>
+<p>当你写数据到Buffer中时，position表示当前的位置。初始的position值为0.当一个byte、long等数据写到Buffer后， position会向前移动到下一个可插入数据的Buffer单元。position最大可为capacity – 1.</p>
+<p>当读取数据时，也是从某个特定位置读。当将Buffer从写模式切换到读模式，position会被重置为0. 当从Buffer的position处读取数据时，position向前移动到下一个可读的位置。</p>
+<h3 id="limit">limit</h3>
+<p>在写模式下，Buffer的limit表示你最多能往Buffer里写多少数据。 写模式下，limit等于Buffer的capacity。</p>
+<p>当切换Buffer到读模式时， limit表示你最多能读到多少数据。因此，当切换Buffer到读模式时，limit会被设置成写模式下的position值。换句话说，你能读到之前写入的所有数据（limit被设置成已写数据的数量，这个值在写模式下就是position）</p>
+<h2 id="Buffer的类型">Buffer的类型</h2>
+<p>Java NIO 有以下Buffer类型:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="title">ByteBuffer</span></div><div class="line">MappedByteBuffer</div><div class="line">CharBuffer</div><div class="line">DoubleBuffer</div><div class="line">FloatBuffer</div><div class="line">IntBuffer</div><div class="line">LongBuffer</div><div class="line">ShortBuffer</div></pre></td></tr></table></figure>
+
+
+<p>如你所见，这些Buffer类型代表了不同的数据类型。换句话说，就是可以通过char，short，int，long，float 或 double类型来操作缓冲区中的字节。</p>
+<h2 id="Buffer的分配">Buffer的分配</h2>
+<p>要想获得一个Buffer对象首先要进行分配。 每一个Buffer类都有一个allocate方法。下面是一个分配48字节capacity的ByteBuffer的例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ByteBuffer buf = ByteBuffer.allocate(<span class="number">48</span>);</div></pre></td></tr></table></figure>
+
+
+<p>这是分配一个可存储1024个字符的CharBuffer：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CharBuffer buf = CharBuffer.allocate(<span class="number">1024</span>);</div></pre></td></tr></table></figure>
+
+
+<h2 id="向Buffer中写数据">向Buffer中写数据</h2>
+<p>写数据到Buffer有两种方式：</p>
+<p>从Channel写到Buffer。<br>通过Buffer的put()方法写到Buffer里。<br>从Channel写到Buffer的例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> bytesRead = inChannel.read(buf); <span class="comment">//read into buffer.</span></div></pre></td></tr></table></figure>
+
+
+<p>通过put方法写Buffer的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">buf.put(<span class="number">127</span>);</div></pre></td></tr></table></figure>
+
+<p>put方法有很多版本，允许你以不同的方式把数据写入到Buffer中。例如， 写到一个指定的位置，或者把一个字节数组写入到Buffer。</p>
+<h3 id="flip方法">flip方法</h3>
+<p>flip方法将Buffer从写模式切换到读模式。调用flip()方法会将position设回0，并将limit设置成之前position的值。</p>
+<p>换句话说，position现在用于标记读的位置，limit表示之前写进了多少个byte、char等 —— 现在能读取多少个byte、char等。</p>
+<h2 id="从Buffer中读取数据">从Buffer中读取数据</h2>
+<p>从Buffer中读取数据有两种方式：</p>
+<p>从Buffer读取数据到Channel。<br>使用get()方法从Buffer中读取数据。<br>从Buffer读取数据到Channel的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//read from buffer into channel.</span></div><div class="line"><span class="keyword">int</span> bytesWritten = inChannel.write(buf);</div></pre></td></tr></table></figure>
+
+
+<p>使用get()方法从Buffer中读取数据的例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">byte</span> aByte = buf.get();</div></pre></td></tr></table></figure>
+
+<p>get方法有很多版本，允许你以不同的方式从Buffer中读取数据。例如，从指定position读取，或者从Buffer中读取数据到字节数组。</p>
+<h2 id="其它方法">其它方法</h2>
+<h3 id="rewind()方法">rewind()方法</h3>
+<p>Buffer.rewind()将position设回0，所以你可以重读Buffer中的所有数据。limit保持不变，仍然表示能从Buffer中读取多少个元素（byte、char等）。</p>
+<h3 id="clear()与compact()方法">clear()与compact()方法</h3>
+<p>一旦读完Buffer中的数据，需要让Buffer准备好再次被写入。可以通过clear()或compact()方法来完成。</p>
+<p>如果调用的是clear()方法，position将被设回0，limit被设置成 capacity的值。换句话说，Buffer 被清空了。Buffer中的数据并未清除，只是这些标记告诉我们可以从哪里开始往Buffer里写数据。</p>
+<p>如果Buffer中有一些未读的数据，调用clear()方法，数据将“被遗忘”，意味着不再有任何标记会告诉你哪些数据被读过，哪些还没有。</p>
+<p>如果Buffer中仍有未读的数据，且后续还需要这些数据，但是此时想要先先写些数据，那么使用compact()方法。</p>
+<p>compact()方法将所有未读的数据拷贝到Buffer起始处。然后将position设到最后一个未读元素正后面。limit属性依然像clear()方法一样，设置成capacity。现在Buffer准备好写数据了，但是不会覆盖未读的数据。</p>
+<h3 id="mark()与reset()方法">mark()与reset()方法</h3>
+<p>通过调用Buffer.mark()方法，可以标记Buffer中的一个特定position。之后可以通过调用Buffer.reset()方法恢复到这个position。<br>这样就能对某些位置之间的数据进行反复操作，例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">buffer.mark(); <span class="comment">// 设置一个标识位</span></div><div class="line"><span class="comment">// 进行其它一些列的操作</span></div><div class="line">buffer.reset();  <span class="comment">//position重设为标识位的位置</span></div></pre></td></tr></table></figure>
+
+
+<h3 id="equals()与compareTo()方法">equals()与compareTo()方法</h3>
+<p>可以使用equals()和compareTo()方法两个Buffer。</p>
+<h4 id="equals()">equals()</h4>
+<p>当满足下列条件时，表示两个Buffer相等：</p>
+<p>有相同的类型（byte、char、int等）。<br>Buffer中剩余的byte、char等的个数相等。<br>Buffer中所有剩余的byte、char等都相同。<br>如你所见，equals只是比较Buffer的一部分，不是每一个在它里面的元素都比较。实际上，它只比较Buffer中的剩余元素。</p>
+<h4 id="compareTo()方法">compareTo()方法</h4>
+<p>compareTo()方法比较两个Buffer的剩余元素(byte、char等)， 如果满足下列条件，则认为一个Buffer“小于”另一个Buffer：</p>
+<p>第一个不相等的元素小于另一个Buffer中对应的元素 。<br>所有元素都相等，但第一个Buffer比另一个先耗尽(第一个Buffer的元素个数比另一个少)。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/NIO/">NIO</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/NIO/Buffer的基本用法/" data-title="Buffer的基本用法 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/NIO/Channel to Channel/" title="Channel to Channel">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Channel to Channel</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/MyBatis/MyBatis教程（二）/"  title="MyBatis教程（二）">
+ <strong>NEXT:</strong><br/> 
+ <span>MyBatis教程（二）
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的基本用法"><span class="toc-number">1.</span> <span class="toc-text">Buffer的基本用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的capacity,position和limit"><span class="toc-number">2.</span> <span class="toc-text">Buffer的capacity,position和limit</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#capacity"><span class="toc-number">2.1.</span> <span class="toc-text">capacity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#position"><span class="toc-number">2.2.</span> <span class="toc-text">position</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#limit"><span class="toc-number">2.3.</span> <span class="toc-text">limit</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的类型"><span class="toc-number">3.</span> <span class="toc-text">Buffer的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Buffer的分配"><span class="toc-number">4.</span> <span class="toc-text">Buffer的分配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#向Buffer中写数据"><span class="toc-number">5.</span> <span class="toc-text">向Buffer中写数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#flip方法"><span class="toc-number">5.1.</span> <span class="toc-text">flip方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从Buffer中读取数据"><span class="toc-number">6.</span> <span class="toc-text">从Buffer中读取数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它方法"><span class="toc-number">7.</span> <span class="toc-text">其它方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rewind()方法"><span class="toc-number">7.1.</span> <span class="toc-text">rewind()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#clear()与compact()方法"><span class="toc-number">7.2.</span> <span class="toc-text">clear()与compact()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mark()与reset()方法"><span class="toc-number">7.3.</span> <span class="toc-text">mark()与reset()方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#equals()与compareTo()方法"><span class="toc-number">7.4.</span> <span class="toc-text">equals()与compareTo()方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#equals()"><span class="toc-number">7.4.1.</span> <span class="toc-text">equals()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#compareTo()方法"><span class="toc-number">7.4.2.</span> <span class="toc-text">compareTo()方法</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

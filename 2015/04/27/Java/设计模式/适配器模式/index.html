@@ -1,0 +1,369 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>适配器模式 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="概述
+适配器模式（adapter pattern），属于结构型模式，有时候也称包装样式或者包装。
+实现方式
+适配器模式有2种实现方式，一种是类适配器模式，即实现类继承一个父类并实现一个接口类，然后通过调用父类的方法去完成重写接口的方法。另一种是对象适配模式，即实现类只实现一个接口类，然后把另一个类作">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/设计模式/适配器模式/" title="适配器模式" itemprop="url">适配器模式</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现方式"><span class="toc-number">2.</span> <span class="toc-text">实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器模式和对象适配器模式"><span class="toc-number">2.1.</span> <span class="toc-text">类适配器模式和对象适配器模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式在API中的示例"><span class="toc-number">3.</span> <span class="toc-text">适配器模式在API中的示例</span></a></li></ol>
+		</div>
+		
+		<h2 id="概述">概述</h2>
+<p>适配器模式（adapter pattern），属于结构型模式，有时候也称包装样式或者包装。</p>
+<h2 id="实现方式">实现方式</h2>
+<p>适配器模式有2种实现方式，一种是类适配器模式，即实现类继承一个父类并实现一个接口类，然后通过调用父类的方法去完成重写接口的方法。<br>另一种是对象适配模式，即实现类只实现一个接口类，然后把另一个类作为实现类的属性，通过调用该属性的方法完成重写接口的方法。</p>
+<h3 id="类适配器模式和对象适配器模式">类适配器模式和对象适配器模式</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line">* 适配器模式代码示例</div><div class="line">*/</div><div class="line">interface Target {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span>();</div><div class="line">}</div><div class="line"> </div><div class="line">class Adaptee {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span>() {</div><div class="line">        System.out.println(<span class="string">"Adaptee request..."</span>);</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="comment">// 类适配器模式</span></div><div class="line">class Adaptar extends Adaptee implements Target {</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span>() {</div><div class="line">        <span class="comment">// 通过调用父类的方法完成本类重写方法</span></div><div class="line">        <span class="keyword">super</span>.request();</div><div class="line">        <span class="comment">// 其它操作...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="comment">// 对象适配器模式</span></div><div class="line">class Adapter2 implements Target {</div><div class="line">    <span class="keyword">private</span> Adaptee adaptee;</div><div class="line">    <span class="keyword">public</span> <span class="title">Adapter2</span>(Adaptee adaptee) {</div><div class="line">        <span class="keyword">this</span>.adaptee = adaptee;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span>() {</div><div class="line">        <span class="comment">// 通过调用本类属性完成重写方法</span></div><div class="line">        adaptee.request();</div><div class="line">        <span class="comment">// 其它操作...</span></div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="适配器模式在API中的示例">适配器模式在API中的示例</h2>
+<p>在Java的API中有2个类用到了适配器模式中的对象适配器，分别是<code>InputStreamReader</code>和<code>OutputStreamWriter</code>。<br>下面从<code>InputStreamReader</code>分析，这是它的源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InputStreamReader</span> <span class="keyword">extends</span> <span class="title">Reader</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> StreamDecoder sd;</div><div class="line">   </div><div class="line">    <span class="comment">// 构造函数......</span></div><div class="line">        </div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span>() <span class="keyword">throws</span> IOException {</div><div class="line">        <span class="keyword">return</span> sd.read();</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 其它方法......</span></div></pre></td></tr></table></figure>
+
+<p>从上面看到，<code>InputStreamReader</code>中的方法都是通过私有属性<code>StreamDecoder</code>实现的，而这个<code>StreamDecoder</code>继承了<code>Reader</code>类，<br>并拥有<code>InputStream</code>类型的属性。<br>所以<code>InputStreamReader</code>、<code>InputStream</code>和<code>Reader</code>分别是适配器模式中的3个角色，而<code>StreamDecoder</code>则是因为从byte到char需要经过编码。</p>
+<p>对于<code>OutputStreamWriter</code>这个类的分析也类似，这里不再累述。</p>
+<p>最后补充一点IO的东西，<code>InputStreamReader</code>类的子类<code>FileReader</code>中的方法其实都是通过调用父类<code>InputStreamReader</code>实现的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileReader</span> <span class="keyword">extends</span> <span class="title">InputStreamReader</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">FileReader</span>(String fileName) <span class="keyword">throws</span> FileNotFoundException {</div><div class="line">        <span class="keyword">super</span>(<span class="keyword">new</span> FileInputStream(fileName));</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">FileReader</span>(File file) <span class="keyword">throws</span> FileNotFoundException {</div><div class="line">        <span class="keyword">super</span>(<span class="keyword">new</span> FileInputStream(file));</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">FileReader</span>(FileDescriptor fd) {</div><div class="line">        <span class="keyword">super</span>(<span class="keyword">new</span> FileInputStream(fd));</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/设计模式/适配器模式/" data-title="适配器模式 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/设计模式/门面模式/" title="门面模式">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  门面模式</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/设计模式/责任链模式/"  title="责任链模式">
+ <strong>NEXT:</strong><br/> 
+ <span>责任链模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现方式"><span class="toc-number">2.</span> <span class="toc-text">实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#类适配器模式和对象适配器模式"><span class="toc-number">2.1.</span> <span class="toc-text">类适配器模式和对象适配器模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#适配器模式在API中的示例"><span class="toc-number">3.</span> <span class="toc-text">适配器模式在API中的示例</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

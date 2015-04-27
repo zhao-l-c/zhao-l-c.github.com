@@ -1,0 +1,369 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>装饰模式 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="前言：利用 Filter 进行敏感字符过滤时发现没有 set 方法对参数进行修改，只有 get 方法获取参数。所以可以利用装饰模式增强 get 方法的功能，
+概述
+什么是装饰模式：对一个类中的某个方法的功能进行增强。
+一般过程
+1）实现与被增强对象共同的接口/抽象类或者继承该接口的实现类2）把需要增">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/设计模式/装饰模式/" title="装饰模式" itemprop="url">装饰模式</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一般过程"><span class="toc-number">2.</span> <span class="toc-text">一般过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java标准库中的应用"><span class="toc-number">3.</span> <span class="toc-text">Java标准库中的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_javax-servlet-http-HttpServletRequestWrapper"><span class="toc-number">3.1.</span> <span class="toc-text">1. javax.servlet.http.HttpServletRequestWrapper</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_BufferedReader"><span class="toc-number">3.2.</span> <span class="toc-text">2. BufferedReader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_BufferedInputStream、FilterInputStream、InputStream"><span class="toc-number">3.3.</span> <span class="toc-text">3. BufferedInputStream、FilterInputStream、InputStream</span></a></li></ol></li></ol>
+		</div>
+		
+		<p>前言：利用 Filter 进行敏感字符过滤时发现没有 set 方法对参数进行修改，只有 get 方法获取参数。<br>所以可以利用装饰模式增强 get 方法的功能，</p>
+<h2 id="概述">概述</h2>
+<p>什么是装饰模式：对一个类中的某个方法的功能进行增强。</p>
+<h2 id="一般过程">一般过程</h2>
+<p>1）实现与被增强对象共同的接口/抽象类或者继承该接口的实现类<br>2）把需要增强功能的类/抽象类/接口(一般用接口，增强扩展性)，作为包装类的成员属性<br>3）包装类利用构造方法初始化该属性<br>4）实现要增强的方法，对于不需要增强的方法，调用原有对象的方法<br>注意，例如我们想增强Java API中的<code>HttpServletRequest</code>类的某个方法，这是由于这个类已经有一个包装类<code>HttPServletRequestWrapper</code>，<br>因此只需继承该类就行，否则直接实现<code>HttpServletRequest</code>类的话有大量的方法需要实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 直接实现HttpServletRequest的话需要实现大量的方法</span></div><div class="line">class MyHttpServletRequestWrapper implements HttpServletRequest {</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> Object <span class="title">getAttribute</span>(String arg0) {</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    }</div><div class="line">    <span class="comment">// ......</span></div></pre></td></tr></table></figure>
+
+<p>下面是完整的示例代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 1. 继承需增强类的包装类</span></div><div class="line">class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {</div><div class="line">    <span class="comment">// 2. 需要增强类作为本类的属性</span></div><div class="line">    <span class="keyword">private</span> HttpServletRequest request;</div><div class="line">    <span class="comment">// 3. 在构造器中初始化需要增强类</span></div><div class="line">    <span class="keyword">public</span> <span class="title">MyHttpServletRequestWrapper</span>(HttpServletRequest request) {</div><div class="line">        <span class="keyword">super</span>(request);</div><div class="line">        <span class="keyword">this</span>.request = request;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> String <span class="title">getParameter</span>(String name) {</div><div class="line">        <span class="comment">// 4. 通过调用需要增强类的原方法并对该方法进行增强</span></div><div class="line">        String parameters = request.getParameter(name);</div><div class="line">        <span class="comment">// ......对父类方法进行增强</span></div><div class="line">        <span class="keyword">return</span> parameters;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>另外的实例见Eclipse工程<strong>09_Filter_06_checkcomment</strong>，或者黑马的JavaWeb视频<strong>day14 中的 04自定义标准的数据源</strong>。</p>
+<h2 id="Java标准库中的应用">Java标准库中的应用</h2>
+<h3 id="1-_javax-servlet-http-HttpServletRequestWrapper">1. javax.servlet.http.HttpServletRequestWrapper</h3>
+<p>从上面的介绍知道，这个类本身就用到了装饰模式</p>
+<h3 id="2-_BufferedReader">2. BufferedReader</h3>
+<p>BufferReader 类中就用到了装饰模式对 Reader 抽象类进行包装<br>BufferReader 的部分源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BufferedReader</span> <span class="keyword">extends</span> <span class="title">Reader</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> Reader in;</div><div class="line">    <span class="keyword">public</span> <span class="title">BufferedReader</span>(Reader in, <span class="keyword">int</span> sz) {</div><div class="line">        <span class="keyword">super</span>(in);</div><div class="line">        <span class="keyword">if</span> (sz &lt;= <span class="number">0</span>)</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Buffer size &lt;= 0"</span>);</div><div class="line">        <span class="keyword">this</span>.in = in;</div><div class="line">        cb = <span class="keyword">new</span> <span class="keyword">char</span>[sz];</div><div class="line">        nextChar = nChars = <span class="number">0</span>;</div><div class="line">    }</div><div class="line">    <span class="comment">// ......</span></div></pre></td></tr></table></figure>
+
+
+<h3 id="3-_BufferedInputStream、FilterInputStream、InputStream">3. BufferedInputStream、FilterInputStream、InputStream</h3>
+<p>参考：《深入分析Java Web技术内幕》P60<br>首先<code>FilterInputStream</code>继承并引用了<code>InputStream</code>，<code>FilterInputStream</code>只是一个中间类，用于被其它类继承，源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FilterInputStream</span> <span class="keyword">extends</span> <span class="title">InputStream</span> </span>{</div><div class="line">    <span class="keyword">protected</span> <span class="keyword">volatile</span> InputStream in;</div><div class="line">    <span class="keyword">protected</span> <span class="title">FilterInputStream</span>(InputStream in) {</div><div class="line">        <span class="keyword">this</span>.in = in;</div><div class="line">    }</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span>() <span class="keyword">throws</span> IOException {</div><div class="line">        <span class="keyword">return</span> in.read();</div><div class="line">    }</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span>(<span class="keyword">byte</span> b[]) <span class="keyword">throws</span> IOException {</div><div class="line">        <span class="keyword">return</span> read(b, <span class="number">0</span>, b.length);</div><div class="line">    }</div><div class="line"><span class="comment">//......</span></div></pre></td></tr></table></figure>
+
+<p>它有很多子类，这些子类在实例化时都需要实现了<code>InputStream中</code>所有方法的类作为构造器参数，例如<code>BufferedInputStream</code>，<br>在实例化时可以传递<code>FileInputStream</code>作为构造器参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BufferedInputStream bis = <span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"filename"</span>));</div></pre></td></tr></table></figure>
+
+<p>这是因为<code>BufferedInputStream</code>中部分等方法需要直接或间接使用<code>FileInputStream</code>中的方法，例如read方法。看源码，<br><code>BufferedInputStream</code>重写了<code>read(byte b[], int off, int len)</code>方法，而<code>read(byte b[])</code>最终也是调用前面的方法实现的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// BufferedInputStream类中的read方法</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">read</span>(<span class="keyword">byte</span> b[], <span class="keyword">int</span> off, <span class="keyword">int</span> len)</div><div class="line">        <span class="keyword">throws</span> IOException</div><div class="line">    {</div><div class="line">        <span class="comment">// ....</span></div><div class="line">        <span class="keyword">for</span> (;;) {</div><div class="line">            <span class="keyword">int</span> nread = read1(b, off + n, len - n);</div><div class="line">            <span class="comment">// ...</span></div><div class="line">            <span class="keyword">if</span> (input != <span class="keyword">null</span> && input.available() &lt;= <span class="number">0</span>)</div><div class="line">                <span class="keyword">return</span> n;</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> <span class="title">read1</span>(<span class="keyword">byte</span>[] b, <span class="keyword">int</span> off, <span class="keyword">int</span> len) <span class="keyword">throws</span> IOException {</div><div class="line">        <span class="comment">// ...</span></div><div class="line">            <span class="keyword">if</span> (len &gt;= getBufIfOpen().length && markpos &lt; <span class="number">0</span>) {</div><div class="line">                <span class="keyword">return</span> getInIfOpen().read(b, off, len);</div><div class="line">            }</div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">    <span class="keyword">private</span> InputStream <span class="title">getInIfOpen</span>() <span class="keyword">throws</span> IOException {</div><div class="line">        InputStream input = in;</div><div class="line">        <span class="keyword">if</span> (input == <span class="keyword">null</span>)</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"Stream closed"</span>);</div><div class="line">        <span class="keyword">return</span> input;</div><div class="line">    }</div></pre></td></tr></table></figure>
+
+<p>可以看到<code>read</code>首先调用了私有的<code>read1</code>方法，<code>read1</code>方法又调用了<code>getInIfOpen</code>的<code>read</code>方法，<br>而<code>getInIfOpen</code>返回的就是<code>BufferedInputStream</code>构造器中传入的<code>InputStream</code>子类。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/设计模式/">设计模式</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/设计模式/装饰模式/" data-title="装饰模式 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/设计模式/观察者模式/" title="观察者模式">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  观察者模式</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/设计模式/策略模式/"  title="策略模式">
+ <strong>NEXT:</strong><br/> 
+ <span>策略模式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一般过程"><span class="toc-number">2.</span> <span class="toc-text">一般过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java标准库中的应用"><span class="toc-number">3.</span> <span class="toc-text">Java标准库中的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_javax-servlet-http-HttpServletRequestWrapper"><span class="toc-number">3.1.</span> <span class="toc-text">1. javax.servlet.http.HttpServletRequestWrapper</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_BufferedReader"><span class="toc-number">3.2.</span> <span class="toc-text">2. BufferedReader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_BufferedInputStream、FilterInputStream、InputStream"><span class="toc-number">3.3.</span> <span class="toc-text">3. BufferedInputStream、FilterInputStream、InputStream</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

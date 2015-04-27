@@ -1,0 +1,564 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Struts2完全教程（1）- 入门项目详细说明 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="使用Filter作为控制分发器
+这是定义一个Filter作为拦截器的简单工程，目的是手动的处理URL请求。
+例如在某个页面用有这样一个URL请求：
+1&amp;lt;a href=&quot;product_input.action&quot;&amp;gt;Product Input&amp;lt;/a&amp;gt;
+
+这时候定义的Filter类">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Struts2/Struts2完全教程（1）- 入门项目详细说明/" title="Struts2完全教程（1）- 入门项目详细说明" itemprop="url">Struts2完全教程（1）- 入门项目详细说明</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用Filter作为控制分发器"><span class="toc-number">1.</span> <span class="toc-text">使用Filter作为控制分发器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第一个Struts2项目"><span class="toc-number">2.</span> <span class="toc-text">第一个Struts2项目</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2项目的搭建过程"><span class="toc-number">2.1.</span> <span class="toc-text">Struts2项目的搭建过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#web-xml文件的说明"><span class="toc-number">2.2.</span> <span class="toc-text">web.xml文件的说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#struts-xml文件说明"><span class="toc-number">2.3.</span> <span class="toc-text">struts.xml文件说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2应用的默认配置文件"><span class="toc-number">2.4.</span> <span class="toc-text">Struts2应用的默认配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2响应请求的基本过程"><span class="toc-number">2.5.</span> <span class="toc-text">Struts2响应请求的基本过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP页面的说明"><span class="toc-number">2.6.</span> <span class="toc-text">JSP页面的说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-number">2.7.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action类"><span class="toc-number">3.</span> <span class="toc-text">Action类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#访问Web资源"><span class="toc-number">4.</span> <span class="toc-text">访问Web资源</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用ActionContext的解耦方法"><span class="toc-number">4.1.</span> <span class="toc-text">使用ActionContext的解耦方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用实现XxxAware的解耦方法"><span class="toc-number">4.2.</span> <span class="toc-text">使用实现XxxAware的解耦方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_ServletActionContext_的耦合方法"><span class="toc-number">4.3.</span> <span class="toc-text">使用 ServletActionContext  的耦合方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用实现ServletXxxAware接口的耦合方法"><span class="toc-number">4.4.</span> <span class="toc-text">使用实现ServletXxxAware接口的耦合方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ActionSupport"><span class="toc-number">5.</span> <span class="toc-text">ActionSupport</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#result节点补充介绍"><span class="toc-number">6.</span> <span class="toc-text">result节点补充介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#result的name属性"><span class="toc-number">6.1.</span> <span class="toc-text">result的name属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#result的type属性"><span class="toc-number">6.2.</span> <span class="toc-text">result的type属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通配符映射规则"><span class="toc-number">7.</span> <span class="toc-text">通配符映射规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#声明式异常处理"><span class="toc-number">8.</span> <span class="toc-text">声明式异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#异常捕获和处理方法"><span class="toc-number">8.1.</span> <span class="toc-text">异常捕获和处理方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#异常处理的基本机制"><span class="toc-number">8.2.</span> <span class="toc-text">异常处理的基本机制</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="使用Filter作为控制分发器">使用Filter作为控制分发器</h2>
+<p>这是定义一个Filter作为拦截器的简单工程，目的是手动的处理URL请求。</p>
+<p>例如在某个页面用有这样一个URL请求：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"product_input.action"</span>&gt;</span>Product Input<span class="tag">&lt;/<span class="title">a</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这时候定义的Filter类代码为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebFilter</span>(<span class="string">"*.action"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyFilterDispatcher</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>{</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="title">MyFilterDispatcher</span>() {}</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span>(ServletRequest request, ServletResponse response, FilterChain chain) <span class="keyword">throws</span> IOException, ServletException {</div><div class="line">        HttpServletRequest req = (HttpServletRequest) request;</div><div class="line">        String servletPath = req.getServletPath();</div><div class="line">        System.out.println(servletPath);</div><div class="line">        String dispatcherPath = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span>(<span class="string">"/product_input.action"</span>.equals(servletPath)) {</div><div class="line">            dispatcherPath = <span class="string">"/WEB-INF/section00/input.jsp"</span>;</div><div class="line">        }</div><div class="line"> </div><div class="line">        <span class="keyword">if</span>(<span class="string">"/product_save.action"</span>.equals(servletPath)) {</div><div class="line">            Integer productID = <span class="number">10001</span>;</div><div class="line">            String productName = req.getParameter(<span class="string">"productName"</span>);</div><div class="line">            String productDesc = req.getParameter(<span class="string">"productDesc"</span>);</div><div class="line">            Product product = <span class="keyword">new</span> Product(productID, productName, productDesc);</div><div class="line">            req.setAttribute(<span class="string">"product"</span>, product);</div><div class="line">            dispatcherPath = <span class="string">"/WEB-INF/section00/details.jsp"</span>;</div><div class="line">        }</div><div class="line">        <span class="comment">// 转发到相应的JSP</span></div><div class="line">        <span class="keyword">if</span>(dispatcherPath != <span class="keyword">null</span>) {</div><div class="line">            request.getRequestDispatcher(dispatcherPath).forward(request, response);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        }</div><div class="line">        chain.doFilter(request, response);</div><div class="line">    }</div><div class="line">    <span class="comment">// .... 省略父类重写方法</span></div></pre></td></tr></table></figure>
+
+<p><strong>可以看到，在<code>MyFilterDispatcher</code>中对不同的ServletPath进行了处理，然后转发到不同的地址。这也是Struts2的基本实现原理。</strong></p>
+<h2 id="第一个Struts2项目">第一个Struts2项目</h2>
+<h3 id="Struts2项目的搭建过程">Struts2项目的搭建过程</h3>
+<p>下面搭建一个HelloWorld工程，基本步骤为：<br>（1）新建Web工程，导入相关的jar包；</p>
+<p>（2）配置web.xml文件，参考jar包中的内容进行配置；</p>
+<p>（3）配置项目src目录下的struts.xml文件，这个文件进行路由控制。<br>注意，关联struts.xml文件的DTD文件为URL，使之能自动提示。</p>
+<p>下面会分别对Struts2 相关的配置文件和处理请求的原理进行说明。</p>
+<h3 id="web-xml文件的说明">web.xml文件的说明</h3>
+<p>Helloworld工程中web.xml的内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">web-app</span> <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">    <span class="attribute">xmlns</span>=<span class="value">"http://java.sun.com/xml/ns/javaee"</span> <span class="attribute">xmlns:web</span>=<span class="value">"http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"</span></div><div class="line">    <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"</span></div><div class="line">    <span class="attribute">id</span>=<span class="value">"WebApp_ID"</span> <span class="attribute">version</span>=<span class="value">"2.5"</span>&gt;</div><div class="line"> </div><div class="line">    <span class="comment">&lt;!-- 配置 Struts2 的 Filter --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">filter</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">filter-name</span>&gt;</span>struts2<span class="tag">&lt;/<span class="title">filter-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">filter-class</span>&gt;</span>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter<span class="tag">&lt;/<span class="title">filter-class</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">filter</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">filter-mapping</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">filter-name</span>&gt;</span>struts2<span class="tag">&lt;/<span class="title">filter-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="title">url-pattern</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">filter-mapping</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">web-app</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>（第一次编写这个文件可以参考Struts2 APP包中struts2-blank项目的web.xml内容。）</p>
+<p>这里配置了Struts2的一个Filter，对所有URL请求（通配符为<code>*</code>）都进行拦截过滤。</p>
+<h3 id="struts-xml文件说明">struts.xml文件说明</h3>
+<blockquote>
+<p>参考资料<br><a href="http://struts.apache.org/docs/configuration-elements.html" target="_blank" rel="external">struts2文档</a></p>
+</blockquote>
+<p>Helloworld项目的struts.xml文件内容为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span> ?&gt;</div><div class="line">&lt;!<span class="type">DOCTYPE</span> struts <span class="type">PUBLIC</span></div><div class="line">    <span class="string">"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"</span></div><div class="line">    <span class="string">"http://struts.apache.org/dtds/struts-2.3.dtd"</span>&gt;</div><div class="line"> </div><div class="line">&lt;struts&gt;</div><div class="line">    &lt;!--</div><div class="line">        package：package用来组织模块。</div><div class="line">        name：必须，用于其它的包引用当前包。</div><div class="line">        extends：当前包继承那个包的所有配置，通常情况下继承 struts-default包。这个包在struts-default.xml文件中定义。</div><div class="line">        namespace：可选，如果它没有给出，则以/作为默认值。 若namespace有一个非默认值，则要想调用这个包里的<span class="type">Action</span>就必须把这个属性所定义的命名空间添加到有关的 <span class="type">URI</span> 字符串里， 也就是此时<span class="type">URL</span>的格式为http://localhost:<span class="number">8080</span>/contextPath/namespace/actionName.action</div><div class="line">     --&gt;</div><div class="line">    &lt;package name=<span class="string">"helloworld"</span> extends=<span class="string">"struts-default"</span>&gt;</div><div class="line">        &lt;!--</div><div class="line">            action：对应一个struts2 的请求。</div><div class="line">            name：struts2请求的名字。</div><div class="line">            class：响应请求的类，默认类为: com.opensymphony.xwork2.<span class="type">ActionSupport</span>。</div><div class="line">            <span class="keyword">method</span>：响应请求的方法，默认方法为: execute。</div><div class="line">         --&gt;</div><div class="line">        &lt;action name=<span class="string">"s2_product_input"</span> class=<span class="string">"com.opensymphony.xwork2.ActionSupport"</span> <span class="keyword">method</span>=<span class="string">"execute"</span>&gt;</div><div class="line">            &lt;!--</div><div class="line">                <span class="literal">result</span>：请求的返回结果。</div><div class="line">                name：必须，表示方法的返回字符串值，默认为<span class="string">"success"</span>。</div><div class="line">                <span class="keyword">type</span>：请求的处理类型，例如dispatcher转发，redirect重定向等等。</div><div class="line">             --&gt;</div><div class="line">            &lt;<span class="literal">result</span> <span class="keyword">type</span>=<span class="string">"dispatcher"</span> name=<span class="string">"success"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section01/input.jsp&lt;/<span class="literal">result</span>&gt;</div><div class="line">        &lt;/action&gt;</div><div class="line">        &lt;action name=<span class="string">"s2_product_save"</span> class=<span class="string">"section01.Product"</span> <span class="keyword">method</span>=<span class="string">"save"</span>&gt;</div><div class="line">            &lt;<span class="literal">result</span> <span class="keyword">type</span>=<span class="string">"dispatcher"</span> name=<span class="string">"showDetails"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section01/details.jsp&lt;/<span class="literal">result</span>&gt;</div><div class="line">        &lt;/action&gt;</div><div class="line">        &lt;action name=<span class="string">"s2_test"</span> class=<span class="string">"section01.Product"</span> <span class="keyword">method</span>=<span class="string">"test"</span>&gt;</div><div class="line">            &lt;<span class="literal">result</span> <span class="keyword">type</span>=<span class="string">"dispatcher"</span> name=<span class="string">"success"</span>&gt;/&lt;/<span class="literal">result</span>&gt;</div><div class="line">        &lt;/action&gt;</div><div class="line">    &lt;/package&gt;</div><div class="line">&lt;/struts&gt;</div></pre></td></tr></table></figure>
+
+<p><strong>上面已经对xml的标签进行了详细说明。</strong></p>
+<h3 id="Struts2应用的默认配置文件">Struts2应用的默认配置文件</h3>
+<p>在struts-core-xxx.jar包org.apache.struts2下面有一个default.properties文件，就是Struts2的默认配置文件。<br>例如该文件中的：<code>struts.action.extension=action,,</code>配置有效的URL请求后缀为<code>action</code>或者空。因此Helloworld项目中，使用<code>product_input.action</code>或者<code>product_input</code>都是有效的请求URL。</p>
+<p><strong>default.properties文件中的配置项可以在struts.xml文件中使用constant标签修改。</strong>例如上面的请求后缀可以在struts.xml中这样修改：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">struts</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">constant</span> <span class="attribute">name</span>=<span class="value">"struts.action.extension"</span> <span class="attribute">value</span>=<span class="value">"action,do"</span>&gt;</span><span class="tag">&lt;/<span class="title">constant</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="title">package</span>&gt;</span>  </div><div class="line">    ......</div><div class="line">    <span class="tag">&lt;/<span class="title">package</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">struts</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>这时候就可以使用action或者do作为后缀了。</p>
+<h3 id="Struts2响应请求的基本过程">Struts2响应请求的基本过程</h3>
+<p>结合前面使用Filter作为过滤器的项目可知，Struts2的执行流程大致为：<br>首先是web.xml文件中配置的Filter过滤URL请求，然后根据struts.xml文件中配置的action标签处理请求， 处理结果根据result配置的内容返回。 例如/ s2_product_save.action就由 section01.Product类中的save方法处理，最后处理完后转发到 /WEB-INF/section01/details.jsp页面。</p>
+<p>下面是Action类 <code>section01.Product</code>的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">package section01;</div><div class="line"> </div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> Product {</div><div class="line"> </div><div class="line">    <span class="keyword">private</span> Integer productID;</div><div class="line">    <span class="keyword">private</span> String productName;</div><div class="line">    <span class="keyword">private</span> String productDesc;</div><div class="line">    <span class="comment">// 省略getter、setter和toString方法</span></div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">// 输出一行字符串，返回值为空</span></div><div class="line">    <span class="keyword">public</span> String <span class="title">test</span>() {</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="string">"hello,world"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 执行保存，返回值为"showDetails"</span></div><div class="line">    <span class="keyword">public</span> String <span class="title">save</span>() {</div><div class="line">        <span class="keyword">this</span>.setProductID(<span class="number">1002</span>);</div><div class="line">        System.<span class="keyword">out</span>.println(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">return</span> <span class="string">"showDetails"</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="JSP页面的说明">JSP页面的说明</h3>
+<p>下面看看details.jsp页面的核心内容：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line">    产品清单：</div><div class="line">    <span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line">    productID:\${productID }</div><div class="line">    <span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line">    productName:\${productName }</div><div class="line">    <span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line">    productDesc:\${productDesc }</div><div class="line">    <span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">""</span>&gt;</span>backward<span class="tag">&lt;/<span class="title">a</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以看到，JSP中不再是使用前面项目中的 <code>\${requestScope.product.productName}</code>获取属性，而是 直接使用 <code>\${productName}</code>取出对象的属性， 也就是相当于执行<code>&lt;%=request.getAttribute(&quot;productName&quot;)%&gt;</code>。</p>
+<p><strong>由此可以知道，JSP中的request域对象存放的不再是对象，而是对象的属性。</strong> 可以在JSP中输出request对象来确认。即在JSP中加上这一句<code>&lt;%=request.getClass()%&gt;</code>，可以看到结果为<code>org.apache.struts2.dispatcher.StrutsRequestWrapper</code>，这是<code>HttpServletRequest</code>借口的实现类。</p>
+<h3 id="小结">小结</h3>
+<p>通过下图可以清晰的知道Struts2处理请求的流程。</p>
+<p>下面会详细补充说明struts.xml的result节点配置、Action类和action方法、JSP使用EL或者S标签获取OGNL值的相关细节。</p>
+<h2 id="Action类">Action类</h2>
+<p>struts.xml文件中，每个action标签表示应用对一个请求的处理，最终处理过程会交到Action类中的方法实现。例如Helloworld项目中的<code>section01.Product</code>类就是一个Action类。</p>
+<p>三种方法创建一个 Action 类：</p>
+<ul>
+<li>使用普遍的 Java 类；</li>
+<li>继承 <code>ActionSupport</code> 类；</li>
+<li>实现 <code>Action</code> 接口；</li>
+</ul>
+<p>Action类的特点是：</p>
+<ul>
+<li>Action类的 属性用于接收表单对应字段和在JSP页面中显示。因此它的命名和getter、setter方法必须遵守JavaBean的规则，否则无法自动完成请求参数设置和页面回显等功能。</li>
+</ul>
+<ul>
+<li>属性的类型可以是任意类型，而且从字符串到非字符串的基本数据库类型之间的数据转换可以由Struts2自动完成；</li>
+</ul>
+<ul>
+<li>必须有一个不带参的构造器（Struts2需要根据action标签中class属性值反射完成Action类的实例化）；</li>
+</ul>
+<ul>
+<li>至少有一个供action调用的方法，而且同一个Action类中可以 包含多个action方法。action方法的要求是：<ul>
+<li>必须由一个 String 类型的返回值；</li>
+<li>方法的修饰符是 public；</li>
+<li>不能有参数。 默认的action方法为：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> String <span class="title">execute</span>() {</div><div class="line">    <span class="comment">// ......</span></div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ul>
+<li>Struts2 会为每一个 HTTP 请求创建一个新的Action实例（保证了线程安全）。</li>
+</ul>
+<h2 id="访问Web资源">访问Web资源</h2>
+<p>所谓Web资源，指的是<code>HttpSession</code>，<code>HttpServletRequest</code>，<code>HttpServletResponse</code>等Servlet API。 在 Action 中，可以通过以下方式访问这些资源：</p>
+<ul>
+<li>与 Servlet API 解耦的访问方式，包括使用<code>ActionContext</code>和实现XxxAware接口；</li>
+</ul>
+<ul>
+<li>与 Servlet API 耦合的访问方式，包括使用<code>ServletActionContext</code>和实现ServletXxxAware接口。</li>
+</ul>
+<h3 id="使用ActionContext的解耦方法">使用ActionContext的解耦方法</h3>
+<p>为了避免与 Servlet API 耦合在一起, 方便 Action类做单元测试，Struts2 对 <code>HttpSession</code>，<code>HttpServletRequest</code>，<code>HttpServletResponse</code> 进行了封装，构造了3个Map对象来替代原来的对象，在Action中可以直接使用这些Map对象来保存和读取数据。</p>
+<p><strong>也就是，<code>ActionContext</code>是 Action 类执行的上下文对象，在<code>ActionContext</code>中保存了 Action 执行所需要的所有对象，包括 parameters，request，session，application 等。</strong></p>
+<p>下面是获取相应资源的方法：</p>
+<ul>
+<li>获取<code>ServletContext</code>对应的 Map 对象：<code>public Map getApplication()</code>；</li>
+<li>获取<code>HttpSession</code>对应的 Map 对象： <code>public Map getSession()</code>；</li>
+<li>获取请求参数对应的 Map 对象： <code>public Map getParameters()</code>；</li>
+<li>获取<code>HttpServletRequest</code>对应的 Map 对象： <code>public Object get(Object key)</code>。</li>
+<li>获取<code>HttpServletRequest</code>对应的 Map 对象： <code>ActionContext</code>类中没有提供类似getRequest() 这样的方法，要得到<code>HttpServletRequest</code>对应的 Map对象，只能通过为<code>get()</code>方法传递”request”参数实现。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="built_in">String</span> execute() {                                                                     </div><div class="line">    <span class="comment">// 获取Action类的Context对象                                                                    </span></div><div class="line">    ActionContext context = ActionContext.getContext();                                       </div><div class="line"> </div><div class="line">    <span class="comment">// ================================================================                       </span></div><div class="line">    <span class="comment">// 获取Action类的Application Map对象                                                            </span></div><div class="line">    Map&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; applicationMap = context.getApplication();                            </div><div class="line">    applicationMap.put(<span class="string">"applicationKeyTest"</span>, <span class="string">"applicationValueTest"</span>);                         </div><div class="line"> </div><div class="line">    <span class="built_in">Date</span> date = (<span class="built_in">Date</span>) applicationMap.get(<span class="string">"date"</span>);                                            </div><div class="line">    System.out.println(<span class="string">"date: "</span> + date);                                                      </div><div class="line"> </div><div class="line">    <span class="comment">// ================================================================                       </span></div><div class="line">    <span class="comment">// 获取Action类的Session Map 对象                                                               </span></div><div class="line">    Map&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; sessionMap = context.getSession();                                    </div><div class="line">    sessionMap.put(<span class="string">"sessionKeyTest"</span>, <span class="string">"sessionValueTest"</span>);                                     </div><div class="line"> </div><div class="line">    <span class="comment">// 注意context.getSession() 返回的对视是org.apache.struts2.dispatcher.SessionMap类型的               </span></div><div class="line">    <span class="keyword">if</span>(sessionMap <span class="keyword">instanceof</span> SessionMap) {                                                    </div><div class="line">        SessionMap&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; sm = (SessionMap&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt;) sessionMap;              </div><div class="line">        <span class="comment">// 此时可以调用invalidate方法是Session失效                                                       </span></div><div class="line">        sm.invalidate();                                                                      </div><div class="line">        System.out.println(<span class="string">"Session 失效，JSP页面不能根据Key获取Session域的Value"</span>);                        </div><div class="line">    }                                                                                         </div><div class="line">    <span class="comment">// ================================================================                       </span></div><div class="line">    <span class="comment">// 获取Action类的Request Map对象                                                                </span></div><div class="line">    @SuppressWarnings(<span class="string">"unchecked"</span>)                                                            </div><div class="line">    Map&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; requestMap = (Map&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt;) context.get(<span class="string">"request"</span>);            </div><div class="line">    requestMap.put(<span class="string">"requestKeyTest"</span>, <span class="string">"requestValueTest"</span>);                                     </div><div class="line"> </div><div class="line">    <span class="comment">// ================================================================                       </span></div><div class="line">    <span class="comment">// 注意：                                                                                    </span></div><div class="line">    <span class="comment">// 1. getParameters返回类型为Map&lt;String, Object&gt;，虽然通过下面的输出发现Object其实是String[]，                 </span></div><div class="line">    <span class="comment">// 但并不能使用Map&lt;String, String[]&gt;作为paramMap的类型，否则错误！                                         </span></div><div class="line">    <span class="comment">// 2. paramMap的值只能读不能修改，虽然修改并不会报错，但也不会生效。                                                 </span></div><div class="line">    Map&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; paramMap = context.getParameters();                                   </div><div class="line">    <span class="built_in">Object</span> obj = paramMap.get(<span class="string">"name"</span>);                                                        </div><div class="line">    System.out.println(obj.getClass()); <span class="comment">// class [Ljava.lang.String; 也就是这是一个String[]类型        </span></div><div class="line"> </div><div class="line">    <span class="comment">// 对paramMap的修改是无效的                                                                       </span></div><div class="line">    paramMap.put(<span class="string">"age"</span>, <span class="number">100</span>);                                                                 </div><div class="line"> </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;                                                                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>通过<code>getSession</code>胡获取的Map实例其实是<code>SessionMap</code>类型的，它有一个<code>invalidate</code>方法可以使<code>HttpSession</code>对象失效；</li>
+</ul>
+<ul>
+<li>只能通过<code>context.get(&quot;request&quot;)</code>获取 <code>HttpServletRequest</code>对应的 Map 对象；</li>
+</ul>
+<ul>
+<li><code>getParameters</code>获取 请求参数对应的 Map 对象， 返回类型为<code>Map&lt;String, Object&gt;</code>，Object其实为<code>String[]</code>类型，也就是一个参数名可以对应多个参数值。但在获取该Map对象时并不能把类型转换为<code>Map&lt;String, String[]&gt;</code>。</li>
+</ul>
+<h3 id="使用实现XxxAware的解耦方法">使用实现XxxAware的解耦方法</h3>
+<p>Action类通过实现<code>ApplicationAware</code>、<code>SessionAware</code>、<code>RequestAwear</code>和 <code>ParameterAwear</code> 接口，由 Struts 注入相应对应的Map<string, object=""> 对象。</string,></p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestXxxAware</span> <span class="keyword">implements</span> <span class="title">ApplicationAware</span></span>{</div><div class="line">    <span class="comment">// 访问Application资源，实现ApplicationAware接口并重写setApplication方法，该方法可以注入Application的Map对象</span></div><div class="line">    <span class="keyword">private</span> Map&lt;String, Object&gt; applicationMap = <span class="keyword">null</span>;</div><div class="line"> </div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setApplication</span>(Map&lt;String, Object&gt; application) {</div><div class="line">        applicationMap = application;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> String <span class="title">execute</span>() {</div><div class="line">        applicationMap.put(<span class="string">"applicationKeyTest"</span>, <span class="string">"applicationValueTest"</span>);</div><div class="line"> </div><div class="line">        Date date = (Date) applicationMap.get(<span class="string">"date"</span>);</div><div class="line">        System.out.println(date);</div><div class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 要访问其他资源，可以实现SessionAware, RequestAware, ParameterAware这些接口，方法类似，不做演示</span></div><div class="line"> </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>使用这种方法的好处是，避免在每个方法中都要分别获取资源。</strong></p>
+<h3 id="使用_ServletActionContext_的耦合方法">使用 ServletActionContext  的耦合方法</h3>
+<p>当需要获取一些属性时，例如servletPath，就需要原生的Servlet API，这时候可以使用 <code>ServletActionContext</code>类实现目的。</p>
+<p><strong><code>ServletActionContext</code> 继承了<code>ActionContext</code></strong>，它提供了获取Servlet API的方法，例如：</p>
+<ul>
+<li>直接获取<code>HttpServletRequest</code>对象：<code>ServletActionContext.getRequest()</code>；</li>
+<li>直接获取<code>HttpSession</code>对象：<code>ServletActionContext.getRequest().getSession()</code>；</li>
+<li>直接获取<code>ServletContext</code>对象：<code>ServletActionContext.getServletContext()</code>。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> String <span class="title">execute</span>() {                                               </div><div class="line">    <span class="comment">// 获取ServletContext                                                 </span></div><div class="line">    ServletContext context = ServletActionContext.getServletContext();  </div><div class="line">    <span class="comment">// 测试过程省略                                                           </span></div><div class="line"> </div><div class="line">    <span class="comment">// 获取HttpServletRequest                                             </span></div><div class="line">    HttpServletRequest request = ServletActionContext.getRequest();     </div><div class="line">    <span class="comment">// 获取HttpSession                                                    </span></div><div class="line">    HttpSession session = ServletActionContext.getRequest().getSession();</div><div class="line"> </div><div class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;                                                   </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="使用实现ServletXxxAware接口的耦合方法">使用实现ServletXxxAware接口的耦合方法</h3>
+<p>Action类通过实现<code>ServletContextAware</code>、<code>ServletRequestAware</code>、<code>ServletResponseAware</code>接口，可以方便的注入相应Servlet API的Map对象。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestServletXxxAware</span> <span class="keyword">implements</span> <span class="title">ServletContextAware</span></span>{</div><div class="line">    <span class="comment">// 同样是实现setter方法把对象注入，</span></div><div class="line">    <span class="comment">// 测试过程省略</span></div><div class="line">    <span class="annotation">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line">    <span class="keyword">private</span> ServletContext context;</div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServletContext</span>(ServletContext context) {</div><div class="line">        <span class="keyword">this</span>.context = context;</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> String <span class="title">execute</span>() {</div><div class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在执行的时候，Struts2 会自动调用这里的<code>setServletContext</code>方法并把参数传递进去！</p>
+<h2 id="ActionSupport">ActionSupport</h2>
+<p><code>ActionSupport</code>是默认的Action类：若struts.xml中某个action节点没有配置class属性，则<code>ActionSupport</code>就是该action节点的处理类，默认处理方法为<code>execute</code>。</p>
+<p>参考下面 <code>ActionSupport</code>的声明：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ActionSupport</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">opensymphony</span>.<span class="title">xwork2</span>.<span class="title">Action</span>,</span></div><div class="line">        <span class="title">com</span>.<span class="title">opensymphony</span>.<span class="title">xwork2</span>.<span class="title">Validateable</span>,</div><div class="line">        <span class="title">com</span>.<span class="title">opensymphony</span>.<span class="title">xwork2</span>.<span class="title">ValidationAware</span>,</div><div class="line">        <span class="title">com</span>.<span class="title">opensymphony</span>.<span class="title">xwork2</span>.<span class="title">TextProvider</span>,</div><div class="line">        <span class="title">com</span>.<span class="title">opensymphony</span>.<span class="title">xwork2</span>.<span class="title">LocaleProvider</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> {</div><div class="line">    <span class="comment">// ......</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以知道， <code>ActionSupport</code> 已经继承了验证、错误消息处理、国际化等的类，因此自定义Action类可以直接继承<code>ActionSupport</code>，方便这些功能的实现。</p>
+<h2 id="result节点补充介绍">result节点补充介绍</h2>
+<h3 id="result的name属性">result的name属性</h3>
+<p><strong>result节点的name属性对应的是action方法的字符串返回值。（也可以在声明式异常中使用，后面会介绍）</strong></p>
+<p>在struts.xml文件中，一个action节点可以配置多个result子节点，相应的action方法也就会有不同的字符串返回值。<br>例如下面的action配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;action name=<span class="string">"testResultName"</span> class=<span class="string">"section02.TestResult"</span> <span class="keyword">method</span>=<span class="string">"testResultName"</span>&gt; </div><div class="line">    &lt;<span class="literal">result</span> name=<span class="string">"result_0"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section02/testresult0.jsp&lt;/<span class="literal">result</span>&gt;             </div><div class="line">    &lt;<span class="literal">result</span> name=<span class="string">"result_1"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section02/testresult1.jsp&lt;/<span class="literal">result</span>&gt;             </div><div class="line">    &lt;<span class="literal">result</span> name=<span class="string">"result_2"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section02/testresult2.jsp&lt;/<span class="literal">result</span>&gt;             </div><div class="line">    &lt;<span class="literal">result</span> name=<span class="string">"result_3"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section02/testresult3.jsp&lt;/<span class="literal">result</span>&gt;             </div><div class="line">&lt;/action&gt;</div></pre></td></tr></table></figure>
+
+<p>此时Action类中的处理方法为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="built_in">String</span> testResultName() {   </div><div class="line">    <span class="keyword">if</span>(<span class="built_in">number</span>%<span class="number">4</span> == <span class="number">0</span>) {            </div><div class="line">        <span class="keyword">return</span> <span class="string">"result_0"</span>;         </div><div class="line">    } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="built_in">number</span>%<span class="number">4</span> == <span class="number">1</span>) {     </div><div class="line">        <span class="keyword">return</span> <span class="string">"result_1"</span>;         </div><div class="line">    } <span class="keyword">else</span> <span class="keyword">if</span>(<span class="built_in">number</span>%<span class="number">4</span> == <span class="number">2</span>) {     </div><div class="line">        <span class="keyword">return</span> <span class="string">"result_2"</span>;         </div><div class="line">    } <span class="keyword">else</span> {                       </div><div class="line">        <span class="keyword">return</span> <span class="string">"result_3"</span>;         </div><div class="line">    }                              </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>也就是根据不同的number值，最后可以转发到不同的JSP页面。</p>
+<h3 id="result的type属性">result的type属性</h3>
+<p><strong>type表示响应结果的类型，可以打开struts-default.xml文件查询Struts2支持的响应类型，如下所示：</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="literal">result</span>-types&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"chain"</span> class=<span class="string">"com.opensymphony.xwork2.ActionChainResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"dispatcher"</span> class=<span class="string">"org.apache.struts2.dispatcher.ServletDispatcherResult"</span> default=<span class="string">"true"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"freemarker"</span> class=<span class="string">"org.apache.struts2.views.freemarker.FreemarkerResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"httpheader"</span> class=<span class="string">"org.apache.struts2.dispatcher.HttpHeaderResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"redirect"</span> class=<span class="string">"org.apache.struts2.dispatcher.ServletRedirectResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"redirectAction"</span> class=<span class="string">"org.apache.struts2.dispatcher.ServletActionRedirectResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"stream"</span> class=<span class="string">"org.apache.struts2.dispatcher.StreamResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"velocity"</span> class=<span class="string">"org.apache.struts2.dispatcher.VelocityResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"xslt"</span> class=<span class="string">"org.apache.struts2.views.xslt.XSLTResult"</span>/&gt;</div><div class="line">    &lt;<span class="literal">result</span>-<span class="keyword">type</span> name=<span class="string">"plainText"</span> class=<span class="string">"org.apache.struts2.dispatcher.PlainTextResult"</span> /&gt;</div><div class="line">&lt;/<span class="literal">result</span>-types&gt;</div></pre></td></tr></table></figure>
+
+<p>其中最常用的是dispatcher、redirect、redirectAction和chain：</p>
+<ul>
+<li>dispatcher：把控制权<strong>转发</strong>给指定资源，是默认的处理方式；</li>
+</ul>
+<ul>
+<li>redirect：把控制权<strong>重定向</strong>给指定资源。 redirect 结果类型接受下面这些参数：<ul>
+<li>location：用来给出重定向的目的地.它是默认属性；</li>
+<li>parse：用来表明是否把 location 参数的值视为一个 OGNL 表达式来解释，默认值为 true。<br>示例：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="literal">result</span>&gt;</div><div class="line">    &lt;param name=<span class="string">"location"</span>&gt;/login.jsp?name=${name}&lt;/param&gt;</div><div class="line">&lt;/<span class="literal">result</span>&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>redirectAction：<strong>重定向到另一个action节点</strong>。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="literal">result</span> name=<span class="string">"result_2"</span> <span class="keyword">type</span>=<span class="string">"redirectAction"</span>&gt;   </div><div class="line">    &lt;param name=<span class="string">"actionName"</span>&gt;testXxxAware&lt;/param&gt;</div><div class="line">    &lt;param name=<span class="string">"namespace"</span>&gt;/&lt;/param&gt;            </div><div class="line">&lt;/<span class="literal">result</span>&gt;</div></pre></td></tr></table></figure>
+
+<p><strong>此时必须用actionName字节点声明重定向的action名称，而且这个action是有效的配置项（在前面已经配置过的action节点）。</strong><br>其实重定向到另一个action节点也可以用redirect实现，例如用redirect实现上面的示例则为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="literal">result</span> name=<span class="string">"result_2"</span> <span class="keyword">type</span>=<span class="string">"redirect"</span>&gt;/testXxxAware&lt;/<span class="literal">result</span>&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>chain：前一个 action把控制权<strong>转发</strong>给后一个 action，而前一个 action 的状态在后一个 action 中依然保持。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="literal">result</span> name=<span class="string">"result_3"</span> <span class="keyword">type</span>=<span class="string">"chain"</span>&gt;                 </div><div class="line">    &lt;param name=<span class="string">"actionName"</span>&gt;testXxxAware&lt;/param&gt;     </div><div class="line">    &lt;param name=<span class="string">"namespace"</span>&gt;/&lt;/param&gt;                 </div><div class="line">&lt;/<span class="literal">result</span>&gt;</div></pre></td></tr></table></figure>
+
+<h2 id="通配符映射规则">通配符映射规则</h2>
+<p>一个 Web 应用可能有成百上千个 action 声明，可以利用 struts 提供的通配符映射机制把多个彼此相似的映射关系简化为一个映射关系。</p>
+<p>通配符映射规则：</p>
+<ul>
+<li><code>*</code>可以匹配零个或多个字符，但不包括<code>/</code>字符。如果想把<code>/</code>字符包括在内，需要使用<code>**</code>。如果需要对某个字符进行转义，需要使用<code>\</code>；</li>
+<li>若找到多个匹配，<strong>没有通配符的那个将胜出</strong>；</li>
+<li>若指定的动作不存在，Struts 将会尝试把这个 URI 与任何一个包含着通配符<code>*</code>的动作名及进行匹配；</li>
+<li>被通配符匹配到的 URI 字符串的子串可以用<code>{1}</code>，<code>{2}</code>来引用。<code>{1}</code>匹配第一个子串，<code>{2}</code> 匹配第二个子串… <code>{0}</code>匹配整个 URI；</li>
+<li>若 Struts 找到的带有通配符的匹配不止一个，<strong>则按先后顺序进行匹配</strong>。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;action name=<span class="string">"*_*"</span> class=<span class="string">"section02.{1}"</span> <span class="keyword">method</span>=<span class="string">"{2}"</span>&gt;</div><div class="line">    &lt;<span class="literal">result</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section02/{<span class="number">2</span>}.jsp&lt;/<span class="literal">result</span>&gt;       </div><div class="line">&lt;/action&gt;</div></pre></td></tr></table></figure>
+
+<h2 id="声明式异常处理">声明式异常处理</h2>
+<h3 id="异常捕获和处理方法">异常捕获和处理方法</h3>
+<p>struts.xml文件中可以使用exception-mapping或者global-exception-mappings配置声明式异常捕获映射，其中前者是局部的，后者是全局的。</p>
+<p>局部异常处理示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;package name=<span class="string">"section03"</span> extends=<span class="string">"struts-default"</span>&gt;                                                            </div><div class="line">    &lt;action name=<span class="string">"s3_product_input"</span>&gt;                                                                           </div><div class="line">        &lt;<span class="literal">result</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section03/product_input.jsp&lt;/<span class="literal">result</span>&gt;                                                  </div><div class="line">    &lt;/action&gt;                                                                                                  </div><div class="line">    &lt;action name=<span class="string">"testOGNL"</span> class=<span class="string">"section03.TestOGNL"</span> <span class="keyword">method</span>=<span class="string">"testOGNL"</span>&gt;                                      </div><div class="line">        &lt;!-- 声明式异常处理 --&gt;                                                                                       </div><div class="line">        &lt;exception-mapping <span class="literal">result</span>=<span class="string">"back_to_input"</span> exception=<span class="string">"java.lang.ArithmeticException"</span>/&gt;</div><div class="line">        &lt;!-- 处理异常 --&gt;</div><div class="line">        &lt;<span class="literal">result</span> name=<span class="string">"back_to_input"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section03/product_input.jsp&lt;/<span class="literal">result</span>&gt;            </div><div class="line">        &lt;!-- 正常响应结果 --&gt;                  </div><div class="line">        &lt;<span class="literal">result</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section03/product_details.jsp&lt;/<span class="literal">result</span>&gt;                                                </div><div class="line">    &lt;/action&gt;                                                                                                  </div><div class="line">&lt;/package&gt;</div></pre></td></tr></table></figure>
+
+<p>exception-mapping节点用于在action节点中就是声明局部异常处理。</p>
+<p>也可以使用全局的方式配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;package name=<span class="string">"section03"</span> extends=<span class="string">"struts-default"</span>&gt;                                                            </div><div class="line">    &lt;!-- 声明全局的异常处理 --&gt;                                                                                         </div><div class="line">    &lt;global-results&gt;                                                                                           </div><div class="line">        &lt;<span class="literal">result</span> name=<span class="string">"back_to_input"</span>&gt;/<span class="type">WEB</span>-<span class="type">INF</span>/section03/product_input.jsp&lt;/<span class="literal">result</span>&gt;                             </div><div class="line">    &lt;/global-results&gt;                                                                                          </div><div class="line">    &lt;global-exception-mappings&gt;                                                                                </div><div class="line">        &lt;exception-mapping <span class="literal">result</span>=<span class="string">"back_to_input"</span> exception=<span class="string">"java.lang.ArithmeticException"</span>/&gt;</div><div class="line">    &lt;/global-exception-mappings&gt;                                                                               </div><div class="line">    ...... 省略后面     </div><div class="line">&lt;/package&gt;</div></pre></td></tr></table></figure>
+
+<p>global-exception-mappings节点用于在package中声明全局的异常捕获，而且<strong>global-exception-mappings必须在global-results节点后面</strong>。</p>
+<h3 id="异常处理的基本机制">异常处理的基本机制</h3>
+<p>声明式异常处理机制由拦截器栈中的<code>ExceptionMappingInterceptor</code>拦截器负责处理，当某个exception-mapping节点声明的异常被捕获到时，该拦截器就会向 ValueStack 中添加一个名为<code>ExceptionHolder</code>的对象，该对象有两个属性：</p>
+<ul>
+<li>exception：表示被捕获异常的 Exception 对象；</li>
+<li>exceptionStack：包含着被捕获异常的栈。</li>
+</ul>
+<p>也就是栈顶此时为<code>ExceptionHolder</code>对象（可以通过<code>&lt;s:debug/&gt;</code>查看栈顶对象）。</p>
+<p><strong>因此在JSP页面上通过 s:property 标签可以显示异常信息</strong>，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">获取<span class="keyword">exception</span>对象：</div><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"exception"</span>/&gt; </div><div class="line">&lt;br/&gt;</div><div class="line"></div><div class="line"></div><div class="line">获取<span class="keyword">exception</span>对象的message属性：</div><div class="line">&lt;s:property <span class="keyword">value</span>=<span class="string">"exception.message"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<p>相关源码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">// <span class="type">ExceptionMappingInterceptor</span></div><div class="line">public <span class="type">String</span> intercept(<span class="type">ActionInvocation</span> invocation) throws <span class="type">Exception</span> {</div><div class="line">    <span class="type">String</span> <span class="literal">result</span>;</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="literal">result</span> = invocation.invoke();</div><div class="line">    } catch (<span class="type">Exception</span> e) {</div><div class="line">        <span class="keyword">if</span> (isLogEnabled()) {</div><div class="line">            handleLogging(e);</div><div class="line">        }</div><div class="line">        <span class="type">List</span>&lt;<span class="type">ExceptionMappingConfig</span>&gt; exceptionMappings = </div><div class="line">            invocation.getProxy().getConfig().getExceptionMappings();</div><div class="line">        <span class="type">ExceptionMappingConfig</span> mappingConfig = this.findMappingFromExceptions(exceptionMappings, e);</div><div class="line">        <span class="keyword">if</span> (mappingConfig != null && mappingConfig.getResult()!=null) {</div><div class="line">            <span class="type">Map</span> parameterMap = mappingConfig.getParams();</div><div class="line">            // create a mutable <span class="type">HashMap</span> since some interceptors will remove parameters, </div><div class="line">            // <span class="keyword">and</span> parameterMap <span class="keyword">is</span> immutable</div><div class="line">            invocation.getInvocationContext().setParameters(new <span class="type">HashMap</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt;(parameterMap));</div><div class="line">            <span class="literal">result</span> = mappingConfig.getResult();</div><div class="line">            publishException(invocation, new <span class="type">ExceptionHolder</span>(e));</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            throw e;</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> <span class="literal">result</span>;</div><div class="line">}           </div><div class="line"></div><div class="line"></div><div class="line">// 把包含异常信息的<span class="type">ExceptionHolder</span>对象设置到栈顶</div><div class="line">protected <span class="type">void</span> publishException(<span class="type">ActionInvocation</span> invocation, <span class="type">ExceptionHolder</span> exceptionHolder) { </div><div class="line">    invocation.getStack().push(exceptionHolder);                                                </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+<blockquote>
+<p>在后续的学习汇总，需要注意几个概念：<br>Action类<br>action方法<br>值栈</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Struts2/">Struts2</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Struts2/Struts2完全教程（1）- 入门项目详细说明/" data-title="Struts2完全教程（1）- 入门项目详细说明 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/Struts2/Struts2完全教程（2）- OGNL表达式和s标签/" title="Struts2完全教程（2）- OGNL表达式和s标签">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Struts2完全教程（2）- OGNL表达式和s标签</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（四）：原理分析/"  title="Spring MVC完全教程（四）：原理分析">
+ <strong>NEXT:</strong><br/> 
+ <span>Spring MVC完全教程（四）：原理分析
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用Filter作为控制分发器"><span class="toc-number">1.</span> <span class="toc-text">使用Filter作为控制分发器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第一个Struts2项目"><span class="toc-number">2.</span> <span class="toc-text">第一个Struts2项目</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2项目的搭建过程"><span class="toc-number">2.1.</span> <span class="toc-text">Struts2项目的搭建过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#web-xml文件的说明"><span class="toc-number">2.2.</span> <span class="toc-text">web.xml文件的说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#struts-xml文件说明"><span class="toc-number">2.3.</span> <span class="toc-text">struts.xml文件说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2应用的默认配置文件"><span class="toc-number">2.4.</span> <span class="toc-text">Struts2应用的默认配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Struts2响应请求的基本过程"><span class="toc-number">2.5.</span> <span class="toc-text">Struts2响应请求的基本过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP页面的说明"><span class="toc-number">2.6.</span> <span class="toc-text">JSP页面的说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-number">2.7.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action类"><span class="toc-number">3.</span> <span class="toc-text">Action类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#访问Web资源"><span class="toc-number">4.</span> <span class="toc-text">访问Web资源</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用ActionContext的解耦方法"><span class="toc-number">4.1.</span> <span class="toc-text">使用ActionContext的解耦方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用实现XxxAware的解耦方法"><span class="toc-number">4.2.</span> <span class="toc-text">使用实现XxxAware的解耦方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_ServletActionContext_的耦合方法"><span class="toc-number">4.3.</span> <span class="toc-text">使用 ServletActionContext  的耦合方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用实现ServletXxxAware接口的耦合方法"><span class="toc-number">4.4.</span> <span class="toc-text">使用实现ServletXxxAware接口的耦合方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ActionSupport"><span class="toc-number">5.</span> <span class="toc-text">ActionSupport</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#result节点补充介绍"><span class="toc-number">6.</span> <span class="toc-text">result节点补充介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#result的name属性"><span class="toc-number">6.1.</span> <span class="toc-text">result的name属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#result的type属性"><span class="toc-number">6.2.</span> <span class="toc-text">result的type属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通配符映射规则"><span class="toc-number">7.</span> <span class="toc-text">通配符映射规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#声明式异常处理"><span class="toc-number">8.</span> <span class="toc-text">声明式异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#异常捕获和处理方法"><span class="toc-number">8.1.</span> <span class="toc-text">异常捕获和处理方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#异常处理的基本机制"><span class="toc-number">8.2.</span> <span class="toc-text">异常处理的基本机制</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

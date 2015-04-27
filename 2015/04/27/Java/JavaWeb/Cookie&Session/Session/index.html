@@ -1,0 +1,463 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Session | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="服务器端技术
+在Cookie一节已经提到，Session属于服务端技术。
+一次会话的解析
+首先开启浏览器并用一个窗口访问下面的资源SessionDemo1：
+12345void doGet(HttpServletRequest request, HttpServletResponse respons">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/JavaWeb/Cookie&Session/Session/" title="Session" itemprop="url">Session</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#服务器端技术"><span class="toc-number">1.</span> <span class="toc-text">服务器端技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一次会话的解析"><span class="toc-number">2.</span> <span class="toc-text">一次会话的解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session的实现原理"><span class="toc-number">3.</span> <span class="toc-text">Session的实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Session和Cookie"><span class="toc-number">3.1.</span> <span class="toc-text">Session和Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#结论"><span class="toc-number">3.2.</span> <span class="toc-text">结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getSession(false)方法"><span class="toc-number">3.3.</span> <span class="toc-text">getSession(false)方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session失效问题"><span class="toc-number">4.</span> <span class="toc-text">Session失效问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#说明"><span class="toc-number">4.0.1.</span> <span class="toc-text">说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改Session对应Cookie的有效时间"><span class="toc-number">4.1.</span> <span class="toc-text">修改Session对应Cookie的有效时间</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#浏览器禁用Cookie后Session失效的解决办法"><span class="toc-number">5.</span> <span class="toc-text">浏览器禁用Cookie后Session失效的解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重复提交问题与解决办法"><span class="toc-number">6.</span> <span class="toc-text">重复提交问题与解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#验证码校验"><span class="toc-number">7.</span> <span class="toc-text">验证码校验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpSession对象的搁置与激活"><span class="toc-number">8.</span> <span class="toc-text">HttpSession对象的搁置与激活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题补充："><span class="toc-number">9.</span> <span class="toc-text">问题补充：</span></a></li></ol>
+		</div>
+		
+		<h2 id="服务器端技术">服务器端技术</h2>
+<p>在Cookie一节已经提到，Session属于服务端技术。</p>
+<h2 id="一次会话的解析">一次会话的解析</h2>
+<p>首先开启浏览器并用一个窗口访问下面的资源SessionDemo1：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> doGet(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">    HttpSession session = request.getSession();</div><div class="line">    session.setAttribute(<span class="string">"data"</span>, <span class="string">"hello"</span>);</div><div class="line">    response.getWriter().println(<span class="string">"done"</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>然后在同一个浏览器的不同窗口中访问SessionDemo2：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">    HttpSession session = request.getSession();</div><div class="line">    Object obj = session.getAttribute(<span class="string">"data"</span>);</div><div class="line">    PrintWriter out = response.getWriter();</div><div class="line">    <span class="keyword">if</span>(obj != <span class="keyword">null</span>) {</div><div class="line">        out.println(obj.toString());</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        out.println(<span class="string">"nothing!"</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这时能获取Session中对应的内容，这里没什么可说的。</p>
+<p>然后再开启一个新的浏览器进程，并打开一个窗口，还是访问SessionDemo2，对应IE8或以上来说，也能获取Session中对应的内容。<br><strong>也就是浏览器只有还存在（同款浏览器），那么无论打开新窗口或新的浏览器，Session都能访问，若中间出现中断就不能在获取Session中对应的内容了。</strong></p>
+<p><strong>或者更简单的说明，浏览器没关，那么会话就一直存在（其实有效时间是30分钟，下面会说明）。</strong></p>
+<h2 id="Session的实现原理">Session的实现原理</h2>
+<p>首先看<code>HttpServletRequest</code>的<code>getSession</code>方法，该方法用于获取一个Session对象，可以传入true（等价于不传参数）或false作为方法的参数：</p>
+<h3 id="Session和Cookie">Session和Cookie</h3>
+<p>先获取浏览器传递过来的Cookie数组中是否有name为JSESSIONID的对象（即请求头中有name为JSESSIONID的Cookie）， 若有则根据该对象生成Session对象。若没有，则创建新的Session对象（其实就是Cookie），而且设置响应头的<strong>Set-Cookie</strong>字段。<br>看下面的测试代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/SessionCookie"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionCookie</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line"> </div><div class="line">        Cookie[] cookieArray = request.getCookies();</div><div class="line">        <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">                <span class="keyword">if</span>(<span class="string">"JSESSIONID"</span>.equals(c.getName())) {</div><div class="line">                    out.println(<span class="string">"name="</span> + c.getName() + <span class="string">", value="</span> + c.getValue()</div><div class="line">                            + <span class="string">", age="</span> + c.getMaxAge() + <span class="string">", path="</span> + c.getPath()</div><div class="line">                            + <span class="string">", secure="</span> + c.getSecure());   </div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">        HttpSession session = request.getSession();</div><div class="line">        session.setAttribute(<span class="string">"data"</span>, <span class="string">"hello, session"</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>测试过程</strong>：</p>
+<ul>
+<li><p>当第一次请求该Servlet资源时，<strong>没有任何Cookie</strong>，此时<code>request.getSession()</code> 会创建一个新的<code>HttpSession</code>对象，而这个<code>HttpSession</code>对象是通过 Cookie技术实现的。它的name属性为<strong>JSESSIONID</strong>，value值为一个很长的数组字母组合。<strong> 而且响应头中写入一个Cookie</strong>，它大致为： <code>Set-Cookie: JSESSIONID=85DF4EE96EE132E8736748CCC6597625;  Path=/session01/; HttpOnly</code>；</p>
+</li>
+<li><p>第二次访问时，就能获取到Cookie且name为JSESSIONID，这时的请求头：     <code>Cookie: JSESSIONID=85DF4EE96EE132E8736748CCC6597625</code>， 而响应头这时是没有Cookie的。后续继续访问该资源都是请求头携带Cookie，而响应头没有Cookie，直到会话结束；</p>
+</li>
+</ul>
+<ul>
+<li>当关闭浏览器（退出进程），重新打开新的浏览器访问资源时，<strong>也是没有Cookie</strong>！这说明了上一次会话Session对应的Cookie是一个临时的Cookie（从输出内容可以看到maxAge=-1），所以才会在浏览器退出是被删除。</li>
+</ul>
+<blockquote>
+<p>注意：<br>1）这个Session（Cookie）的存活时间就是前面说的一次会话，即浏览器关闭后， 下次打开浏览器访问会创建新的Session（对应Cookie的值会不一样）。<br>2）不同用户或者同一个用户的不同浏览器之间调用getSession创建的Cookie是不同的，这可以从Cookie的值上看得出。 而打开同一个浏览器的不同窗口或者多个同款浏览器的进程之间的Session对应的Cookie是相同的。</p>
+</blockquote>
+<p><strong>测试结果</strong>：</p>
+<ul>
+<li>第一次访问时，输出内容为：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">session request...</div><div class="line">======<span class="variable">session=</span>====</div><div class="line"><span class="variable">id=</span><span class="number">9</span>A31E0374B6CC638F783B8D749E2257A, <span class="variable">createTime=</span><span class="number">1429029123032</span>, <span class="variable">maxInactiveInterval=</span><span class="number">1800</span> </div><div class="line">======<span class="variable">session=</span>====</div></pre></td></tr></table></figure>
+
+<ul>
+<li>从第二次开始，输出内容为：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">session request...</div><div class="line">======<span class="variable">cookie=</span>====</div><div class="line"><span class="variable">name=</span>JSESSIONID, <span class="variable">value=</span><span class="number">9</span>A31E0374B6CC638F783B8D749E2257A, <span class="variable">path=</span><span class="constant">null</span>, <span class="variable">maxAge=</span>-<span class="number">1</span>, <span class="variable">domain=</span><span class="variable">null</span></div><div class="line">======<span class="variable">cookie=</span>====</div><div class="line">======<span class="variable">session=</span>====</div><div class="line"><span class="variable">id=</span><span class="number">9</span>A31E0374B6CC638F783B8D749E2257A, <span class="variable">createTime=</span><span class="number">1429029123032</span>, <span class="variable">maxInactiveInterval=</span><span class="number">1800</span></div><div class="line">======<span class="variable">session=</span>====</div></pre></td></tr></table></figure>
+
+<p>从第二次的输出结果知道，Session的id和Cookie的value值是一致的！！</p>
+<h3 id="结论">结论</h3>
+<p><strong>第一次访问时，没有携带JSESSIONID，此时服务端直接创建一个HttpSession对象，并且以响应头Set-Cookie的方式设置到浏览器端；第二次访问时就携带了JSESSIONID，服务端根据这个JSESSIONID知道这是已经创建了的HttpSession对象，所以直接返回该对象。</strong></p>
+<p><strong>当关闭浏览器后，浏览器端的Cookie会被清除，此时再次访问的话就不会携带JSESSIONID，服务器端就认为这是个新的请求，重新创建HttpSession对象；而服务器应该维护着大量的HttpSession对象，并在合适的时间销毁。</strong></p>
+<p>最后，查看<code>getSession()</code>方法的API的说明：</p>
+<blockquote>
+<p>Returns the current session associated with this request, or if the request does not have a session, creates one.</p>
+</blockquote>
+<h3 id="getSession(false)方法">getSession(false)方法</h3>
+<p><code>getSession(false)</code>和<code>getSession()</code>是有区别的，前者 只能根据请求头传递的Cookie对象创建Session对象，若请求头中没有Session对应的Cookie对象，则返回值为null！</p>
+<p>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/SessionCookie2"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionCookie2</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line"> </div><div class="line">        Cookie[] cookieArray = request.getCookies();</div><div class="line">        <span class="keyword">if</span>(cookieArray != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">for</span>(Cookie c : cookieArray) {</div><div class="line">                <span class="keyword">if</span>(<span class="string">"JSESSIONID"</span>.equals(c.getName())) {</div><div class="line">                    out.println(<span class="string">"name="</span> + c.getName() + <span class="string">", value="</span> + c.getValue()</div><div class="line">                            + <span class="string">", age="</span> + c.getMaxAge() + <span class="string">", path="</span> + c.getPath()</div><div class="line">                            + <span class="string">", secure="</span> + c.getSecure());   </div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line"> </div><div class="line">        HttpSession session = request.getSession(<span class="keyword">false</span>);</div><div class="line">        <span class="keyword">if</span>(session != <span class="keyword">null</span>) {</div><div class="line">            session.setAttribute(<span class="string">"data"</span>, <span class="string">"hello, session"</span>);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            out.println(<span class="string">"session is null"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>上面的测试代码中，若请求消息头中没有JSESSIONID的Cookie，则getSession(false)返回值为null。<br>若在同一个浏览器中先访问了SessionCookie资源，再访问SessionCookie2资源时就能获取到Session对象，原因在上面的注意中说明了。</p>
+<h2 id="Session失效问题">Session失效问题</h2>
+<p>前面说明的Session的原理后，知道是通过Cookie技术实现的。而Cookie可以设置存活时间，<strong>那么默认的Session时间是30分钟</strong>， 也就是浏览器没关，等待30分钟后Session也会失效，再次访问时就会调用<code>getSession(true)</code>方法的话创建新的Session。</p>
+<p><strong>注意，这里所说的失效是针对服务端来说的！因为在客户端只要关闭了浏览器进程Session就会销毁！</strong></p>
+<p>如果没到达30分钟就关闭浏览器后再重新访问，这时Session是新创建的，而原先服务器端的Session其实也还存在于内存中，但已经不能获取了！</p>
+<p>修改Session时间的方法是：<br><strong>可以直接在服务器端修改，也可以通过HttpSession在客户端设置，但最后都是在服务器端生效的！</strong></p>
+<ul>
+<li>方法一：<br>修改web.xml文件，注意：Tomcat服务器和项目中都有web.xml文件！</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">web-app</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">session-config</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">session-timeout</span>&gt;</span>1<span class="tag">&lt;/<span class="title">session-timeout</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">session-config</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">web-app</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+<ul>
+<li>方法二：<br>调用<code>HttpSession</code>的<code>setMaxInactiveInterval</code>方法：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/SessionLife3"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionLife3</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line">        DateFormat format = DateFormat.getInstance();</div><div class="line"> </div><div class="line">        HttpSession session = request.getSession();</div><div class="line">        Cookie sessionCookie = <span class="keyword">null</span>;</div><div class="line">        Cookie[] cookies = request.getCookies();</div><div class="line">        <span class="keyword">if</span>(cookies != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">for</span>(Cookie cookie : cookies) {</div><div class="line">                <span class="keyword">if</span>(<span class="string">"JSESSIONID"</span>.equals(cookie.getName())) {</div><div class="line">                    sessionCookie = cookie;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line"> </div><div class="line">        sessionInfo(session, sessionCookie, out, format);</div><div class="line"> </div><div class="line">        session.setMaxInactiveInterval(<span class="number">10</span>);</div><div class="line">        sessionInfo(session, sessionCookie, out, format);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="comment">// 输出Session的信息，包括创建时间，上次获取时间和最大活动时间</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionInfo</span>(HttpSession session, Cookie cookie, PrintWriter out, DateFormat format) {</div><div class="line"> </div><div class="line">        <span class="keyword">long</span> getCreationTime = session.getCreationTime();</div><div class="line">        <span class="keyword">long</span> getLastAccessedTime = session.getLastAccessedTime();</div><div class="line">        <span class="keyword">int</span> getMaxInactiveInterval = session.getMaxInactiveInterval();</div><div class="line">        String creationTime = format.format(<span class="keyword">new</span> Date(getCreationTime));</div><div class="line">        String accessTime = format.format(<span class="keyword">new</span> Date(getLastAccessedTime));</div><div class="line"> </div><div class="line">        out.println(<span class="string">"Session:&lt;br&gt;getCreationTime:"</span> + creationTime</div><div class="line">                + <span class="string">", getLastAccessedTime:"</span> + accessTime</div><div class="line">                + <span class="string">", getMaxInactiveInterval:"</span> + getMaxInactiveInterval</div><div class="line">                + <span class="string">"&lt;br&gt;"</span>);</div><div class="line"> </div><div class="line">        <span class="keyword">if</span>(cookie != <span class="keyword">null</span>) {</div><div class="line">            out.println(<span class="string">"Cookie:&lt;br&gt; value:"</span> + cookie.getValue()</div><div class="line">                + <span class="string">", maxage:"</span> + cookie.getMaxAge()</div><div class="line">                + <span class="string">"&lt;br&gt;&lt;br&gt;"</span>);</div><div class="line">        }</div><div class="line"> </div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<p>注意：<br>session的失效时间是在服务端计算的，因此调试时应该修改服务端时间进行调试，而不是客户端。</p>
+<h4 id="说明">说明</h4>
+<p>1）优先级：setMaxInactiveInterval &gt; 应用的web.xml设置 &gt; Tomcat的web.xml设置。<br>2）若访问服务器session超时，即上次会话结束，但服务器与客户端会产生一个新的会话，之前的session里的属性值全部丢失。<br>3）客户端与服务器一次有效会话（session没有超时），若代码中设置了setMaxInactiveInterval值，那么这个session的最大不活动间隔时间将被修改，并被应用为新值。<br>4）Session在这些情况销毁：某个请求周期内调用了Session.invalidate()方法，此请求周期结束后，session被销毁；<br>或者是session超时后自动销毁；或者客户端关掉浏览器。<br>5.对于JSP，如果指定了<code>&lt;%@ page session=&quot;false&quot;%&gt;</code>，则在JSP中无法直接访问内置的session变量，同时也不会主动创建session，<br>因为此时JSP未自动执行<code>request.getSession()</code>操作获取session。</p>
+<h3 id="修改Session对应Cookie的有效时间">修改Session对应Cookie的有效时间</h3>
+<p>既然Session是通过Cookie实现，那么获取name为JSESSIONID的Cookie后，设置age和path属性，然后添加到response中，<br>这时响应头就会有Set-Cookie，此时关闭浏览器后在Cookie有效时间内重新打开浏览器能获取上次的Session。<br>示例代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/SessionLife2"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionLife2</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        <span class="keyword">boolean</span> hasSession = <span class="keyword">false</span>;</div><div class="line"> </div><div class="line">        Cookie[] cookies = request.getCookies();</div><div class="line">        <span class="keyword">if</span>(cookies != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">for</span>(Cookie cookie : cookies) {</div><div class="line">                <span class="keyword">if</span>(<span class="string">"JSESSIONID"</span>.equals(cookie.getName())) {</div><div class="line">                    System.out.println(<span class="string">"获取到Cookie"</span>);</div><div class="line">                    hasSession = <span class="keyword">true</span>;</div><div class="line">                    <span class="comment">// 在这个时间内关闭浏览器退出后重新打开浏览器，Session（Cookie）还在</span></div><div class="line">                    cookie.setMaxAge(<span class="number">60</span>);</div><div class="line">                    cookie.setPath(request.getContextPath());</div><div class="line">                    <span class="comment">// 告诉浏览器保存Cookie，响应头有Set-Cookie头</span></div><div class="line">                    response.addCookie(cookie);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span>(!hasSession) {</div><div class="line">            System.out.println(<span class="string">"创建新的Session"</span>);</div><div class="line">            HttpSession session = request.getSession();</div><div class="line">            session.setAttribute(<span class="string">"data"</span>, <span class="string">"hello, session"</span>);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            PrintWriter out = response.getWriter();</div><div class="line">            response.setContentType(<span class="string">"charset=UTF-8"</span>);</div><div class="line">            HttpSession session = request.getSession(<span class="keyword">false</span>);</div><div class="line">            <span class="comment">// 这里session一定不为null，因为为null就会创建新的Session</span></div><div class="line">            Object data = session.getAttribute(<span class="string">"data"</span>);</div><div class="line">            out.println(<span class="string">"data:"</span> + data);</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>疑惑<br>上面修改Session有效时间和获取Session对应的Cookie对象，然后用setMaxAge修改存活时间的方法有什么区别？？？？<br>个人思考，正确性未知：<br>应该避免这种用法，因为设置Cookie的存活时间是客户端计算的，而Session的有效时间又是服务端计算的，两者的时间不统一，<br>很难知道Session是否已经失效或者Cookie是否存活在下次请求头中。<br>另一种说法：<br>如果通过创建一个名为 JSESSIONID的Cookie保存在客户端中并设置了生命周期为最大，那么当服务器端失效后，<br>客户端的Cookie依然存在，但传递过去后由于服务器端已经没有对应的HttpSession，所以不能识别。</p>
+</blockquote>
+<h2 id="浏览器禁用Cookie后Session失效的解决办法">浏览器禁用Cookie后Session失效的解决办法</h2>
+<p>若浏览器设置禁用Cookie，由于Session是依靠Cookie实现的，因此会失效。此时的解决办法是重写URL地址。<br>浏览器禁止Cookie后可以理解为响应头和请求头都不再带Cookie或者Set-Cookie字段，这时可以把相应的Cookie：<br>JSESSIONID=XXXXX加到URL地址后面，这时跳转或重定向时虽然请求头没有Cookie，但URL地址中还是能获取到Cookie，就解决了问题。<br><code>HttpServletResponse</code>提供了2个方法，分别用于一般跳转和重定向的URL重写：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">encodeURL(<span class="built_in">String</span> url);</div><div class="line">encodeRedirectURL(<span class="built_in">String</span> url);</div></pre></td></tr></table></figure>
+
+<p>注意，若浏览器禁用Cookie后，整个网站是所有URL地址都需要重写。<br>示例：<br>登录界面的html代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">form</span> <span class="attribute">action</span>=<span class="value">"/session01/SimpleLogin"</span>&gt;</span>               </div><div class="line">    username:<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"username"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">value</span>=<span class="value">"登录"</span> /&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span>           </div><div class="line"><span class="tag">&lt;/<span class="title">form</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>跳转到登录的Servlet，若浏览器禁用Cookie，需要重写URL：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/SimpleLogin"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleLogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        String username = request.getParameter(<span class="string">"username"</span>);</div><div class="line">        HttpSession session = request.getSession();</div><div class="line">        session.setAttribute(<span class="string">"username"</span>, username);</div><div class="line">        <span class="comment">// 重写URL地址，防止浏览器禁用Cookie后Session失效</span></div><div class="line">        String url = request.getContextPath() + <span class="string">"/MainPage"</span>;</div><div class="line">        url = response.encodeRedirectURL(url);</div><div class="line">        <span class="comment">// 重写后的URL大概是这样的：url= /session01/MainPage;jsessionid=5D4EBF41CD2E64F8CDC95FE3661B93D8</span></div><div class="line">        System.out.println(<span class="string">"url= "</span> + url);</div><div class="line">        response.sendRedirect(url);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest req, HttpServletResponse resp)</div><div class="line">            <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doPost(req, resp);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>最后是判断是否登录成功：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/MainPage"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainPage</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line">        HttpSession session = request.getSession(<span class="keyword">false</span>);</div><div class="line">        <span class="keyword">if</span>(session == <span class="keyword">null</span>) {</div><div class="line">            out.println(<span class="string">"请登录"</span>);</div><div class="line">            <span class="keyword">return</span> ;</div><div class="line">        }</div><div class="line">        Object obj = session.getAttribute(<span class="string">"username"</span>);</div><div class="line">        <span class="keyword">if</span>(obj == <span class="keyword">null</span>) {</div><div class="line">            out.println(<span class="string">"请登录"</span>);</div><div class="line">            <span class="keyword">return</span> ;</div><div class="line">        }</div><div class="line">        String username = (String)obj;</div><div class="line">        out.println(<span class="string">"登录成功："</span> + username);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="重复提交问题与解决办法">重复提交问题与解决办法</h2>
+<p>例如在登录界面时，由于服务端响应较慢或网络延迟等问题，用户点击了多次的登录按钮。此时相当于发送了多次请求，服务端若都对这些请求进行处理的话可能产生问题。<br>解决方法：<br>在登录界面产生一个唯一的记号token（例如UUID），点击登录后把这个token发送到服务端，同时在发送前写入Session中。<br>在服务端接收到这个token后与Session中的值对比，若相同说明是第一次登录。否则是重复提交。<br>示例：<br>下面是登录界面的代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line">    <span class="vbscript">&lt;%<span class="built_in">String</span> uuid = UUID.randomUUID().toString(); %&gt;</span></div><div class="line">    <span class="vbscript">&lt;%<span class="built_in">request</span>.getSession().setAttribute(<span class="string">"uuid"</span>, uuid); %&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="title">form</span> <span class="attribute">action</span>=<span class="value">"/session01/Relogin"</span> <span class="attribute">method</span>=<span class="value">"post"</span>&gt;</span></div><div class="line">        username:<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"username"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">value</span>=<span class="value">"登录"</span> /&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"hidden"</span> <span class="attribute">name</span>=<span class="value">"token"</span> <span class="attribute">value</span>=<span class="value">&lt;%=uuid</span> %&gt;</span> /&gt;<span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>下面是服务端的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/Relogin"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Relogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            Thread.sleep(<span class="number">1000</span>);</div><div class="line">        } <span class="keyword">catch</span> (InterruptedException e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">        String username = request.getParameter(<span class="string">"username"</span>);</div><div class="line">        String token = request.getParameter(<span class="string">"token"</span>);</div><div class="line">        HttpSession session = request.getSession();</div><div class="line">        String uuid = (String) session.getAttribute(<span class="string">"uuid"</span>);</div><div class="line"> </div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line">        out.println(<span class="string">"token="</span> + token + <span class="string">", uuid="</span> + uuid + <span class="string">"&lt;br&gt;"</span>);</div><div class="line"> </div><div class="line">        <span class="keyword">if</span>(uuid != <span class="keyword">null</span> && uuid.equals(token)) {</div><div class="line">            out.println(<span class="string">"登录成功，username:"</span> + username);</div><div class="line">            <span class="comment">// 删除Session的属性</span></div><div class="line">            session.removeAttribute(<span class="string">"uuid"</span>);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            out.println(<span class="string">"请不要重复登录"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h2 id="验证码校验">验证码校验</h2>
+<p>登录界面获取验证码，而产生验证码的Servlet除了返回验证码图片外，还要把验证码放入Session。<br>进入登录校验时，就能从Session中获取验证码，同时与登录界面传递的验证码进行检验了。<br>示例代码：<br>登录界面的html代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript"></span></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">fleshCode</span><span class="params">()</span> </span>{</div><div class="line">        <span class="keyword">var</span> code = <span class="built_in">document</span>.getElementById(<span class="string">"code"</span>);</div><div class="line">        code.src = <span class="string">"/session01/VerifyCodeLogin?"</span> + <span class="keyword">new</span> <span class="built_in">Date</span>().getTime();</div><div class="line">    }</div><div class="line"><span class="tag">&lt;/<span class="title">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">form</span> <span class="attribute">action</span>=<span class="value">"/session01/CodeLogin"</span>&gt;</span></div><div class="line">        username:<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"username"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">        code:<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"code"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">img</span> <span class="attribute">alt</span>=<span class="value">""</span> <span class="attribute">src</span>=<span class="value">"/session01/VerifyCodeLogin"</span> <span class="attribute">id</span>=<span class="value">"code"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"button"</span> <span class="attribute">value</span>=<span class="value">"刷新"</span> <span class="attribute">onclick</span>=<span class="value">"fleshCode()"</span>/&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">value</span>=<span class="value">"登录"</span> /&gt;</span><span class="tag">&lt;<span class="title">br</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>产生验证码的Servlet：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">class GenerateCode {</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WIDTH = <span class="number">120</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HEIGHT = <span class="number">30</span>;</div><div class="line"> </div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">getCode</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> IOException {</div><div class="line">        BufferedImage bi = <span class="keyword">new</span> BufferedImage(WIDTH, HEIGHT,</div><div class="line">                BufferedImage.TYPE_INT_RGB);</div><div class="line">        Graphics g = bi.getGraphics();</div><div class="line">        <span class="comment">// 边框</span></div><div class="line">        g.setColor(Color.BLUE);</div><div class="line">        g.drawRect(<span class="number">0</span>, <span class="number">0</span>, WIDTH, HEIGHT);</div><div class="line">        <span class="comment">// 背景</span></div><div class="line">        g.setColor(Color.GRAY);</div><div class="line">        g.fillRect(<span class="number">1</span>, <span class="number">1</span>, WIDTH - <span class="number">2</span>, HEIGHT - <span class="number">2</span>);</div><div class="line">        <span class="comment">// 干扰线</span></div><div class="line">        g.setColor(Color.YELLOW);</div><div class="line">        Random r = <span class="keyword">new</span> Random();</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) {</div><div class="line">            <span class="keyword">int</span> x0 = r.nextInt(WIDTH);</div><div class="line">            <span class="keyword">int</span> y0 = r.nextInt(HEIGHT);</div><div class="line">            <span class="keyword">int</span> x1 = r.nextInt(WIDTH);</div><div class="line">            <span class="keyword">int</span> y1 = r.nextInt(HEIGHT);</div><div class="line">            g.drawLine(x0, y0, x1, y1);</div><div class="line">        }</div><div class="line">        <span class="comment">// 字符</span></div><div class="line">        g.setColor(Color.RED);</div><div class="line">        g.setFont(<span class="keyword">new</span> Font(<span class="string">"宋体"</span>, Font.BOLD, <span class="number">20</span>));</div><div class="line">        StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</div><div class="line">        <span class="keyword">int</span> x = <span class="number">20</span>;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) {</div><div class="line">            String c = r.nextInt(<span class="number">9</span>) + <span class="string">""</span>;</div><div class="line">            g.drawString(c, x, <span class="number">20</span>);</div><div class="line">            x += <span class="number">20</span>;</div><div class="line">            buffer.append(c);</div><div class="line">        }</div><div class="line">        <span class="comment">// 加密字符并放入session</span></div><div class="line">        String code = buffer.toString();</div><div class="line">        request.getSession().setAttribute(<span class="string">"code"</span>, MD5Util.encode(code));</div><div class="line">        ImageIO.write(bi, <span class="string">"jpeg"</span>, response.getOutputStream());</div><div class="line">    }</div><div class="line">}</div><div class="line"> </div><div class="line"><span class="javadoc">/**</span></div><div class="line">* 登录时提供验证码进行校验，涉及的页面是：login2.html</div><div class="line">*/</div><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/VerifyCodeLogin"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VerifyCodeLogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        GenerateCode.getCode(request, response);</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request,</div><div class="line">            HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>检验的Servlet：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@WebServlet</span>(<span class="string">"/CodeLogin"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CodeLogin</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>{</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1</span>L;</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        String code = request.getParameter(<span class="string">"code"</span>);</div><div class="line">        code = MD5Util.encode(code);</div><div class="line"> </div><div class="line">        HttpSession session = request.getSession();</div><div class="line">        String md5Code = (String) session.getAttribute(<span class="string">"code"</span>);</div><div class="line"> </div><div class="line">        response.setContentType(<span class="string">"text/html;charset=UTF-8"</span>);</div><div class="line">        PrintWriter out = response.getWriter();</div><div class="line">        <span class="keyword">if</span>(code != <span class="keyword">null</span> && code.endsWith(md5Code)) {</div><div class="line">            out.println(<span class="string">"登录成功"</span>);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            out.println(<span class="string">"验证码错误"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line"> </div><div class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span>(HttpServletRequest request, HttpServletResponse response) <span class="keyword">throws</span> ServletException, IOException {</div><div class="line">        doGet(request, response);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="HttpSession对象的搁置与激活">HttpSession对象的搁置与激活</h2>
+<p>会话使用时可能出现的现象<br>1）HttpSession对象可能会很多，内存不够<br>2）用户离开电脑时间比较长(但 &lt;30 分钟)<br>3）应用重新启动了(对于用户购买的商品应该还在)</p>
+<p>出现这些情况的时候，可以把HttpSession 对象持久化到硬盘中(利用的是对象的序列号操作)，<br>等到需要的时候重新从硬盘中反序列化就能获取原来的对象。</p>
+<p>HttpSession 有以下4个状态，且它们之间的转换如图所示：</p>
+<h2 id="问题补充：">问题补充：</h2>
+<blockquote>
+<p>1）第一方Cookie和第三方Cookie<br>第一方cookie指的是访客当前访问的网站给访客的浏览器设置的cookie, 会被存储在访客的计算机上。<br>第三方cookie指的是当前访问的网站中会加载另外第三方的代码，例如促销广告，那么第三方也会在访客的计算机上添加cookie，这种就是第三方cookie。例如访问新浪微博，京东的广告出现了，那么京东有可能就会在访客的计算器上添加这个cookie文件, 京东就属于第三方。</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Cookie-Session/">Cookie&Session</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/JavaWeb/Cookie&Session/Session/" data-title="Session | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/EL和JSTL/" title="EL和JSTL">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  EL和JSTL</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/JavaWeb/Cookie&Session/Cookie/"  title="Cookie">
+ <strong>NEXT:</strong><br/> 
+ <span>Cookie
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#服务器端技术"><span class="toc-number">1.</span> <span class="toc-text">服务器端技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一次会话的解析"><span class="toc-number">2.</span> <span class="toc-text">一次会话的解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session的实现原理"><span class="toc-number">3.</span> <span class="toc-text">Session的实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Session和Cookie"><span class="toc-number">3.1.</span> <span class="toc-text">Session和Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#结论"><span class="toc-number">3.2.</span> <span class="toc-text">结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getSession(false)方法"><span class="toc-number">3.3.</span> <span class="toc-text">getSession(false)方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session失效问题"><span class="toc-number">4.</span> <span class="toc-text">Session失效问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#说明"><span class="toc-number">4.0.1.</span> <span class="toc-text">说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改Session对应Cookie的有效时间"><span class="toc-number">4.1.</span> <span class="toc-text">修改Session对应Cookie的有效时间</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#浏览器禁用Cookie后Session失效的解决办法"><span class="toc-number">5.</span> <span class="toc-text">浏览器禁用Cookie后Session失效的解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重复提交问题与解决办法"><span class="toc-number">6.</span> <span class="toc-text">重复提交问题与解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#验证码校验"><span class="toc-number">7.</span> <span class="toc-text">验证码校验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpSession对象的搁置与激活"><span class="toc-number">8.</span> <span class="toc-text">HttpSession对象的搁置与激活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题补充："><span class="toc-number">9.</span> <span class="toc-text">问题补充：</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

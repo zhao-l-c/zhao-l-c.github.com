@@ -1,0 +1,629 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>EL和JSTL | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="EL 简介
+EL 全名为 Expression Language， 在JSP 2.0之后，EL 已经正式纳入成为标准规范之一。 因此只要是支持 Servlet 2.4 / JSP  2.0 的 Container， 就都可以在 JSP 网页中直接使用 EL 了。
+EL 语法
+所有 EL 都是用\${">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/EL和JSTL/" title="EL和JSTL" itemprop="url">EL和JSTL</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#EL_简介"><span class="toc-number">1.</span> <span class="toc-text">EL 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EL_语法"><span class="toc-number">2.</span> <span class="toc-text">EL 语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#-_与_[_]_运算符"><span class="toc-number">2.1.</span> <span class="toc-text">. 与 [ ] 运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL取变量的范围"><span class="toc-number">2.2.</span> <span class="toc-text">EL取变量的范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL取值原理"><span class="toc-number">2.3.</span> <span class="toc-text">EL取值原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自动转变类型"><span class="toc-number">2.4.</span> <span class="toc-text">自动转变类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL隐含对象"><span class="toc-number">2.5.</span> <span class="toc-text">EL隐含对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL隐含对象pageContext和JSP隐含对象pageContext的区别"><span class="toc-number">2.6.</span> <span class="toc-text">EL隐含对象pageContext和JSP隐含对象pageContext的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL运算符"><span class="toc-number">2.7.</span> <span class="toc-text">EL运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL函数"><span class="toc-number">2.8.</span> <span class="toc-text">EL函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL表达式的执行原理"><span class="toc-number">2.9.</span> <span class="toc-text">EL表达式的执行原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#若EL不生效，则在<%@_page%>中加入isELIgnored="false"!!"><span class="toc-number">3.</span> <span class="toc-text">若EL不生效，则在<%@ page%>中加入isELIgnored="false"!!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSTL"><span class="toc-number">4.</span> <span class="toc-text">JSTL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#表达式操作"><span class="toc-number">4.1.</span> <span class="toc-text">表达式操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流程控制"><span class="toc-number">4.2.</span> <span class="toc-text">流程控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代操作"><span class="toc-number">4.3.</span> <span class="toc-text">迭代操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URL操作"><span class="toc-number">4.4.</span> <span class="toc-text">URL操作</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="EL_简介">EL 简介</h2>
+<p>EL 全名为 Expression Language， 在JSP 2.0之后，EL 已经正式纳入成为标准规范之一。 因此只要是支持 Servlet 2.4 / JSP  2.0 的 Container， 就都可以在 JSP 网页中直接使用 EL 了。</p>
+<h2 id="EL_语法">EL 语法</h2>
+<p>所有 EL 都是用<code>\${}</code>表示的，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="variable">${sessionScope.user.sex}</span></div></pre></td></tr></table></figure>
+
+<p>上述 EL 范例的意思是： 从 Session 的范围中， 取得 用户的性别。 假若依照之前 JSP Scriptlet 的写法如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">User <span class="literal">user</span> = (User)session.getAttribute(<span class="string">"user"</span>)<span class="comment">;</span></div><div class="line">String sex = <span class="literal">user</span>.getSex( )<span class="comment">;</span></div></pre></td></tr></table></figure>
+
+<h3 id="-_与_[_]_运算符">. 与 [ ] 运算符</h3>
+<p>EL 提供<code>.</code>和<code>[ ]</code>两种运算符来存取数据。 下列两者所代表的意思是一样的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="variable">${sessionScope.user.sex}</span></div></pre></td></tr></table></figure>
+
+<p>等于：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">${sessionScope.<span class="literal">user</span>[<span class="string">"sex"</span>]}</div></pre></td></tr></table></figure>
+
+<p>使用<code>[]</code>的可以处理一些特殊的属性：</p>
+<ul>
+<li><strong>例如属性名中带<code>.</code>或<code>–</code>等并非字母或数字的符号</strong>，示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">${<span class="literal">user</span>[<span class="string">"My-Name"</span>] }</div></pre></td></tr></table></figure>
+
+<ul>
+<li>可以动态取值。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">${sessionScope.user[<span class="typedef"><span class="keyword">data</span>]}</span></div></pre></td></tr></table></figure>
+
+<p>这里的data 是一个变量， 假若 data 的值为”sex”时， 那上述的例子等于<code>\${sessionScope.user.sex}</code>； 假若 data 的值为”name”时，它就等于<code>\${sessionScope.user.name}</code>。</p>
+<h3 id="EL取变量的范围">EL取变量的范围</h3>
+<p>EL 存取变量数据的方法很简单，例如：<code>${username}</code> 。它的意思是取出某一范围中名称为 username 的变量。 因为我们并没有指定哪一个范围的 username， 所以它的默认值会先从 Page 范围找， 假如 找不到， 再依序到 Request、 Session、 Application 范围。 假如途中找到 username， 就直接回传， 不再继续找下去， 但是假如全部的范围都没有找到时， 就回传 null。</p>
+<p>下面是EL表达式中可以取值的范围：</p>
+<table>
+<thead>
+<tr>
+<th>范围</th>
+<th>在EL中的名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>page</td>
+<td>pageScope</td>
+</tr>
+<tr>
+<td>request</td>
+<td>requestScope</td>
+</tr>
+<tr>
+<td>session</td>
+<td>sessionScope</td>
+</tr>
+<tr>
+<td>application</td>
+<td>applicationScope</td>
+</tr>
+</tbody>
+</table>
+<p><strong>也就是JSP页面中的4个对象分别对应EL表达式的4个寻找范围，在域对象后面加上Scope以示区分。</strong></p>
+<p>简单测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%                                                        </span></div><div class="line">    pageContext.setAttribute(<span class="string">"p"</span>, <span class="keyword">new</span> Integer(<span class="number">100</span>));      </div><div class="line">    <span class="built_in">request</span>.setAttribute(<span class="string">"r"</span>, <span class="keyword">new</span> Integer(<span class="number">200</span>));          </div><div class="line">    session.setAttribute(<span class="string">"s"</span>, <span class="keyword">new</span> Integer(<span class="number">300</span>));          </div><div class="line">    application.setAttribute(<span class="string">"a"</span>, <span class="keyword">new</span> Integer(<span class="number">400</span>));      </div><div class="line">%&gt;                                                        </div><div class="line">${pageScope.p}<span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                       </div><div class="line">${requestScope.r }<span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                   </div><div class="line">${sessionScope.s }<span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                   </div><div class="line">${applicationScope.a }<span class="tag">&lt;<span class="title">br</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+
+
+
+<p><strong>必须注意的是，这四个隐含对象只能用来取得范围属性值， 却不能取得其他相关信息。例如JSP中的request对象除可以存 取属性之外， 还可以取得用户的请求参数或表头信息等等。 但是在EL中，requestScope只能单纯用来取得对应 范围的属性值。</strong></p>
+<h3 id="EL取值原理">EL取值原理</h3>
+<p>EL表达式使用<code>.</code>或者<code>[ ]</code>获取某个范围的属性值，原理就是这个范围内有某个对象，并且对象中有某个属性的getter方法。<br>例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="variable">${pageScope.user.name}</span></div></pre></td></tr></table></figure>
+
+<p>这时候必然是在pageScope内有user属性，而user属性的类型中有name属性并且提供了getter方法。否则不能正常获取。</p>
+<h3 id="自动转变类型">自动转变类型</h3>
+<p>EL 除了提供方便存取变量的语法之外，它另外一个方便的功能就是： 自动转变类型， 来看 这个范例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="variable">${param.count + 20}</span></div></pre></td></tr></table></figure>
+
+<p>和下面的区别：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%=<span class="built_in">request</span>.getParameter(<span class="string">"value"</span>) + <span class="number">10</span> %&gt;</span></div></pre></td></tr></table></figure>
+
+<p>如果传来 count 的值为 10 时， 那么上面的结果为 30，下面的结果为1010！</p>
+<h3 id="EL隐含对象">EL隐含对象</h3>
+<p>EL本 身也有自己的隐含对象。EL隐含对象总共有11个。</p>
+<table>
+<thead>
+<tr>
+<th>隐含对象</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pageContext</td>
+<td>javax.servlet.ServletContext</td>
+<td>表示此JSP的PageContext</td>
+</tr>
+<tr>
+<td>pageScope</td>
+<td>java.util.Map</td>
+<td>取得Page范围的属性名称所对应的值</td>
+</tr>
+<tr>
+<td>requestScope</td>
+<td>java.util.Map</td>
+<td>取得Request范围的属性名称所对应的值</td>
+</tr>
+<tr>
+<td>sessionScope</td>
+<td>java.util.Map</td>
+<td>取得Session范围的属性名称所对应的值</td>
+</tr>
+<tr>
+<td>applicationScope</td>
+<td>java.util.Map</td>
+<td>取得Application范围的属性名称所对应的值</td>
+</tr>
+<tr>
+<td>param</td>
+<td>java.util.Map</td>
+<td>如同ServletRequest.getParameter(String name)。回传 String 类型的值</td>
+</tr>
+<tr>
+<td>paramValues</td>
+<td>java.util.Map</td>
+<td>如同ServletRequest.getParameterValues(String name)。回传 String [] 类型的值</td>
+</tr>
+<tr>
+<td>header</td>
+<td>java.util.Map</td>
+<td>如同ServletRequest.getHeader(String name)。回传 String 类型的值</td>
+</tr>
+<tr>
+<td>headerValues</td>
+<td>java.util.Map</td>
+<td>如同ServletRequest.getHeaders(String name)。回传 String [] 类型的值</td>
+</tr>
+<tr>
+<td>cookie</td>
+<td>java.util.Map</td>
+<td>如同HttpServletRequest.getCookies()</td>
+</tr>
+<tr>
+<td>initParam</td>
+<td>java.util.Map</td>
+<td>如同ServletContext.getInitParameter(String name)。回传 String 类型的值</td>
+</tr>
+</tbody>
+</table>
+<p><strong>隐含对象中只能取值，不能设置值。</strong></p>
+<p>这 11个隐含对象可以将它们分成三类：</p>
+<ul>
+<li>与范围有关的隐含对象<ul>
+<li>applicationScope</li>
+<li>sessionScope</li>
+<li>requestScope</li>
+<li>pageScope<br>这4个隐含对象在前面已经介绍过。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>与输入有关的隐含对象<ul>
+<li>param</li>
+<li>paramValues<br>注意，param获取一个字符串值，paramValues获取String[]值。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>其他隐含对象<ul>
+<li>cookie</li>
+<li>header</li>
+<li>headerValues</li>
+<li>initParam</li>
+<li>pageContex<br><strong>使用EL表达式获取request、session等对象一定要经过pageContext隐含对象，这也是它的作用。</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="EL隐含对象pageContext和JSP隐含对象pageContext的区别">EL隐含对象pageContext和JSP隐含对象pageContext的区别</h3>
+<p>直接在JSP中输出这两个对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">${pageContext }</div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line"><span class="vbscript">&lt;%=pageContext %&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以发现它们都是相同的类型<code>org.apache.jasper.runtime.PageContextImpl</code>，<strong>所以它们的区别最大的就是EL表达式取值和JSP中使用JSP脚本（或者JSP表达式）取值的区别。</strong></p>
+<p>也就是EL表达式使用的是<code>.propertyName</code>的方式（实际上调用对应属性的getter方法），同时它还有自动类型转换的功能。而JSP脚本一般直接调用方法。</p>
+<p>例如获取contextPath这个属性时，使用EL和JSP表达式为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">EL表达式获取contextPath：</div><div class="line">${pageContext.request.contextPath}</div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">JSP隐含对象获取contextPath:</div><div class="line"><span class="vbscript">&lt;%=((HttpServletRequest)pageContext.getRequest()).getContextPath() %&gt;</span></div></pre></td></tr></table></figure>
+
+<p>可以看到，使用EL的时候，<code>pageContext.request</code>返回值类型虽然为<code>RequestFacade</code>，但通过自动类型转换，转换为<code>HttpServletRequest</code>，最后就能获取<code>HttpServletRequest</code>对象的<code>contextPath</code>属性。</p>
+<p>而JSP表达式中，需要手动把<code>RequestFacade</code>强转为<code>HttpServletRequest</code>，才能调用<code>getContextPath()</code>方法。</p>
+<h3 id="EL运算符">EL运算符</h3>
+<p>EL支持算术、关系和逻辑运行符，但这部分比较简单，这里省略。</p>
+<p>除此之外，EL还支持2个特别的运算符：</p>
+<ul>
+<li>empty运算符。<strong>empty作用与集合或者数字对象，若该对象为null或者对象不为null但元素为空，都会返回false；否则返回true</strong>。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%                                       </span></div><div class="line">    <span class="built_in">String</span>[] a = <span class="literal">null</span>;                   </div><div class="line">    <span class="built_in">String</span>[] b = <span class="keyword">new</span> <span class="built_in">String</span>[]{};         </div><div class="line">    <span class="built_in">String</span>[] c = <span class="keyword">new</span> <span class="built_in">String</span>[]{<span class="string">"hehe"</span>};   </div><div class="line">    pageContext.setAttribute(<span class="string">"a"</span>, a);    </div><div class="line">    pageContext.setAttribute(<span class="string">"b"</span>, b);    </div><div class="line">    pageContext.setAttribute(<span class="string">"c"</span>, c);    </div><div class="line">%&gt;                                       </div><div class="line">${empty pageScope.a }                    </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                    </div><div class="line">${empty pageScope.b }                    </div><div class="line"><span class="tag">&lt;<span class="title">br</span>/&gt;</span>                                    </div><div class="line">${empty pageScope.c }</div></pre></td></tr></table></figure>
+
+<ul>
+<li>条件运算符：<code>\${ A ? B : C}</code>。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="input"><span class="prompt">${(param.age &gt;</span> <span class="number">10</span>) ? <span class="string">"年轻人"</span> <span class="symbol">:</span> <span class="string">"小孩"</span> }</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，<code>?</code>前面若是表达式一般需要加上括号改变优先级，否则容易出现意料之外的错误。</strong></p>
+<h3 id="EL函数">EL函数</h3>
+<p>参考”自定义标签”该节的内容。</p>
+<h3 id="EL表达式的执行原理">EL表达式的执行原理</h3>
+<p>在第一个JSP页面中加入下列EL表达式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="variable">${param.age}</span></div></pre></td></tr></table></figure>
+
+<p>当JSP页面被解析为Servlet后，这部分对应的源代码为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">JspWriter out = pageContext.<span class="keyword">getOut</span>();</div><div class="line"></div><div class="line"><span class="comment">// ......</span></div><div class="line">out.<span class="keyword">write</span>((java.lang.String)PageContextImpl.proprietaryEvaluate(<span class="string">"${param.age }"</span>,</div><div class="line">                String.<span class="keyword">class</span>, (PageContext)jspPageContext,</div><div class="line">                <span class="keyword">null</span>,</div><div class="line">                <span class="keyword">false</span>));</div></pre></td></tr></table></figure>
+
+<p>也就是EL表达式最后会交给<code>PageContextImpl.proprietaryEvaluate</code>方法处理。</p>
+<p>后续的处理过程中，EL表达式<code>${param.age}</code>会被转换为一个<code>Node</code>类型的对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> ValueExpression <span class="title">createValueExpression</span>(Class&lt;?&gt; expectedType)   </div><div class="line">        <span class="keyword">throws</span> ELException {                                          </div><div class="line">    Node n = <span class="keyword">this</span>.build();                                            </div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ValueExpressionImpl(<span class="keyword">this</span>.expression, n, <span class="keyword">this</span>.fnMapper, </div><div class="line">            <span class="keyword">this</span>.varMapper, expectedType);                            </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在这一步中<code>Node n = this.build()</code>就是转换的过程，而<code>Node</code>是一个抽象语法树节点的接口，通过调试发现当前的实现类为<code>AstValue</code>。</p>
+<p>最后，在获取param对应的返回值的时候，会调用下面的方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ImplicitObjectELResolver getValue</span></div><div class="line"><span class="keyword">public</span> Object <span class="title">getValue</span>(ELContext context,                            </div><div class="line">                       Object <span class="keyword">base</span>,                                  </div><div class="line">                       Object property) {                            </div><div class="line">    <span class="comment">// ......                                                           </span></div><div class="line"></div><div class="line"> </div><div class="line">    PageContext ctxt = (PageContext)context.getContext(JspContext.clas</div><div class="line">    <span class="comment">// ......                                                         </span></div><div class="line">    ImplicitObjects implicitObjects =                                </div><div class="line">        ImplicitObjects.getImplicitObjects(ctxt);                    </div><div class="line">    <span class="comment">// ......                                                       </span></div><div class="line">    <span class="keyword">if</span> (<span class="string">"param"</span>.equals (property)) {                                 </div><div class="line">        context.setPropertyResolved(<span class="keyword">true</span>);                           </div><div class="line">        <span class="keyword">return</span> implicitObjects.getParamMap();                        </div><div class="line">    }                                                                </div><div class="line">    <span class="keyword">if</span> (<span class="string">"paramValues"</span>.equals (property)) {                           </div><div class="line">        context.setPropertyResolved(<span class="keyword">true</span>);                           </div><div class="line">        <span class="keyword">return</span> implicitObjects.getParamsMap();                       </div><div class="line">    }                                                                </div><div class="line">    <span class="comment">// ......                                            </span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;                                                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如何在JSP中调试？<br><strong>可以在JSP页面使用EL表达式的位置添加断点，当执行到该断点时，通过Step Into和Step Return的方式定位到<code>PageContextImpl.proprietaryEvaluate</code>方法处就能进行调试了，但要注意，源码jar包的版本一定要和服务器class文件jar包的版本一致，否则定位错误！。</strong></p>
+</blockquote>
+<h2 id="若EL不生效，则在&lt;%@_page%&gt;中加入isELIgnored=&quot;false&quot;!!">若EL不生效，则在<code>&lt;%@ page%&gt;</code>中加入<code>isELIgnored=&quot;false&quot;</code>!!</h2>
+<h2 id="JSTL">JSTL</h2>
+<p>JSTL 全名为 JavaServer Pages Standard Tag Library， 目 前最新的版本为 1.1。 JSTL 是由 JCP （ Java Community Process） 所指定的标准规格， 它主要提供给 Java Web 开发人员一个标准通用的 标签函数库。</p>
+<p>JSTL标签库包含了 五大类，这里只介绍核心标签库的使用，其中包括下列：</p>
+<ul>
+<li>表达式操作；</li>
+<li>流程控制；</li>
+<li>迭代操作；</li>
+<li>URL操作。</li>
+</ul>
+<h3 id="表达式操作">表达式操作</h3>
+<ul>
+<li><code>&lt;c:out&gt;</code>：主要用来显示数据的内容， 就像是<code>&lt;%= %&gt;</code>一样，但可以对特殊符号进行转换，例如<code>&gt;</code>符号。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;c:<span class="keyword">out</span> <span class="keyword">value</span>=<span class="string">"&lt;&lt;jstl&gt;&gt;"</span>&gt;&lt;/c:<span class="keyword">out</span>&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li><code>&lt;c:set&gt;</code>：主要用来将变量储存至 JSP 域对象中， 还可以修改域对象中JavaBean的属性值 。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="built_in">c</span>:<span class="keyword">set</span> value=<span class="string">"lucy"</span> scope=<span class="string">"page"</span> <span class="keyword">var</span>=<span class="string">"name"</span>&gt;&lt;/<span class="built_in">c</span>:<span class="keyword">set</span>&gt;                       </div><div class="line">${pageScope.name}                                                          </div><div class="line">&lt;br/&gt;                                                                      </div><div class="line">&lt;%                                                                         </div><div class="line">    <span class="type">Customer</span> <span class="built_in">c</span> = <span class="keyword">new</span> <span class="type">Customer</span>(<span class="number">1111</span>, <span class="string">"hehe"</span>);                               </div><div class="line">    pageContext.setAttribute(<span class="string">"customer"</span>, <span class="built_in">c</span>);                               </div><div class="line">%&gt;                                                                         </div><div class="line">${pageScope.customer.id }                                                  </div><div class="line">&lt;br/&gt;                                                                      </div><div class="line">&lt;<span class="built_in">c</span>:<span class="keyword">set</span> target=<span class="string">"${pageScope.customer }"</span> value=<span class="string">"1001"</span> property=<span class="string">"id"</span>&gt;&lt;/<span class="built_in">c</span>:<span class="keyword">set</span>&gt;   </div><div class="line">${pageScope.customer.id }</div></pre></td></tr></table></figure>
+
+<p>其中，value、target属性支持EL表达式。</p>
+<ul>
+<li><code>&lt; c:remove &gt;</code>：移除域对象中的指定值。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="built_in">c</span>:remove <span class="keyword">var</span>=<span class="string">"customer"</span> scope=<span class="string">"page"</span>/&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="流程控制">流程控制</h3>
+<ul>
+<li><code>&lt;c:if&gt;</code>：注意不能实现else操作， 但可以把判断的结果存储起来。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="symbol">c:</span><span class="keyword">if</span> test=<span class="string">"${param.age lt 18}"</span> scope=<span class="string">"page"</span> var=<span class="string">"isAdult"</span>&gt;     </div><div class="line">    未成年                                                         </div><div class="line"><span class="input"><span class="prompt">&lt;/c:if&gt;</span>                                                         </span></div><div class="line"><span class="input"><span class="prompt">&lt;br/&gt;</span>                                                           </span></div><div class="line"><span class="variable">${</span>pageScope.isAdult }</div></pre></td></tr></table></figure>
+
+<ul>
+<li><code>&lt;c:choose-c:when-c:otherwise&gt;</code>：可以实现if-else if-else的效果。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">c:choose</span>&gt;</span>                                         </div><div class="line">    <span class="tag">&lt;<span class="title">c:when</span> <span class="attribute">test</span>=<span class="value">"${param.age gt 35}"</span>&gt;</span>中年<span class="tag">&lt;/<span class="title">c:when</span>&gt;</span>  </div><div class="line">    <span class="tag">&lt;<span class="title">c:when</span> <span class="attribute">test</span>=<span class="value">"${param.age gt 18 }"</span>&gt;</span>青年<span class="tag">&lt;/<span class="title">c:when</span>&gt;</span> </div><div class="line">    <span class="tag">&lt;<span class="title">c:otherwise</span>&gt;</span>未成年<span class="tag">&lt;/<span class="title">c:otherwise</span>&gt;</span>                 </div><div class="line"><span class="tag">&lt;/<span class="title">c:choose</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="迭代操作">迭代操作</h3>
+<ul>
+<li><code>&lt;c:forEach&gt;</code>：可以对 Arrays、 Collection、 Iterator、 Enumeration、 Map和 String类型进行循环操作，<strong>对于集合和数组，begin属性是从0开始的！</strong> 示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="string">%--</span> 输出连续的数字 --%&gt;</div><div class="line">&lt;<span class="symbol">c:</span>forEach <span class="keyword">begin</span>=<span class="string">"1"</span> <span class="keyword">end</span>=<span class="string">"10"</span> step=<span class="string">"2"</span> var=<span class="string">"i"</span>&gt;    </div><div class="line">    \<span class="variable">${</span>pageScope.i }--                              </div><div class="line">&lt;<span class="regexp">/c:forEach&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意在遍历<code>Map</code>类型的集合时候，会把<code>Entry&lt;?, ?&gt;</code>放入到临时遍历中，所以要用<code>key</code>和<code>value</code>分别获取。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;c:<span class="keyword">for</span>Each items=<span class="string">"<span class="variable">${requestScope.customers }</span>"</span> var=<span class="string">"c"</span>&gt;</div><div class="line">        <span class="variable">${c.key }</span>--<span class="variable">${c.value.id}</span>--<span class="variable">${c.value.name }</span>&lt;br/&gt;</div><div class="line">    &lt;/c:<span class="keyword">for</span>Each&gt;</div></pre></td></tr></table></figure>
+
+
+<p>该标签还有一个重要的属性<code>varStatus</code>，它有4个属性：<code>index</code>、<code>count</code>、<code>first</code>和<code>last</code>。示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%                                                                                     </span></div><div class="line">    <span class="built_in">String</span>[] <span class="built_in">array</span> = <span class="keyword">new</span> <span class="built_in">String</span>[]{<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>, <span class="string">"d"</span>};                                 </div><div class="line">    <span class="built_in">request</span>.setAttribute(<span class="string">"array"</span>, <span class="built_in">array</span>);                                              </div><div class="line">%&gt;                                                                                     </div><div class="line"><span class="tag">&lt;<span class="title">c:forEach</span> <span class="attribute">items</span>=<span class="value">"${requestScope.array }"</span> <span class="attribute">varStatus</span>=<span class="value">"status"</span> <span class="attribute">var</span>=<span class="value">"a"</span>&gt;</span>                  </div><div class="line">    ${status.index }--${status.count }--${status.first }--${status.last }--${a}<span class="tag">&lt;<span class="title">br</span>/&gt;</span>   </div><div class="line"><span class="tag">&lt;/<span class="title">c:forEach</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li><code>c:forTokens</code>： 类似 String中的split方法。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;%                                                                   </div><div class="line">    session.setAttribute(<span class="string">"token"</span>, <span class="string">"he.ha.xi.ji"</span>);                    </div><div class="line">%&gt;                                                                   </div><div class="line">&lt;c:<span class="keyword">for</span>Tokens items=<span class="string">"<span class="variable">${sessionScope.token }</span>"</span> delims=<span class="string">"."</span> var=<span class="string">"t"</span>&gt;      </div><div class="line">    <span class="variable">${t }</span>&lt;br/&gt;                                                       </div><div class="line">&lt;/c:<span class="keyword">for</span>Tokens&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="URL操作">URL操作</h3>
+<ul>
+<li><code>c:import</code>： 可以把其他静态或动态文件包含至本身JSP网页 。它 和JSP的<code>&lt;jsp:include&gt;</code>最大的差别在于： <code>&lt;jsp:include&gt;</code>只能包含和自己同一个应用下的文件； 而<code>&lt;c:import&gt;</code>除了能包含和自己同一个应用的文件外，亦可以包含不同应用 或者是其他网站的文件。</li>
+</ul>
+<ul>
+<li><code>c:redirect</code>：重定向。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">c:redirect</span> <span class="attribute">url</span>=<span class="value">"/testEL.jsp"</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<p><strong>注意，这里的<code>/</code>代表的是应用的根目录。</strong></p>
+<p><strong>对于路径的<code>/</code>符号这里有一个规律：如果路径由服务器解析，则这个<code>/</code>代表的是应用的根目录；如果由浏览器解析，则代表的是站点的根目录。</strong><br>所以无论是在JSP中或者Servlet中实现的转发操作，<code>/</code>都代表的是应用的根目录；而JSP中或Servlet中，重定向时<code>/</code>代表的是站点的根目录。</p>
+<ul>
+<li><code>c:url</code>：主要用来产生一个 URL，并可以传递参数并对参数进行编码。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="built_in">c</span>:url value=<span class="string">"/testJSTL.jsp"</span> <span class="keyword">var</span>=<span class="string">"url"</span> scope=<span class="string">"page"</span>&gt;    </div><div class="line">    &lt;<span class="built_in">c</span>:param name=<span class="string">"name"</span>&gt;中文&lt;/<span class="built_in">c</span>:param&gt;                   </div><div class="line">&lt;/<span class="built_in">c</span>:url&gt;                                                </div><div class="line">${pageScope.url}</div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/JSP-Servlet/">JSP&Servlet</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/JavaWeb/JSP&Servlet/EL和JSTL/" data-title="EL和JSTL | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/JSP详解/" title="JSP详解">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  JSP详解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/JavaWeb/Cookie&Session/Session/"  title="Session">
+ <strong>NEXT:</strong><br/> 
+ <span>Session
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#EL_简介"><span class="toc-number">1.</span> <span class="toc-text">EL 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EL_语法"><span class="toc-number">2.</span> <span class="toc-text">EL 语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#-_与_[_]_运算符"><span class="toc-number">2.1.</span> <span class="toc-text">. 与 [ ] 运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL取变量的范围"><span class="toc-number">2.2.</span> <span class="toc-text">EL取变量的范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL取值原理"><span class="toc-number">2.3.</span> <span class="toc-text">EL取值原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自动转变类型"><span class="toc-number">2.4.</span> <span class="toc-text">自动转变类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL隐含对象"><span class="toc-number">2.5.</span> <span class="toc-text">EL隐含对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL隐含对象pageContext和JSP隐含对象pageContext的区别"><span class="toc-number">2.6.</span> <span class="toc-text">EL隐含对象pageContext和JSP隐含对象pageContext的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL运算符"><span class="toc-number">2.7.</span> <span class="toc-text">EL运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL函数"><span class="toc-number">2.8.</span> <span class="toc-text">EL函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EL表达式的执行原理"><span class="toc-number">2.9.</span> <span class="toc-text">EL表达式的执行原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#若EL不生效，则在<%@_page%>中加入isELIgnored="false"!!"><span class="toc-number">3.</span> <span class="toc-text">若EL不生效，则在<%@ page%>中加入isELIgnored="false"!!</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSTL"><span class="toc-number">4.</span> <span class="toc-text">JSTL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#表达式操作"><span class="toc-number">4.1.</span> <span class="toc-text">表达式操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流程控制"><span class="toc-number">4.2.</span> <span class="toc-text">流程控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代操作"><span class="toc-number">4.3.</span> <span class="toc-text">迭代操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URL操作"><span class="toc-number">4.4.</span> <span class="toc-text">URL操作</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

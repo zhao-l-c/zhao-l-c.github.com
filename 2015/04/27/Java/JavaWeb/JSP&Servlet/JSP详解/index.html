@@ -1,0 +1,596 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>JSP详解 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="什么是JSP
+一句话概括 JSP：它是 Java 程序和 Html 标签的集合体，最后会被翻译成一个 Servlet 程序。
+当WEB 容器接收到以 .jsp 为扩展名的 URL 的访问请求时，它将把该访问请求交给 JSP 引擎去处理。每个 JSP 页面在第一次被访问时，JSP 引擎将它翻译成一个 ">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/JSP详解/" title="JSP详解" itemprop="url">JSP详解</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T11:05:15.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是JSP"><span class="toc-number">1.</span> <span class="toc-text">什么是JSP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_脚本"><span class="toc-number">2.</span> <span class="toc-text">JSP 脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_表达式"><span class="toc-number">3.</span> <span class="toc-text">JSP 表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_声明"><span class="toc-number">4.</span> <span class="toc-text">JSP 声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP的隐含对象"><span class="toc-number">5.</span> <span class="toc-text">JSP的隐含对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pageContext"><span class="toc-number">5.1.</span> <span class="toc-text">pageContext</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#request"><span class="toc-number">5.2.</span> <span class="toc-text">request</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#session"><span class="toc-number">5.3.</span> <span class="toc-text">session</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#application"><span class="toc-number">5.4.</span> <span class="toc-text">application</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#out"><span class="toc-number">5.5.</span> <span class="toc-text">out</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#page"><span class="toc-number">5.6.</span> <span class="toc-text">page</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#response"><span class="toc-number">5.7.</span> <span class="toc-text">response</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#config"><span class="toc-number">5.8.</span> <span class="toc-text">config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#exception"><span class="toc-number">5.9.</span> <span class="toc-text">exception</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_指令"><span class="toc-number">6.</span> <span class="toc-text">JSP 指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@_page_%>"><span class="toc-number">6.1.</span> <span class="toc-text"><%@ page %></span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@_include_%>"><span class="toc-number">6.2.</span> <span class="toc-text"><%@ include %></span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@taglib_%>"><span class="toc-number">6.3.</span> <span class="toc-text"><%@taglib %></span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_标签"><span class="toc-number">7.</span> <span class="toc-text">JSP 标签</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:include"><span class="toc-number">7.1.</span> <span class="toc-text">jsp:include</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:forword"><span class="toc-number">7.2.</span> <span class="toc-text">jsp:forword</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:param"><span class="toc-number">7.3.</span> <span class="toc-text">jsp:param</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#乱码问题"><span class="toc-number">8.</span> <span class="toc-text">乱码问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#浏览器发送数据到服务器"><span class="toc-number">8.1.</span> <span class="toc-text">浏览器发送数据到服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#服务器发送数据到浏览器"><span class="toc-number">8.2.</span> <span class="toc-text">服务器发送数据到浏览器</span></a></li></ol></li></ol>
+		</div>
+		
+		<h3 id="什么是JSP">什么是JSP</h3>
+<p>一句话概括 JSP：它是 Java 程序和 Html 标签的集合体，最后会被翻译成一个 Servlet 程序。</p>
+<p>当WEB 容器接收到以 .jsp 为扩展名的 URL 的访问请求时，它将把该访问请求交给 JSP 引擎去处理。<strong>每个 JSP 页面在第一次被访问时，JSP 引擎将它翻译成一个 Servlet 源程序</strong>，再把它编译成class 类文件，然后由 WEB 容器像调用普通 Servlet 程序一样</p>
+<p>查看Eclipse项目中JSP转换成Servlet所在的目录：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">当前工作区<span class="command">\.</span>metadata<span class="command">\.</span>plugins<span class="command">\org</span>.eclipse.wst.server.core<span class="command">\tmp</span>0<span class="command">\work</span><span class="command">\Catalina</span><span class="command">\localhost</span><span class="command">\项</span>目名称<span class="command">\org</span><span class="command">\apache</span><span class="command">\jsp</span>\</div></pre></td></tr></table></figure>
+
+<p>命名规则：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">JSP源程序名 + _jsp.java</div></pre></td></tr></table></figure>
+
+<p>下面是一个示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">index_jsp</span> <span class="keyword">extends</span> <span class="title">org</span>.<span class="title">apache</span>.<span class="title">jasper</span>.<span class="title">runtime</span>.<span class="title">HttpJspBase</span></span></div><div class="line">    <span class="keyword">implements</span> <span class="title">org</span>.<span class="title">apache</span>.<span class="title">jasper</span>.<span class="title">runtime</span>.<span class="title">JspSourceDependent</span> {</div><div class="line"> </div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> javax.servlet.jsp.JspFactory _jspxFactory =</div><div class="line">          javax.servlet.jsp.JspFactory.getDefaultFactory();</div><div class="line"> </div><div class="line">  <span class="keyword">private</span> <span class="keyword">static</span> java.util.Map&lt;java.lang.String,java.lang.Long&gt; _jspx_dependants;</div><div class="line"> </div><div class="line">  <span class="keyword">private</span> javax.el.ExpressionFactory _el_expressionfactory;</div><div class="line">  <span class="keyword">private</span> org.apache.tomcat.InstanceManager _jsp_instancemanager;</div><div class="line"> </div><div class="line">  <span class="keyword">public</span> java.util.Map&lt;java.lang.String,java.lang.Long&gt; <span class="title">getDependants</span>() {</div><div class="line">    <span class="keyword">return</span> _jspx_dependants;</div><div class="line">  }</div><div class="line"> </div><div class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">_jspInit</span>() {</div><div class="line">    _el_expressionfactory = _jspxFactory.getJspApplicationContext(getServletConfig().getServletContext()).getExpressionFactory();</div><div class="line">    _jsp_instancemanager = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(getServletConfig());</div><div class="line">  }</div><div class="line"> </div><div class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">_jspDestroy</span>() {</div><div class="line">  }</div><div class="line"> </div><div class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">_jspService</span>(<span class="keyword">final</span> javax.servlet.http.HttpServletRequest request, <span class="keyword">final</span> javax.servlet.http.HttpServletResponse response)</div><div class="line">        <span class="keyword">throws</span> java.io.IOException, javax.servlet.ServletException {</div><div class="line"> </div><div class="line">    <span class="keyword">final</span> javax.servlet.jsp.PageContext pageContext;</div><div class="line">    javax.servlet.http.HttpSession session = <span class="keyword">null</span>;</div><div class="line">    <span class="keyword">final</span> javax.servlet.ServletContext application;</div><div class="line">    <span class="keyword">final</span> javax.servlet.ServletConfig config;</div><div class="line">    javax.servlet.jsp.JspWriter out = <span class="keyword">null</span>;</div><div class="line">    <span class="keyword">final</span> java.lang.Object page = <span class="keyword">this</span>;</div><div class="line">    javax.servlet.jsp.JspWriter _jspx_out = <span class="keyword">null</span>;</div><div class="line">    javax.servlet.jsp.PageContext _jspx_page_context = <span class="keyword">null</span>;</div><div class="line"> </div><div class="line"> </div><div class="line">    <span class="keyword">try</span> {</div><div class="line">      response.setContentType(<span class="string">"text/html; charset=UTF-8"</span>);</div><div class="line">      pageContext = _jspxFactory.getPageContext(<span class="keyword">this</span>, request, response, <span class="keyword">null</span>, <span class="keyword">true</span>, <span class="number">8192</span>, <span class="keyword">true</span>);</div><div class="line">      _jspx_page_context = pageContext;</div><div class="line">      application = pageContext.getServletContext();</div><div class="line">      config = pageContext.getServletConfig();</div><div class="line">      session = pageContext.getSession();</div><div class="line">      out = pageContext.getOut();</div><div class="line">      _jspx_out = out;</div><div class="line"> </div><div class="line">      out.write(<span class="string">"\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;html&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;head&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;title&gt;Insert title here&lt;/title&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;/head&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;body&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"\t&lt;h3&gt;Welcome&lt;/h3&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;/body&gt;\r\n"</span>);</div><div class="line">      out.write(<span class="string">"&lt;/html&gt;"</span>);</div><div class="line">    } <span class="keyword">catch</span> (java.lang.Throwable t) {</div><div class="line">      <span class="keyword">if</span> (!(t <span class="keyword">instanceof</span> javax.servlet.jsp.SkipPageException)){</div><div class="line">        out = _jspx_out;</div><div class="line">        <span class="keyword">if</span> (out != <span class="keyword">null</span> && out.getBufferSize() != <span class="number">0</span>)</div><div class="line">          <span class="keyword">try</span> {</div><div class="line">            <span class="keyword">if</span> (response.isCommitted()) {</div><div class="line">              out.flush();</div><div class="line">            } <span class="keyword">else</span> {</div><div class="line">              out.clearBuffer();</div><div class="line">            }</div><div class="line">          } <span class="keyword">catch</span> (java.io.IOException e) {}</div><div class="line">        <span class="keyword">if</span> (_jspx_page_context != <span class="keyword">null</span>) </div><div class="line">            _jspx_page_context.handlePageException(t);</div><div class="line">        <span class="keyword">else</span> <span class="keyword">throw</span> <span class="keyword">new</span> ServletException(t);</div><div class="line">      }</div><div class="line">    } <span class="keyword">finally</span> {</div><div class="line">      _jspxFactory.releasePageContext(_jspx_page_context);</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看到翻译后的Java程序：</p>
+<ul>
+<li>继承了<code>HttpJspBase</code>，而<code>HttpJspBase</code>的父类继承了<code>Servlet</code>接口；</li>
+<li>有一个<code>_jspService</code> 方法，类似于 Servlet 中的 <code>Service</code>方法，同时里面也有初始化方法<code>_jspInit</code>和销毁方法<code>_jspDestroy</code>；</li>
+<li></li>
+</ul>
+<h3 id="JSP_脚本">JSP 脚本</h3>
+<p>格式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="comment">% Java语句 %&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>只能放Java语句，这些Java语句最后会<strong>直接</strong>放到<code>_jspService</code> 方法里面，每次请求JSP页面就会执行<code>_jspService</code>方法，也就能执行里面的语句；</li>
+<li>不能定义方法，<strong>原因是 Java 语言中方法内部不能定义方法</strong>！</li>
+</ul>
+<h3 id="JSP_表达式">JSP 表达式</h3>
+<p>格式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%=</span> 表达式 <span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>JSP表达式最终会传入<code>_jspService</code>的<code>out.print</code>中作为参数使用，因此表达式不能用分号结束；</li>
+<li>JSP表达式相当于使用out.print的JSP脚本，例如<code>&lt;%=10%&gt;</code>相当于<code>&lt;%out.print(10);%&gt;</code>；</li>
+<li>JSP表达式不能嵌套表达式。例如要实现输出0到9 ，则可以分为2个JSP脚本一个表达式：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%-</span>-输出<span class="number">0</span>到<span class="number">9</span>的整数--<span class="variable">%&gt;</span></div><div class="line">&lt;%                                </div><div class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) { </div><div class="line"><span class="variable">%&gt;</span>                                  </div><div class="line">    &lt;<span class="variable">%=</span>i <span class="variable">%&gt;</span>                       </div><div class="line">&lt;%                                </div><div class="line">    }                             </div><div class="line"><span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+<p>由于表达式可以使用脚本代替，所以也可以这样写：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="comment">%                                 </span></div><div class="line">    <span class="keyword">for</span>(int <span class="built_in">i</span> = <span class="number">0</span>; <span class="built_in">i</span> &lt; <span class="number">10</span>; <span class="built_in">i</span>++) <span class="cell">{  </span></div><div class="line">        out.println(i);            </div><div class="line">    }                               </div><div class="line">%&gt;</div></pre></td></tr></table></figure>
+
+<p>解析后的java代码： </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;<span class="number">11</span>;j++) {</div><div class="line">    <span class="keyword">out</span>.write(<span class="string">"\r\n"</span>);</div><div class="line">    <span class="keyword">out</span>.write(<span class="string">"\t\t"</span>);</div><div class="line">    <span class="keyword">out</span>.print(j);</div><div class="line">    <span class="keyword">out</span>.write(<span class="string">"&lt;br&gt;\r\n"</span>);</div><div class="line">    <span class="keyword">out</span>.write(<span class="string">"\t"</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<h3 id="JSP_声明">JSP 声明</h3>
+<p>格式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%!</span> 方法的声明 <span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>可以使用JSP声明定义Java函数，JSP声明解析后不会出现在<code>_jspService()</code> 方法里面。示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;%!</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span>(<span class="keyword">int</span> i){</div><div class="line">        <span class="keyword">return</span> i + <span class="number">20</span>;</div><div class="line">    }</div><div class="line">%&gt;</div></pre></td></tr></table></figure>
+
+<ul>
+<li>JSP声明还可以定义全局的变量和函数，功能类似于用<code>static</code>关键字修饰的变量和函数。</li>
+</ul>
+<h3 id="JSP的隐含对象">JSP的隐含对象</h3>
+<p>JSP包括了九大隐含对象：</p>
+<table>
+<thead>
+<tr>
+<th>隐含对象</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>application</td>
+<td>ServletContext</td>
+</tr>
+<tr>
+<td>session</td>
+<td>HttpSession</td>
+</tr>
+<tr>
+<td>request</td>
+<td>HttpServletRequest</td>
+</tr>
+<tr>
+<td>response</td>
+<td>HttpServletResponse</td>
+</tr>
+<tr>
+<td>pageContext</td>
+<td>PageContext</td>
+</tr>
+<tr>
+<td>page</td>
+<td>当前JSP翻译后的Servlet，也就是this</td>
+</tr>
+<tr>
+<td>out</td>
+<td>JspWriter</td>
+</tr>
+<tr>
+<td>config</td>
+<td>ServletConfig</td>
+</tr>
+<tr>
+<td>exception</td>
+<td>Throwable</td>
+</tr>
+</tbody>
+</table>
+<p>注意：</p>
+<ul>
+<li>所谓 隐含对象，也就是在JSP页面中不用定义就可以使用的变量对象；</li>
+<li>隐含对象是翻译后的源程序的<code>_jspService</code>方法中创建 ，可以发现<code>request</code>和<code>response</code>是该函数的参数，而剩余的7个对象则作为函数的局部变量并初始化；</li>
+<li>exception隐含对象只有在JSP指令<code>&lt;%@ page %&gt;</code>中声明属性<code>isErrorPage=&quot;true&quot;</code>后才会出现；</li>
+<li>pageContext，request，session，application称为<strong>域对象</strong>，这4个域对象都有<code>setAttribute</code>和<code>getAttribute</code>方法，它们的作用域分别 从小到大。</li>
+</ul>
+<p>下面分别介绍这些隐含对象：</p>
+<h4 id="pageContext">pageContext</h4>
+<p><code>PageContext</code>类型，它代表当前页面的上下文，在pageContext设置的属性作用域是当前页面，不能转发或者重定向到别的页面。</p>
+<h4 id="request">request</h4>
+<p><code>HttpServletRequest</code>类型，它代表一个请求，在request中设置的属性可以<strong>转发</strong>到别的Servlet或者这JSP。例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">request.getRequestDispatcher(<span class="string">"/testB.jsp"</span>).forward(request, response);  <span class="comment">// 请求转发到 testB.jsp 页面</span></div></pre></td></tr></table></figure>
+
+<h4 id="session">session</h4>
+<p><code>HttpSession</code>类型，它代表一个会话， 同一次会话的多个资源都可以共享（前提是不要关闭浏览器）。也就是在session中设置的属性可以被多个会话共享。</p>
+<h4 id="application">application</h4>
+<p><code>ServletContext</code>类型，代表当前应用的上下文， 在不重启服务器的前提下，设置到application中的属性可以在整个应用中共享。</p>
+<h4 id="out">out</h4>
+<p><code>JspWriter</code>类型，可以直接输出内容到JSP页面。</p>
+<blockquote>
+<p>了解知识： 区分 out与 response.getWriter()<br>response.getWriter()也提供了输出内容到JSP页面的方法。两者的区别是：</p>
+<ul>
+<li>out是<code>javax.servlet.jsp. JspWriter</code>类型，而另一个是<code>java.io.PrintWriter</code>类型；</li>
+<li>response.getWriter() 仅支持输出字符类型数据，即字符、字符数组、字符串等；而out 可以将各种类型的数据通过默认编码转换成bytes字节形式，最后通过<code>write(int c)</code>方法被输出；</li>
+<li>out是带缓冲区的，可以使用<code>out.getBufferSize()</code>获取缓冲区的大小，也就是out不是 直接将数据输出到页面，而是将数据刷新到response的缓冲区后再输出 ；而 response.getWriter () 不带缓冲区， 直接输出数据。</li>
+</ul>
+</blockquote>
+<h4 id="page">page</h4>
+<p>page代表当前页对象，在解析后的源码中它是这样定义和初始化的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> java.lang.Object page = <span class="keyword">this</span>;</div></pre></td></tr></table></figure>
+
+<p>所以它其实是当前的JSP对应的Servlet对象。</p>
+<h4 id="response">response</h4>
+<p><code>HttpServletRequest</code>类型，即Http响应对象，一般用于输出内容到页面和请求重定向。<br>典型的使用方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">response.sendRedirect(request.getContextPath() + <span class="string">"/testB.jsp"</span>);  <span class="comment">//重定向到 testB.jsp 页面</span></div><div class="line">response.getWriter( ).<span class="keyword">write</span>(<span class="string">"hello, this is a response!"</span>); <span class="comment">//输出到页面</span></div></pre></td></tr></table></figure>
+
+
+<h4 id="config">config</h4>
+<p><code>ServletConfig</code>类型。JSP 文件一般不需要配置，但也可以配置。配置JSP页面和配置Servlet是类似的（JSP最终解析为Servlet）。</p>
+<p>例如下面为配置一个URL到Servlet的映射，但URL对应的不是一个Servlet的class，而是一个JSP页面，并且设置初始化参数。 在 web.xml 文件中加入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">servlet</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>testConfig<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- JSP 文件的地址也是从 / 应用开始 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">jsp-file</span>&gt;</span>/testConfig.jsp<span class="tag">&lt;/<span class="title">jsp-file</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">init-param</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">param-name</span>&gt;</span>Pet<span class="tag">&lt;/<span class="title">param-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">param-value</span>&gt;</span>dog<span class="tag">&lt;/<span class="title">param-value</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">init-param</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">servlet</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">servlet-mapping</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>testConfig<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 虚拟地址名可以改为别的，此时请求地址变为 http://localhost:8080/JavaWeb/testconfig.html --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">url-pattern</span>&gt;</span>/testconfig.html<span class="tag">&lt;/<span class="title">url-pattern</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">servlet-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在JSP页面中可以直接获取初始化参数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="comment">%                                                                       </span></div><div class="line">    <span class="variable">String</span> pet = page<span class="variable">Context</span>.get<span class="variable">ServletConfig</span>().get<span class="variable">InitParameter</span>(<span class="string">"Pet"</span>); </div><div class="line">    out.println(pet);                                                    </div><div class="line"><span class="comment">%&gt;</span></div></pre></td></tr></table></figure>
+
+
+<p>所以访问是表面上是请求一个HTML页面，实际上是一个JSP页面在响应。</p>
+<h4 id="exception">exception</h4>
+<p><code>Throwable</code>类型，前面说过，需要在JSP页面中用JSP指令声明这是一个错误页面后才能获取这个隐含对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;%@ page <span class="variable">language=</span><span class="string">"java"</span> <span class="variable">contentType=</span><span class="string">"text/html; charset=UTF-8"</span> <span class="variable">pageEncoding=</span><span class="string">"UTF-8"</span> <span class="variable">isErrorPage=</span><span class="string">"true"</span>%&gt;</div></pre></td></tr></table></figure>
+
+<p>服务器发现错误时，会有自己的一套错误讯息网页以供响应，例如在发生404 Not Found之类的错误时，IIS、Apache、Tomcat等都会有各自不同的网页来响应客户端。<br>为了要在不同的服务器有一致的错误处理页面外观，我们也可以自行规划错误讯息处理网页，将服务器的那一套替换掉，使用自行的规画，实际在web.xml中加入以下的标签作示范： </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">error-page</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">error-code</span>&gt;</span>404<span class="tag">&lt;/<span class="title">error-code</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">location</span>&gt;</span>/Exception/error.jsp<span class="tag">&lt;/<span class="title">location</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">error-page</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">error-page</span>&gt;</span>                                                            </div><div class="line">    <span class="tag">&lt;<span class="title">exception-type</span>&gt;</span>javax.servlet.ServletException<span class="tag">&lt;/<span class="title">exception-type</span>&gt;</span>     </div><div class="line">    <span class="tag">&lt;<span class="title">location</span>&gt;</span>/WEB-INF/error.jsp<span class="tag">&lt;/<span class="title">location</span>&gt;</span>                             </div><div class="line"><span class="tag">&lt;/<span class="title">error-page</span>&gt;</span>                                                           </div><div class="line">b-app&gt;</div></pre></td></tr></table></figure>
+
+<p>（需要用非IE浏览器测试！）</p>
+<p>另一种方法，就是直接在JSP页面中声明出现异常时跳转的异常处理页面：<br>在某个页面a.jsp中声明：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;%@ page <span class="variable">language=</span><span class="string">"java"</span> <span class="variable">contentType=</span><span class="string">"text/html; charset=UTF-8"</span> <span class="variable">pageEncoding=</span><span class="string">"UTF-8"</span> <span class="variable">errorPage=</span><span class="string">"/WEB-INF/error.jsp"</span>%&gt;</div></pre></td></tr></table></figure>
+
+<p>然后在异常处理页面中声明：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;%@ page <span class="variable">language=</span><span class="string">"java"</span> <span class="variable">contentType=</span><span class="string">"text/html; charset=UTF-8"</span> <span class="variable">pageEncoding=</span><span class="string">"UTF-8"</span> <span class="variable">isErrorPage=</span><span class="string">"true"</span>%&gt;</div></pre></td></tr></table></figure>
+
+<p>这时候当 a.jsp 产生了异常就会转发到错误处理页面 /WEB-INF/error.jsp 。</p>
+<p>（可以查看解析后的源码分析异常的基本处理过程。）</p>
+<h3 id="JSP_指令">JSP 指令</h3>
+<p>JSP指令的作用是根据指令中的属性和值解析JSP页面生成的Servlet源程序。</p>
+<p>基本语法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%@</span> 指令 属性名=<span class="string">"值"</span> <span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+
+<h4 id="&lt;%@_page_%&gt;">&lt;%@ page %&gt;</h4>
+<p>语法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%@</span> page</div><div class="line">    contentType=<span class="string">"text/html; charset=utf-8"</span>   <span class="comment">// 指定servlet向浏览输出数据的编码与浏览器显示数据所用的编码（解码）</span></div><div class="line">    pageEncoding=<span class="string">"utf-8"</span>                       <span class="comment">// 在jsp转化为java文件时的解码所用码表（要求必须与jsp 的保存编码一致）</span></div><div class="line">    errorPage=<span class="string">"/exception/b.jsp"</span>             <span class="comment">// 出了异常转向的错误提示页面</span></div><div class="line">    isELIgnored=<span class="string">"false"</span>                      <span class="comment">// 是否忽略el表达式</span></div><div class="line">    import=<span class="string">"java.util.List,java.util.Map"</span>    <span class="comment">// 导包，多个包之间用逗号隔开</span></div><div class="line">    session=<span class="string">"true"</span>                            <span class="comment">//   是否自动创建session对象，默认为true</span></div><div class="line"><span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+<p>对 pageEncoding 和 contentType补充说明：</p>
+<ul>
+<li><p>pageEncoding：声明把 JSP 文件翻译为 Java 源码后的编码格式。 而如果 pageEncoding 的值和 JSP 保存的编码格式（Eclipse中可以通过右键properties 查看）不一致，那么翻译后的 Java 文件就会出现乱码。</p>
+</li>
+<li><p>contentType：声明翻译后的源码发送到浏览器时的数据类型和编码格式。 所以 pageEncoding 和 contentType 即使不同也没有问题，关键是 pageEncoding 要和 JSP 文件的保存编码类型一定一致。</p>
+</li>
+</ul>
+<h4 id="&lt;%@_include_%&gt;">&lt;%@ include %&gt;</h4>
+<p>静态导入JSP页面或者HTML页面。</p>
+<p>例如a.jsp中加入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="variable">%@</span> include <span class="keyword">file</span>=<span class="string">"b.jsp"</span> <span class="variable">%&gt;</span></div></pre></td></tr></table></figure>
+
+<p>在 a.jsp 转成 Java 文件前，把 inlude 指定的 b.jsp 页面内容<strong>直接复制</strong>到 include 指令的位置上，因此最后 只产生<strong>一个</strong>Java 类文件！</p>
+<p><strong>使用<code>&lt;%@include %&gt;</code>可以把多个子页面组合成一个完整的页面。</strong></p>
+<h4 id="&lt;%@taglib_%&gt;">&lt;%@taglib %&gt;</h4>
+<p>用于导入jstl或自定义标签库。</p>
+<h3 id="JSP_标签">JSP 标签</h3>
+<p>JSP 文件也有类似 HTML 文件的标签，这些标签基本格式是：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">jsp:标签名</span> &gt;</span> <span class="tag">&lt;/<span class="title">jsp:标签名</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+<h4 id="jsp:include">jsp:include</h4>
+<p>类似JSP指令中的<code>&lt;%@include %&gt;</code>，也是可以导入其它页面，<strong>同时也能传递参数</strong>。</p>
+<p>例如a.jsp中加入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;jsp:<span class="built_in">include</span> page=<span class="string">"c.jsp"</span>&gt;                   </div><div class="line">    &lt;jsp:<span class="built_in">param</span> name=<span class="string">"name"</span> <span class="built_in">value</span>=<span class="string">"ben"</span> /&gt;    </div><div class="line">&lt;/jsp:<span class="built_in">include</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>这时候a.jsp解析后的对应的源码为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">org.apache.jasper.<span class="keyword">runtime</span>.JspRuntimeLibrary.<span class="keyword">include</span>(request, response, <span class="string">"c.jsp"</span> + <span class="string">"?"</span> +</div><div class="line">          org.apache.jasper.<span class="keyword">runtime</span>.JspRuntimeLibrary.URLEncode(<span class="string">"name"</span>, request.getCharacterEncoding())+ <span class="string">"="</span> +</div><div class="line">          org.apache.jasper.<span class="keyword">runtime</span>.JspRuntimeLibrary.URLEncode(<span class="string">"ben"</span>, request.getCharacterEncoding()), out, <span class="keyword">false</span>);</div></pre></td></tr></table></figure>
+
+<p>从源码可以知道，指向的时候需要去请求c.jsp页面并把request和response还有参数携带过去。 <strong>也就是相当于当前页面发送请求到目标页面并把目标页面的输出结果显示在使用<code>jsp:include</code>的位置。</strong></p>
+<p>可以在 c.jsp 中获取传递的参数<code>&lt;%=request.getParameter(&quot;name&quot;)  %&gt;</code>。</p>
+<p><strong>从上面说明知道，使用 <code>jsp:include</code>的时候，目标页面是存在的，所以它也会被解析。所以和 <code>&lt;%@include %&gt;</code>不同的是，<code>jsp:include</code>是动态导入，即在当前页面执行的时候才去请求目标页面，当前JSP和目标JSP都会被解析为Java 文件。</strong></p>
+<h4 id="jsp:forword">jsp:forword</h4>
+<p>将当前请求转发到指定的 JSP 页面或者是Servlet 映射路径中，相当于：<code>r equest.getRequestDispatcher(path).forward(request, response);</code>。<br><strong>同jsp:include，可以携带参数（转发和请求都可以携带参数）。</strong></p>
+<p>示例a.jsp中加入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">jsp:forward</span> <span class="attribute">page</span>=<span class="value">"d.jsp"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">jsp:param</span>  <span class="attribute">name</span>=<span class="value">"year"</span>  <span class="attribute">value</span>=<span class="value">"2012"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">jsp:forward</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>对应的java代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="keyword">true</span>) {</div><div class="line">    _jspx_page_context.forward(<span class="string">"d.jsp"</span> + <span class="string">"?"</span> +</div><div class="line">        org.apache.jasper.<span class="keyword">runtime</span>.JspRuntimeLibrary.URLEncode(<span class="string">"2014"</span>, request.getCharacterEncoding())+ <span class="string">"="</span> +</div><div class="line">        org.apache.jasper.<span class="keyword">runtime</span>.JspRuntimeLibrary.URLEncode(<span class="string">"year"</span>, request.getCharacterEncoding()));</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>相当于：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="vbscript">&lt;%</span></div><div class="line">    <span class="built_in">request</span>.getRequestDispatcher(<span class="string">"d.jsp"</span>).forward(<span class="built_in">request</span>,<span class="built_in">response</span>);               </div><div class="line">%&gt;</div></pre></td></tr></table></figure>
+
+<p>可以在 d.jsp 中获取传递的参数<code>&lt;%=request.getParameter(&quot; year &quot;)  %&gt;</code>。</p>
+<h4 id="jsp:param">jsp:param</h4>
+<p>生成一个请求参数，<strong>会自动编码</strong>，一般与<code>jsp:forward</code>或者<code>jsp:include</code>标签配合使用。</p>
+<h3 id="乱码问题">乱码问题</h3>
+<h4 id="浏览器发送数据到服务器">浏览器发送数据到服务器</h4>
+<p>浏览器向服务器提交一些中文参数数据，服务器端接收可能乱码。</p>
+<p>浏览器使用POST方法提交的数据，服务端接收时这样设置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 设置请求参数的编码类型</span></div><div class="line">request.setCharacterEncoding(<span class="string">"UTF-8"</span>);</div></pre></td></tr></table></figure>
+
+<p>必须在获取请求参数之前设置，一般就写在<code>service</code>方法第一行！</p>
+<p>浏览器使用GET方法提交的数据，服务端接收时这样设置：</p>
+<ul>
+<li>方法一：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">String</span> name = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="built_in">request</span>.getParameter(<span class="string">"name"</span>).getByts(<span class="string">"UTF-8"</span>), <span class="string">"UTF-8"</span>);</div></pre></td></tr></table></figure>
+
+<ul>
+<li>方法二：<br>修改T omcat的 conf/server.xml 文件中 Connector标签节点：<br>只添加<code>URIEncoding=&quot;utf-8&quot;</code>属性；<br>或者 添加<code>useBodyEncodingForURI=&quot;true&quot;</code>并且在Servlet的<code>service</code>方法中添加：<code>request.setCharacterEncoding(&quot;utf-8&quot;);</code>。</li>
+</ul>
+<h4 id="服务器发送数据到浏览器">服务器发送数据到浏览器</h4>
+<p>服务器端向浏览器端响应请求，浏览接收到的可能是乱码。</p>
+<p>Servlet中设置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 设置返回数据编码格式，必须在response.getWriter()之前设置</span></div><div class="line">response.setCharacterEncoding(<span class="string">"utf-8"</span>);</div><div class="line"><span class="comment">// 告诉浏览器解码时用的编码类型</span></div><div class="line">response.setContentType(<span class="string">"text/html; charset=UTF-8"</span>);</div></pre></td></tr></table></figure>
+
+<p>JSP中设置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;%@ page <span class="variable">language=</span><span class="string">"java"</span> <span class="variable">contentType=</span><span class="string">"text/html; charset=UTF-8"</span> <span class="variable">pageEncoding=</span><span class="string">"UTF-8"</span>%&gt;</div></pre></td></tr></table></figure>
+
+<p>注意这2个方法的区别：</p>
+<ul>
+<li><code>setCharacterEncoding</code>是这是返回数据的编码格式，对应JSP<code>&lt;%@ page/&gt;</code>指令的 pageEncoding属性；</li>
+<li><code>setContentType</code>是告诉浏览器解码时的编码类型，对应JSP <code>&lt;%@ page/&gt;</code>指令的 contentType属性。</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/JSP-Servlet/">JSP&Servlet</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/JavaWeb/JSP&Servlet/JSP详解/" data-title="JSP详解 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/Servlet详解/" title="Servlet详解">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Servlet详解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/04/27/Java/JavaWeb/JSP&Servlet/EL和JSTL/"  title="EL和JSTL">
+ <strong>NEXT:</strong><br/> 
+ <span>EL和JSTL
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是JSP"><span class="toc-number">1.</span> <span class="toc-text">什么是JSP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_脚本"><span class="toc-number">2.</span> <span class="toc-text">JSP 脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_表达式"><span class="toc-number">3.</span> <span class="toc-text">JSP 表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_声明"><span class="toc-number">4.</span> <span class="toc-text">JSP 声明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP的隐含对象"><span class="toc-number">5.</span> <span class="toc-text">JSP的隐含对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pageContext"><span class="toc-number">5.1.</span> <span class="toc-text">pageContext</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#request"><span class="toc-number">5.2.</span> <span class="toc-text">request</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#session"><span class="toc-number">5.3.</span> <span class="toc-text">session</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#application"><span class="toc-number">5.4.</span> <span class="toc-text">application</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#out"><span class="toc-number">5.5.</span> <span class="toc-text">out</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#page"><span class="toc-number">5.6.</span> <span class="toc-text">page</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#response"><span class="toc-number">5.7.</span> <span class="toc-text">response</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#config"><span class="toc-number">5.8.</span> <span class="toc-text">config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#exception"><span class="toc-number">5.9.</span> <span class="toc-text">exception</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_指令"><span class="toc-number">6.</span> <span class="toc-text">JSP 指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@_page_%>"><span class="toc-number">6.1.</span> <span class="toc-text"><%@ page %></span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@_include_%>"><span class="toc-number">6.2.</span> <span class="toc-text"><%@ include %></span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#<%@taglib_%>"><span class="toc-number">6.3.</span> <span class="toc-text"><%@taglib %></span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JSP_标签"><span class="toc-number">7.</span> <span class="toc-text">JSP 标签</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:include"><span class="toc-number">7.1.</span> <span class="toc-text">jsp:include</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:forword"><span class="toc-number">7.2.</span> <span class="toc-text">jsp:forword</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#jsp:param"><span class="toc-number">7.3.</span> <span class="toc-text">jsp:param</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#乱码问题"><span class="toc-number">8.</span> <span class="toc-text">乱码问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#浏览器发送数据到服务器"><span class="toc-number">8.1.</span> <span class="toc-text">浏览器发送数据到服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#服务器发送数据到浏览器"><span class="toc-number">8.2.</span> <span class="toc-text">服务器发送数据到浏览器</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

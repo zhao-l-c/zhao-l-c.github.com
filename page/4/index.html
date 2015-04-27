@@ -1,0 +1,381 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="整理日常的学习内容">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main">
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/设计模式/工厂模式/" title="工厂模式" itemprop="url">
+  
+    <h1 itemprop="name">工厂模式</h1>
+    
+     
+           <p itemprop="description" >概述
+工厂模式主要是为创建对象提供过渡接口，以便将创建对象的具体过程屏蔽隔离起来，
+分类
+在《Java与模式》一书中，工厂模式分为下面三种：简单工厂模式（Simple Factory）工厂方法模式（Factory Method）抽象工厂模式（Abstract Factory）
+而</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/设计模式/命令模式/" title="命令模式" itemprop="url">
+  
+    <h1 itemprop="name">命令模式</h1>
+    
+     
+           <p itemprop="description" >概述
+命令（Command）模式：又称Action模式或者Transaction模式。命令模式把发出命令的负责人和执行命令的负责人分开，也就是实现功能的分工。命令模式包含下面几个角色：Client：创建命令并决定接收者。Command：命令接口，定义抽象方法。ConcreteCo</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/设计模式/单例模式/" title="单例模式" itemprop="url">
+  
+    <h1 itemprop="name">单例模式</h1>
+    
+     
+           <p itemprop="description" >单例设计模式
+解决问题
+一个类在内存中只存在一个对象。
+保证对象唯一的方法
+禁止其他类建立该类的对象—-&amp;gt; 构造函数私有化其它类又能访问这个类的对象—-&amp;gt;在该类中创建一个静态、私有对象提供最后只有提供一个公有方法获利用类获取该对象—-&amp;gt;提供一个静态、公有的方法，</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/设计模式/代理模式/" title="代理模式" itemprop="url">
+  
+    <h1 itemprop="name">代理模式</h1>
+    
+     
+           <p itemprop="description" >静态代理
+首先看一下静态代理的实现方式。
+介绍有如下的接口和实现类：
+123456789101112// 接口类interface UserDao {    int add();} // 接口实现类class UserDaoImpl implements UserDao {   </p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/Struts2/Struts2完全教程（5）- 文件上传下载，表单重复提交和自定义拦截器/" title="Struts2完全教程（5）- 文件上传下载，表单重复提交和自定义拦截器" itemprop="url">
+  
+    <h1 itemprop="name">Struts2完全教程（5）- 文件上传下载，表单重复提交和自定义拦截器</h1>
+    
+     
+           <p itemprop="description" >文件上传
+文件上传的功能是由FileUploadInterceptor拦截器扩展的，查看这个拦截器的javadoc了解具体的用法。
+简单示例
+首先，提交 表单需要注意的3点：
+
+须把 HTML 表单的 enctype 属性设置为 multipart/form-data；
+须把 H</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/Struts2/Struts2完全教程（4）- 类型转换和国际化/" title="Struts2完全教程（4）- 类型转换和国际化" itemprop="url">
+  
+    <h1 itemprop="name">Struts2完全教程（4）- 类型转换和国际化</h1>
+    
+     
+           <p itemprop="description" >类型转换
+从一个HTML表单到一个Action对象， 类型转换是从字符串到非字符串。HTTP没有 “类型” 的概念. 每一项表单输入只可能是一个字符串或一个字符串数组。在服务器端，必须把 String 转换为特定的数据类型。 在Struts2中，把请求参数映射到ValueStac</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Android/Android完全教程（三）：持久化-保存数据到SQLite/" title="Android完全教程（三）：持久化-保存数据到SQLite" itemprop="url">
+  
+    <h1 itemprop="name">Android完全教程（三）：持久化-保存数据到SQLite</h1>
+    
+     
+           <p itemprop="description" >SQLite操作
+SQLite简介
+在Android平台上，集成了一个嵌入式关系型数据库—SQLite，SQLite3支持 NULL、INTEGER、REAL（浮点数字）、TEXT（字符串文本）和BLOB（二进制对象）数据类型，也接受varchar(n)、char(n)、deci</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/Struts2/Struts2完全教程（2）- OGNL表达式和s标签/" title="Struts2完全教程（2）- OGNL表达式和s标签" itemprop="url">
+  
+    <h1 itemprop="name">Struts2完全教程（2）- OGNL表达式和s标签</h1>
+    
+     
+           <p itemprop="description" >OGNL
+
+参考资料Struts2学习笔记（13）Struts2中OGNL详解Apache Struts 2 Documentation
+
+Struts2的OGNL
+OGNL是Object Graphic Navigation Language（对象图导航语言）的缩写，它是一个开</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/Struts2/Struts2完全教程（1）- 入门项目详细说明/" title="Struts2完全教程（1）- 入门项目详细说明" itemprop="url">
+  
+    <h1 itemprop="name">Struts2完全教程（1）- 入门项目详细说明</h1>
+    
+     
+           <p itemprop="description" >使用Filter作为控制分发器
+这是定义一个Filter作为拦截器的简单工程，目的是手动的处理URL请求。
+例如在某个页面用有这样一个URL请求：
+1&amp;lt;a href=&quot;product_input.action&quot;&amp;gt;Product Input&amp;lt;/a&amp;gt;
+
+这时候</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/04/27/Java/SpringMVC/Spring MVC完全教程（四）：原理分析/" title="Spring MVC完全教程（四）：原理分析" itemprop="url">
+  
+    <h1 itemprop="name">Spring MVC完全教程（四）：原理分析</h1>
+    
+     
+           <p itemprop="description" >Spring MVC的执行流程分析
+启动分析
+DispatcherServlet执行父类FrameworkServlet的initServletBean方法，它会执行下列的核心代码：
+123456789101112// FrameworkServlet  initServletB</p>
+        
+    
+    <time datetime="2015-04-27T11:05:15.000Z" itemprop="datePublished">4月 27 2015</time>
+  </a>
+</section>
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/">Next &raquo;</a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Android/" title="Android">Android<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Concurrent/" title="Concurrent">Concurrent<sup>7</sup></a></li>
+		
+			<li><a href="/tags/ConcurrentAPI/" title="ConcurrentAPI">ConcurrentAPI<sup>1</sup></a></li>
+		
+			<li><a href="/tags/Cookie-Session/" title="Cookie&amp;Session">Cookie&amp;Session<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Hibernate/" title="Hibernate">Hibernate<sup>5</sup></a></li>
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/JSP-Servlet/" title="JSP&amp;Servlet">JSP&amp;Servlet<sup>5</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Maven/" title="Maven">Maven<sup>4</sup></a></li>
+		
+			<li><a href="/tags/MyBatis/" title="MyBatis">MyBatis<sup>2</sup></a></li>
+		
+			<li><a href="/tags/NIO/" title="NIO">NIO<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Network/" title="Network">Network<sup>2</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/Spring/" title="Spring">Spring<sup>5</sup></a></li>
+		
+			<li><a href="/tags/SpringMVC/" title="SpringMVC">SpringMVC<sup>4</sup></a></li>
+		
+			<li><a href="/tags/Struts2/" title="Struts2">Struts2<sup>5</sup></a></li>
+		
+			<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>12</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+
+
+  </body>
+ </html>
