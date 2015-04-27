@@ -1,0 +1,570 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Hibernate4完全教程（二）：常用API和方法介绍 | LC的笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="zlc">
+    
+    <meta name="description" content="常用API介绍
+
+ConfigurationConfiguration类负责管理 Hibernate 的配置信息。一般包括： 数据库的URL、用户名、密码、JDBC驱动类，数据库Dialect,数据库连接池等（对应 hibernate.cfg.xml 文件）和 持久化类与数据表的映射关系（对应*.h">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="LC的笔记" title="LC的笔记"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="LC的笔记">LC的笔记</a></h1>
+				<h2 class="blog-motto">好记性不如烂笔头</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/27/Java/Hibernate/Hibernate4完全教程（二）：常用API和方法介绍/" title="Hibernate4完全教程（二）：常用API和方法介绍" itemprop="url">Hibernate4完全教程（二）：常用API和方法介绍</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://yoursite.com" title="zlc">zlc</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-04-27T10:45:38.000Z" itemprop="datePublished">4月 27 2015</time>
+    Updated:<time datetime="2015-04-27T10:45:38.000Z" itemprop="dateModified">4月 27 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用API介绍"><span class="toc-number">1.</span> <span class="toc-text">常用API介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session详解"><span class="toc-number">2.</span> <span class="toc-text">Session详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#flush方法"><span class="toc-number">2.1.</span> <span class="toc-text">flush方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#commit和flush方法的区别"><span class="toc-number">2.2.</span> <span class="toc-text">commit和flush方法的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#refresh方法"><span class="toc-number">2.3.</span> <span class="toc-text">refresh方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Hibernate中设置隔离级别"><span class="toc-number">2.4.</span> <span class="toc-text">在Hibernate中设置隔离级别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#clear方法"><span class="toc-number">2.5.</span> <span class="toc-text">clear方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对象的状态"><span class="toc-number">3.</span> <span class="toc-text">对象的状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session常用方法"><span class="toc-number">4.</span> <span class="toc-text">Session常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Save和persist方法"><span class="toc-number">4.1.</span> <span class="toc-text">Save和persist方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#get和load方法"><span class="toc-number">4.2.</span> <span class="toc-text">get和load方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update和saveOrUpdate方法"><span class="toc-number">4.3.</span> <span class="toc-text">update和saveOrUpdate方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#delete和evict方法"><span class="toc-number">4.4.</span> <span class="toc-text">delete和evict方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#doWork"><span class="toc-number">4.5.</span> <span class="toc-text">doWork</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hibernate与触发器协同工作"><span class="toc-number">4.6.</span> <span class="toc-text">Hibernate与触发器协同工作</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="常用API介绍">常用API介绍</h2>
+<ul>
+<li>Configuration<br><code>Configuration</code>类负责管理 Hibernate 的配置信息。一般包括： 数据库的URL、用户名、密码、JDBC驱动类，数据库Dialect,数据库连接池等（对应 hibernate.cfg.xml 文件）和 持久化类与数据表的映射关系（对应*.hbm.xml 文件）。<br>创建<code>Configuration</code>的方式 ：<ul>
+<li>使用hibernate.properties文件：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Configuration</span> cfg = <span class="keyword">new</span> <span class="keyword">Configuration</span>();</div></pre></td></tr></table></figure>
+
+<pre><code><span class="addition">+ 使用 hibernate.cfg.xml文件：</span>
+</code></pre><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Configuration</span> cfg = <span class="keyword">new</span> <span class="keyword">Configuration</span>().configure();</div></pre></td></tr></table></figure>
+
+<pre><code><span class="addition">+ 还支持带参数的访问：</span>
+</code></pre><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">File</span> <span class="keyword">file</span> = <span class="keyword">new</span> <span class="keyword">File</span>(“simpleit.xml”);</div><div class="line"><span class="keyword">Configuration</span> cfg = <span class="keyword">new</span> <span class="keyword">Configuration</span>().configure(<span class="keyword">file</span>);</div></pre></td></tr></table></figure>
+
+<ul>
+<li>SessionFactory<br><code>SessionFactory</code> 针对单个数据库映射关系经过编译后的内存镜像，<strong>是线程安全的</strong>。 <code>SessionFactory</code> 对象一旦构造完毕，即被赋予特定的配置信息。<br><code>SessionFactory</code> 是生成Session的工厂， 构造 <code>SessionFactory</code> 很消耗资源，一般情况下<strong>一个应用中只初始化一个 <code>SessionFactory</code> 对象。</strong><br>Hibernate4 新增了一个<code>ServiceRegistry</code>接口，所有基于 Hibernate 的配置或者服务都必须统一向这个<code>ServiceRegistry</code>注册后才能生效。<br>Hibernate4 中创建 <code>SessionFactory</code> 的步骤：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Configuration</span> config = <span class="keyword">new</span> <span class="keyword">Configuration</span>().configure();                                          </div><div class="line">ServiceRegistry serviceRegistry =                                                                </div><div class="line">        <span class="keyword">new</span> ServiceRegistryBuilder().applySettings(config.getProperties()).buildServiceRegistry();</div><div class="line">SessionFactory factory = config.buildSessionFactory(serviceRegistry);</div></pre></td></tr></table></figure>
+
+<ul>
+<li>Session<br><code>Session</code>是应用程序与数据库之间交互操作的一个单线程对象，是 Hibernate 运作的中心，所有持久化对象必须在 <code>Session</code> 的管理下才可以进行持久化操作。此对象的生命周期很短。 <code>Session</code> 对象有一个一级缓存，显式执行<code>flush</code>之前，所有的持久层操作的数据都缓存在 <code>Session</code> 对象处。<strong>相当于 JDBC 中的<code>Connection</code></strong>。 <strong>持久化类与 <code>Session</code> 关联起来后就具有了持久化的能力</strong>。<br><code>Session</code>的方法：<ul>
+<li>取得持久化对象的方法： <code>get()</code>、<code>load()</code>；</li>
+<li>持久化对象都得保存，更新和删除：<code>save()</code>、<code>update()</code>、<code>saveOrUpdate()</code>、<code>delete()</code>；</li>
+<li>开启事务：<code>beginTransaction()</code>；</li>
+<li>管理 <code>Session</code> 的方法：<code>isOpen()</code>、<code>flush()</code>、<code>clear()</code>、<code>evict()</code>、<code>close()</code>等。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Transaction<br><code>Transaction</code>代表一次原子操作，它具有数据库事务的概念。所有持久层都应该在事务管理下进行，即使是只读操作。<br>常用方法:<ul>
+<li>commit()：提交相关联的session实例；</li>
+<li>rollback()：撤销事务操作；</li>
+<li>wasCommitted()：检查事务是否提交。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Session详解">Session详解</h2>
+<p>在<code>Session</code>接口的实现中包含一系列的集合, 这些集合构成了<code>Session</code>的缓存。只要<code>Session</code>实例没有结束生命周期，且没有清理缓存，则存放在它缓存中的对象也不会结束生命周期。 <code>Session</code>缓存就是Hibernate的一级缓存。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSessionCache</span>() {                     </div><div class="line">    News news = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);   </div><div class="line">    News news2 = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);  </div><div class="line">    <span class="comment">// true                                          </span></div><div class="line">    System.<span class="keyword">out</span>.println(news == news2);               </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>下面介绍<code>Session</code>中的重要方法。</p>
+<h3 id="flush方法">flush方法</h3>
+<p><code>flush()</code>方法的作用是把存储在内存Session的对象同步到数据库中，即所谓的<strong>脏检查</strong>。它在下列情况下被调用：</p>
+<ul>
+<li>显示调用<code>flush()</code>方法</li>
+<li>执行<code>Transaction.commit()</code>方法前，一定会先调用<code>flush()</code>方法，确保更新保存到数据库；</li>
+</ul>
+<ul>
+<li>执行HQL或QBC 查询时，如果缓存中持久化对象的属性已经发生了变化，也会先进行<code>flush()</code>操作，以得到数据表的最新的记录。例如：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testFlush2</span>() {                                                </div><div class="line">    News news = (News)session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);                         </div><div class="line">    <span class="comment">// 修改持久化对象的属性                                                         </span></div><div class="line">    news.setAuthor(<span class="string">"oracle"</span>);                                             </div><div class="line">    System.<span class="keyword">out</span>.println(news);                                             </div><div class="line">    <span class="comment">// 这时候会执行flush方法                                                      </span></div><div class="line">    News news2 = (News) session.createCriteria(News.class).uniqueResult();</div><div class="line">    System.<span class="keyword">out</span>.println(news2);                                            </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="commit和flush方法的区别">commit和flush方法的区别</h3>
+<p><code>flush()</code>执行一系列SQL语句，但不提交事务；<code>commit</code>方法先调用<code>flush</code>方法，然后提交事务，提交事务意味着对数据库操作永久保存下来。</p>
+<h3 id="refresh方法">refresh方法</h3>
+<p><code>refresh()</code>方法会强制发送 SELECT 语句，以使<code>Session</code>缓存中对象的状态和数据表中对应的记录保持一致！</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testRefresh</span>() {                                                                                          </div><div class="line">    News news = (News)session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);                                                                    </div><div class="line">    System.<span class="keyword">out</span>.println(news);                                                                                        </div><div class="line">    <span class="comment">/*                                                                                                               </span></div><div class="line">     * 测试方法：                                                                                                         </div><div class="line">     * 在这里加上一个断点让代码执行到这里停住，然后修改数据库某个字段。测试结果发现已经发送了SELECT语句，但结果还是没有变化。                                                </div><div class="line">     * 这是因为MySQL默认的隔离级别为REPEATABLE READ，需要使用Hibernate修改为READ COMMITTED。                                              </div><div class="line">     */                                                                                                              </div><div class="line">    session.refresh(news);                                                                                           </div><div class="line">    System.<span class="keyword">out</span>.println(news);                                                                                        </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="在Hibernate中设置隔离级别">在Hibernate中设置隔离级别</h3>
+<p>JDBC 数据库连接使用数据库系统默认的隔离级别，在 Hibernate 的配置文件中可以显式的设置隔离级别，每一个隔离级别都对应一个整数：</p>
+<table>
+<thead>
+<tr>
+<th>代号</th>
+<th>隔离级别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>READ UNCOMMITED</td>
+</tr>
+<tr>
+<td>2</td>
+<td>READ COMMITED</td>
+</tr>
+<tr>
+<td>4</td>
+<td>REPEATABLE READ</td>
+</tr>
+<tr>
+<td>8</td>
+<td>SERIALIZEABLE</td>
+</tr>
+</tbody>
+</table>
+<p>Hibernate 通过为<strong>hibernate.connection.isolation</strong>属性来设置事务的隔离级别，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="keyword">property</span> <span class="property">name</span>=<span class="string">"connection.isolation"</span>&gt;<span class="number">2</span>&lt;/<span class="keyword">property</span>&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="clear方法">clear方法</h3>
+<p>强制清理<code>Session</code>缓存。</p>
+<h2 id="对象的状态">对象的状态</h2>
+<p>站在持久化的角度，Hibernate 把对象分为4种状态：持久化状态，临时状态，游离状态，删除状态。</p>
+<ul>
+<li><p>临时对象（ TRANSIENT ）：</p>
+<ul>
+<li>在使用代理主键的情况下，OID为null；</li>
+<li>不处于Session的缓存中；</li>
+<li>在数据库中没有对应的记录。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>持久化对象（PERSISTENT）：<ul>
+<li>OID 不为 null；</li>
+<li>位于 Session 缓存中；</li>
+<li>Session 在 flush 缓存时，会根据持久化对象的属性变化，来同步更新数据库；</li>
+<li>在同一个 Session 实例的缓存中，数据库表中的每条记录只对应唯一的持久化对象。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>删除对象（DELETED）：<ul>
+<li>在数据库中没有和其 OID 对应的记录；</li>
+<li>不再处于 Session 缓存中；</li>
+<li>一般情况下，应用程序不该再使用被删除的对象。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>游离对象（DETACHED）：<ul>
+<li>OID 不为 null；</li>
+<li>不再处于 Session 缓存中；</li>
+<li>一般情况需下，游离对象是由持久化对象转变过来的，因此在数据库中可能还存在与它对应的记录。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>可以查看<code>AbstractSaveEventListener</code>中的<code>getEntityState</code>方法了解Hibernate是如何判断一个对象的状态的：</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> EntityState getEntityState(                                                                </div><div class="line">        Object entity,                                                                               </div><div class="line">        <span class="built_in">String</span> entityName,                                                                           </div><div class="line">        EntityEntry entry, <span class="comment">//pass this as an argument only to avoid double looking                   </span></div><div class="line">        SessionImplementor source) {                                                                 </div><div class="line">    final boolean traceEnabled <span class="subst">=</span> <span class="keyword">LOG</span><span class="built_in">.</span>isTraceEnabled();                                               </div><div class="line">    <span class="keyword">if</span> ( entry <span class="subst">!=</span> <span class="built_in">null</span> ) { <span class="comment">// the object is persistent                                               </span></div><div class="line">        <span class="comment">//the entity is associated with the session, so check its status                             </span></div><div class="line">        <span class="keyword">if</span> ( entry<span class="built_in">.</span>getStatus() <span class="subst">!=</span> Status<span class="built_in">.</span>DELETED ) {                                                 </div><div class="line">            <span class="comment">// do nothing for persistent instances                                                   </span></div><div class="line">            <span class="keyword">if</span> ( traceEnabled ) {                                                                    </div><div class="line">                <span class="keyword">LOG</span><span class="built_in">.</span>tracev( <span class="string">"Persistent instance of: {0}"</span>, getLoggableName( entityName, entity ) );  </div><div class="line">            }                                                                                        </div><div class="line">            <span class="keyword">return</span> EntityState<span class="built_in">.</span>PERSISTENT;                                                           </div><div class="line">        }                                                                                            </div><div class="line">        <span class="comment">// ie. e.status==DELETED                                                                     </span></div><div class="line">        <span class="keyword">if</span> ( traceEnabled ) {                                                                        </div><div class="line">            <span class="keyword">LOG</span><span class="built_in">.</span>tracev( <span class="string">"Deleted instance of: {0}"</span>, getLoggableName( entityName, entity ) );         </div><div class="line">        }                                                                                            </div><div class="line">        <span class="keyword">return</span> EntityState<span class="built_in">.</span>DELETED;                                                                  </div><div class="line">    }                                                                                                </div><div class="line">    <span class="comment">// the object is transient or detached                                                           </span></div><div class="line">    <span class="comment">// the entity is not associated with the session, so                                             </span></div><div class="line">    <span class="comment">// try interceptor and unsaved-value                                                             </span></div><div class="line">    <span class="keyword">if</span> ( ForeignKeys<span class="built_in">.</span>isTransient( entityName, entity, getAssumedUnsaved(), source )) {               </div><div class="line">        <span class="keyword">if</span> (  traceEnabled ) {                                                                       </div><div class="line">            <span class="keyword">LOG</span><span class="built_in">.</span>tracev( <span class="string">"Transient instance of: {0}"</span>, getLoggableName( entityName, entity ) );       </div><div class="line">        }                                                                                            </div><div class="line">        <span class="keyword">return</span> EntityState<span class="built_in">.</span>TRANSIENT;                                                                </div><div class="line">    }                                                                                                </div><div class="line">    <span class="keyword">if</span> ( traceEnabled ) {                                                                            </div><div class="line">        <span class="keyword">LOG</span><span class="built_in">.</span>tracev( <span class="string">"Detached instance of: {0}"</span>, getLoggableName( entityName, entity ) );            </div><div class="line">    }                                                                                                </div><div class="line">    <span class="keyword">return</span> EntityState<span class="built_in">.</span>DETACHED;                                                                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong><code>Session</code>的特定方法能使对象从一个状态转换到另一个状态。</strong>下面是执行不同方法对象状态变化的示意图：</p>
+<hr>
+<h2 id="Session常用方法">Session常用方法</h2>
+<p>查看<code>Session</code>了解相关的方法的说明。</p>
+<h3 id="Save和persist方法">Save和persist方法</h3>
+<p><code>save</code>方法的特点是：</p>
+<ul>
+<li>使一个临时对象变为持久化对象，即保存到数据库中；</li>
+<li>根据主键生成策略 为对象分配 ID，所以手动分配的ID无效；</li>
+<li>在<code>flush</code>缓存时会发送一条 INSERT 语句；</li>
+<li>持久化对象的 ID 是不能被修改的，否则抛出异常。<br>示例：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSave</span>() {                                  </div><div class="line">    News news = <span class="keyword">new</span> News(<span class="string">"test_save"</span>, <span class="string">"java"</span>, <span class="keyword">new</span> Date());</div><div class="line">    <span class="comment">// id使用generator产生，则保存前设置id是无效的                       </span></div><div class="line">    news.setId(<span class="number">1002</span>);                                     </div><div class="line">    <span class="comment">// id为null                                            </span></div><div class="line">    System.<span class="keyword">out</span>.println(news);                             </div><div class="line">    Serializable id = session.save(news);                 </div><div class="line">    System.<span class="keyword">out</span>.println(id);                               </div><div class="line">    <span class="comment">// id非null                                            </span></div><div class="line">    System.<span class="keyword">out</span>.println(news);                             </div><div class="line">     <span class="comment">// 不可以修改id值，否则抛出异常</span></div><div class="line">    news.setId(<span class="number">2001</span>);              </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<blockquote>
+<p>修改对象的ID会抛出异常是在执行<code>commit</code>方法前调用<code>flush</code>的时候抛出的。也就是修改了对象的属性时，Hibernate会去同步到数据库中，但明显对于ID的属性是不可修改的，所以抛出异常。具体是在<code>DefaultFlushEntityEventListener</code>的<code>checkId</code>方法中抛出。</p>
+</blockquote>
+<p><code>persist</code>方法和<code>save</code>类似，<strong>但如果执行保存前，对象已经设置了ID，则<code>persist</code>方法会抛出异常，而<code>save</code>方法则不会！</strong><br>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPersist</span>() {                                                         </div><div class="line">    News news = <span class="keyword">new</span> News(<span class="string">"test_persist"</span>, <span class="string">"java"</span>, <span class="keyword">new</span> Date());                       </div><div class="line">    <span class="comment">// 当对象设置了id并且使用persist方法保存时，对象的状态会被认为是游离状态，保存会失败                                </span></div><div class="line">    <span class="comment">// news.setId(1001);                                                            </span></div><div class="line">    session.persist(news);                                                          </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+<blockquote>
+<p>调试<code>persist</code>方法的代码发现，当对象设置了ID属性时，对象的状态为游离状态，而<code>persist</code>方法保存游离状态的对象就会抛出异常。</p>
+</blockquote>
+<h3 id="get和load方法">get和load方法</h3>
+<p>都可以根据跟定的OID从数据库中加载一个持久化对象。区别：</p>
+<ul>
+<li>执行<code>get</code>方法会立即查询对象并返回结果；执行<code>load</code>只是<strong>假设对象存在</strong>，返回代理类（即使对象不存在但还没使用到对象，此时不会报错）；</li>
+</ul>
+<ul>
+<li>但数据库中没有OID对应的对象是时，<code>get</code>方法返回null；而<code>load</code>方法还是返回代理类对象，但只要获取这个对象的数据就会报错！</li>
+</ul>
+<ul>
+<li><code>get</code>方法是立即加载，而<code>load</code>是延迟加载策略。</li>
+</ul>
+<p><code>load</code>方法示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLoad</span>() {                                                      </div><div class="line">    News news = (News)session.load(News.class, <span class="number">12</span>);                           </div><div class="line">    <span class="comment">// 无论对象是否存在都会返回代理类                                                        </span></div><div class="line">    System.<span class="keyword">out</span>.println(news.getClass()); <span class="comment">// class section01.News_$$_javassist_0</span></div><div class="line">    <span class="comment">// 如果不使用对象，则不会发送查询语句                                                      </span></div><div class="line">    System.<span class="keyword">out</span>.println(news);                                                 </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><strong>注意，<code>get</code>方法获取的对象是持久化对象，修改了属性后会自动更新！</strong>原因是在<code>Transaction</code>执行<code>commit</code>方法前会去调用<code>flush</code>方法，所以如果<code>get</code>方法获取到对象被修后就会自动更新到数据库：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGet</span>() {                               </div><div class="line">    News news = (News)session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);     </div><div class="line">    <span class="comment">// 修改对象的属性后自动更新到数据库                               </span></div><div class="line">    news.setAuthor(<span class="string">"hehe"</span>);                           </div><div class="line">    System.<span class="keyword">out</span>.println(news);                         </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="update和saveOrUpdate方法">update和saveOrUpdate方法</h3>
+<p><code>update</code>方法说明：</p>
+<ul>
+<li>前面说过，如果<strong>更新一个持久化对象</strong>，不需要显式调用<code>update</code>方法，因为<code>Transaction</code>调用<code>commit</code>前会调用<code>flush</code>同步数据库； 如果<strong>更新一个游离对象</strong>，则需要显式调用<code>update</code>方法！</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 游离对象一定会发送UPDATE语句                             </span></div><div class="line">@Test                                            </div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span>() {                       </div><div class="line">    News news = (News)session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);</div><div class="line">    <span class="comment">// 把Session关闭，这时候news就是一个游离对象                </span></div><div class="line">    tranx.commit();                              </div><div class="line">    session.close();                             </div><div class="line">    <span class="comment">// 重新获取Session对象                             </span></div><div class="line">    session = factory.openSession();             </div><div class="line">    tranx = session.beginTransaction();          </div><div class="line">    <span class="comment">// news此时是游离对象，会执行UPDATE语句                   </span></div><div class="line">    session.update(news);                        </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ul>
+<li>执行<code>update</code>方法一定会发送UPDATE语句，无论游离对象是否被改变。此时在.hbm.xml文件的class属性添加<strong>select-before-update=true</strong>属性，这样执行<code>update</code>方法前会先执行SELECT语句，判断Session中的对象是否和数据库中不一致，这样来确定是否发送UPDATE语句（实际应用中其实不必加这个属性）；</li>
+</ul>
+<ul>
+<li>数据库中没有和游离对象OID对应的记录，则执行<code>update</code>方法抛出异常；</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 数据库中没有和游离对象OID对应的记录，则执行`update`方法抛出异常                             </span></div><div class="line">@Test                                                                </div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate2</span>() {                                          </div><div class="line">    News news = (News)session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);                    </div><div class="line">    <span class="comment">// 把Session关闭，这时候news就是一个游离对象                                    </span></div><div class="line">    tranx.commit();                                                  </div><div class="line">    session.close();                                                 </div><div class="line">    <span class="comment">// 重新获取Session对象                                                 </span></div><div class="line">    session = factory.openSession();                                 </div><div class="line">    tranx = session.beginTransaction();                              </div><div class="line">    <span class="comment">// 数据库中没有对应的记录                                                   </span></div><div class="line">    news.setId(<span class="number">1001</span>);                                                </div><div class="line">    session.update(news);                                            </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>Hibernate是根据执行更新后数据库返回的记录数来判断，例如期待返回1，实际返回0则抛异常。</p>
+</blockquote>
+<ul>
+<li>Session中如果有2个OID相同的对象，执行<code>update</code>时抛异常。<br>Session中是否已经有相同OID的对象。</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate3</span>() {                                  </div><div class="line">    News news = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);           </div><div class="line">    <span class="comment">// 把Session关闭，这时候news就是一个游离对象                            </span></div><div class="line">    tranx.commit();                                          </div><div class="line">    session.close();                                         </div><div class="line">    <span class="comment">// 重新获取Session对象                                         </span></div><div class="line">    session = factory.openSession();                         </div><div class="line">    tranx = session.beginTransaction();                      </div><div class="line">    <span class="comment">// Session中先放入一个OID相同的对象，然后执行update方法                    </span></div><div class="line">    News news2 = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);          </div><div class="line">    session.update(news);                                    </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>也就是保存的游离对象的OID不能和Session中已经存在的对象的OID相同，因为save或者update方法会把游离对象变为持久化对象，执行save或者update方法前回去判断。</p>
+</blockquote>
+<p><code>saveOrUpdate</code>方法：</p>
+<ul>
+<li>这个方法同时包含了<code>save</code>与<code>update</code>方法的功能，如果对象是游离对象，则执行UPDATE操作；如果对象是临时对象，则执行INSERT操作；<strong>判断游离对象还是临时对象的方法是OID是否为null</strong>；</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSaveOrUpdate</span>() {                     </div><div class="line">    <span class="comment">// 临时对象，执行INSERT操作                               </span></div><div class="line">    News news = <span class="keyword">new</span> News(<span class="string">"hehe"</span>, <span class="string">"java"</span>, <span class="keyword">new</span> Date());</div><div class="line">    session.saveOrUpdate(news);                      </div><div class="line"> </div><div class="line">    <span class="comment">// 游离对象，执行UPDATE操作                               </span></div><div class="line">    News news2 = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);  </div><div class="line">    news2.setAuthor(<span class="string">"oracle"</span>);                       </div><div class="line">    session.saveOrUpdate(news2);                     </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ul>
+<li>若对象OID非null，且数据库中没有对应记录，执行<code>saveOrUpdate</code>会抛出异常（这是明显的，和<code>update</code>方法一样）；</li>
+</ul>
+<ul>
+<li>为.hbm.xml文件的id属添加<strong>unsaved-value=value</strong>，可以把一个OID非null的对象当做临时对象处理，也就是执行INSERT操作。<br>修改News.hbm.xml文件：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;id <span class="variable">name=</span><span class="string">"id"</span> <span class="variable">type=</span><span class="string">"java.lang.Integer"</span> <span class="variable">unsaved-value=</span><span class="string">"11"</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSaveOrUpdate2</span>() {                           </div><div class="line">    <span class="comment">// 设置.hbm.xml文件的id属性，添加unsaved-value="11"               </span></div><div class="line">    <span class="comment">// 此时的news对象被认为是临时对象，执行INSERT操作                         </span></div><div class="line">    News news = <span class="keyword">new</span> News(<span class="string">"saveorupdate"</span>, <span class="string">"java"</span>, <span class="keyword">new</span> Date());</div><div class="line">    news.setId(<span class="number">11</span>);                                         </div><div class="line">    session.saveOrUpdate(news);                             </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h3 id="delete和evict方法">delete和evict方法</h3>
+<p><code>delete</code>方法：</p>
+<ul>
+<li>根据OID删除数据库中记录，如果数据库每有对应的记录则抛出异常。<strong>同时Session中的对象也会被剔除</strong>；</li>
+</ul>
+<ul>
+<li>删除的对象可以是临时对象、持久化对象或者游离对象，最重要的是OID的值；</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> testDelete() {                       </div><div class="line">    <span class="comment">// 删除临时对象                                    </span></div><div class="line">    News news = <span class="keyword">new</span> News();                      </div><div class="line">    news.setId(<span class="number">5</span>);                               </div><div class="line">    session.<span class="keyword">delete</span>(news);                        </div><div class="line"> </div><div class="line">    <span class="comment">// 删除持久化对象                                   </span></div><div class="line">    News news2 = (News) session.<span class="keyword">get</span>(News.<span class="keyword">class</span>, <span class="number">3</span>);</div><div class="line">    session.<span class="keyword">delete</span>(news2);                       </div><div class="line">}</div></pre></td></tr></table></figure>
+
+
+
+
+<ul>
+<li>删除的对象是持久化对象时，删除后OID也不为null。可以通过设置应用的配置文件，添加 hibernate.use_identifier_rollback配置项为true，这样删除后OID就变为null。<br>.cfg.xml配置文件：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="keyword">property</span> <span class="property">name</span>=<span class="string">"use_identifier_rollback"</span>&gt;<span class="constant">true</span>&lt;/<span class="keyword">property</span>&gt;</div></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete2</span>() {                         </div><div class="line">    News news = (News) session.<span class="keyword">get</span>(News.class, <span class="number">2</span>);  </div><div class="line">    System.<span class="keyword">out</span>.println(news);                       </div><div class="line">    session.delete(news);                           </div><div class="line">    <span class="comment">// id为null                                      </span></div><div class="line">    System.<span class="keyword">out</span>.println(news);                       </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><code>evict</code>方法： 从Session缓存中把指定的持久化对象移除，后面执行<code>commit</code>方法时就不会对该对象同步数据库。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testEvict</span>() {                                          </div><div class="line">    News news = (News) session.<span class="keyword">get</span>(News.class, <span class="number">1</span>);                 </div><div class="line">    News news2 = (News) session.<span class="keyword">get</span>(News.class, <span class="number">2</span>);                </div><div class="line">    <span class="comment">// 分别修改属性                                                      </span></div><div class="line">    news.setAuthor(<span class="string">"tom"</span>);                                         </div><div class="line">    news2.setAuthor(<span class="string">"tom"</span>);                                        </div><div class="line">    <span class="comment">// 从Session缓存中把news对象删除，执行commit时就不会更新这个对象                     </span></div><div class="line">    session.evict(news);                                           </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="doWork">doWork</h3>
+<p><code>doWork(Work)</code>方法用于执行<code>Work</code>接口指定的操作，即调用<code>Work</code>对象的<code>execute()</code>方法，<code>Session</code>会把当前使用的数据库连接传递给<code>execute()</code>方法。</p>
+<p><code>Work</code>接口的<code>execute()</code>方法中接口<code>Connection</code>作为参数，所以<strong>这个方法可以调用JDBC原生的API</strong>。</p>
+<p>示例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDoWork</span>() {                                                </div><div class="line">    session.doWork(<span class="keyword">new</span> Work() {                                           </div><div class="line">        <span class="annotation">@Override</span>                                                         </div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span>(Connection connection) <span class="keyword">throws</span> SQLException {  </div><div class="line">            String sql = <span class="string">"select count(id) from news"</span>;                    </div><div class="line">            PreparedStatement ps = <span class="keyword">null</span>;                                  </div><div class="line">            ResultSet rs = <span class="keyword">null</span>;                                          </div><div class="line">            <span class="keyword">try</span> {                                                         </div><div class="line">                ps = connection.prepareStatement(sql);                    </div><div class="line">                rs = ps.executeQuery();                                   </div><div class="line">                <span class="keyword">if</span>(rs.next()) {                                           </div><div class="line">                    Integer count = rs.getInt(<span class="number">1</span>);                         </div><div class="line">                    System.out.println(count);                            </div><div class="line">                }                                                         </div><div class="line">            } <span class="keyword">finally</span> {                                                   </div><div class="line">                ps.close();                                               </div><div class="line">                rs.close();                                               </div><div class="line">            }                                                             </div><div class="line">        }                                                                 </div><div class="line">    });                                                                   </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="Hibernate与触发器协同工作">Hibernate与触发器协同工作</h3>
+<p>如果数据库中有触发器，Hibernate执行上面的方法时会触发触发器共，造成两类问题：</p>
+<ul>
+<li>触发器使<code>Session</code>的缓存中的持久化对象与数据库中对应的数据不一致，也就是触发器运行在数据库中，它执行后不会更新到Hibernate的<code>Session</code>中。<br>解决方法：<br>在执行完<code>Session</code>的相关操作后，立即调用<code>refresh</code>方法，使得数据库中和<code>Session</code>中的对象同步。</li>
+</ul>
+<ul>
+<li><code>Session</code>的<code>update</code>方法盲目地激发触发器：无论游离对象的属性是否发生变化，都会执行UPDATE语句，而UPDATE语句会激发数据库中相应的触发器。<br>解决方法：<br>前面已经说过，是在.hbm.xml文件的class属性中添加select-before-update=”true”，这样会先执行查询语句，判断是否真的需要更新对象到数据库。</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/hibernate/">hibernate</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://yoursite.com/2015/04/27/Java/Hibernate/Hibernate4完全教程（二）：常用API和方法介绍/" data-title="Hibernate4完全教程（二）：常用API和方法介绍 | LC的笔记" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/02/24/Java/JDBC/JDBC详解-03/"  title="JDBC详解-03">
+ <strong>NEXT:</strong><br/> 
+ <span>JDBC详解-03
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用API介绍"><span class="toc-number">1.</span> <span class="toc-text">常用API介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session详解"><span class="toc-number">2.</span> <span class="toc-text">Session详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#flush方法"><span class="toc-number">2.1.</span> <span class="toc-text">flush方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#commit和flush方法的区别"><span class="toc-number">2.2.</span> <span class="toc-text">commit和flush方法的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#refresh方法"><span class="toc-number">2.3.</span> <span class="toc-text">refresh方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在Hibernate中设置隔离级别"><span class="toc-number">2.4.</span> <span class="toc-text">在Hibernate中设置隔离级别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#clear方法"><span class="toc-number">2.5.</span> <span class="toc-text">clear方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对象的状态"><span class="toc-number">3.</span> <span class="toc-text">对象的状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session常用方法"><span class="toc-number">4.</span> <span class="toc-text">Session常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Save和persist方法"><span class="toc-number">4.1.</span> <span class="toc-text">Save和persist方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#get和load方法"><span class="toc-number">4.2.</span> <span class="toc-text">get和load方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update和saveOrUpdate方法"><span class="toc-number">4.3.</span> <span class="toc-text">update和saveOrUpdate方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#delete和evict方法"><span class="toc-number">4.4.</span> <span class="toc-text">delete和evict方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#doWork"><span class="toc-number">4.5.</span> <span class="toc-text">doWork</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hibernate与触发器协同工作"><span class="toc-number">4.6.</span> <span class="toc-text">Hibernate与触发器协同工作</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/JDBC/" title="JDBC">JDBC<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Java/" title="Java">Java<sup>3</sup></a></li>
+		
+			<li><a href="/tags/Oracle/" title="Oracle">Oracle<sup>6</sup></a></li>
+		
+			<li><a href="/tags/SQL/" title="SQL">SQL<sup>6</sup></a></li>
+		
+			<li><a href="/tags/hibernate/" title="hibernate">hibernate<sup>2</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://yoursite.com" target="_blank" title="zlc">zlc</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
